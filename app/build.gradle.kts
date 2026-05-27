@@ -1,15 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
     namespace = "com.example.apporderfood"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.apporderfood"
@@ -45,7 +40,7 @@ dependencies {
     implementation(libs.coordinatorlayout)
     implementation(libs.iconics.core)
     implementation(libs.iconics.views)
-    implementation("com.mikepenz:fontawesome-typeface:5.9.0.2-kotlin@aar")
+    implementation(libs.fontawesome.typeface)
     implementation(libs.firebase.auth)
     implementation(libs.credentials)
     implementation(libs.credentials.play.services.auth)
