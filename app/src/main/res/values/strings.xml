@@ -25,4 +25,18 @@
     <string name="xac_nhan_mat_khau_moi">Xác nhận mật khẩu mới</string>
     <string name="hint_xac_nhan_mat_khau">Nhập lại mật khẩu mới</string>
     <string name="cap_nhat_mat_khau">Cập nhật mật khẩu</string>
+    <!-- Thống kê doanh thu screen -->
+    <string name="title_thong_ke">Thống kê doanh thu</string>
+    <string name="tab_hom_nay">Hôm nay</string>
+    <string name="tab_tuan_nay">Tuần này</string>
+    <string name="tab_thang_nay">Tháng này</string>
+    <string name="label_tong_doanh_thu">TỔNG DOANH THU</string>
+    <string name="format_tien_te">%1$s đ</string> <!-- Dùng để format 15.250.000 đ -->
+    <string name="format_growth">%1$s so với hôm qua</string>
+    <string name="label_tong_don_hang">Tổng đơn hàng</string>
+    <string name="label_mon_da_huy">Món đã hủy</string>
+    <string name="label_ban_chua_thanh_toan">Bàn chưa thanh toán</string>
+    <string name="format_don_hang">%1$d đơn</string>
+    <string name="format_mon">%1$d món</string>
+    <string name="format_ban">%1$d bàn</string>
 </resources>
