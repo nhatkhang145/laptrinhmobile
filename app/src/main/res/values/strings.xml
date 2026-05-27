@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Zappy</string>
+
+    <!-- Tiện ích screen -->
+    <string name="tien_ich">Tiện ích</string>
+    <string name="quan_ly_tai_khoan">Quản lý tài khoản</string>
+    <string name="user_name">Nguyễn Văn A</string>
+    <string name="bao_mat_tai_khoan">Bảo mật &amp; Tài khoản</string>
+    <string name="doi_mat_khau">Đổi mật khẩu</string>
+    <string name="doi_mat_khau_desc">Cập nhật mật khẩu định kỳ để bảo vệ tài khoản</string>
+    <string name="dang_xuat">Đăng xuất</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_order">Order</string>
+    <string name="nav_so_do">Sơ đồ</string>
+    <string name="nav_tien_ich">Tiện ích</string>
+
+    <!-- Change Password screen -->
+    <string name="doi_mat_khau_title">Đổi mật khẩu</string>
+    <string name="doi_mat_khau_subtitle">Vui lòng nhập mật khẩu hiện tại và mật khẩu mới của bạn để đảm bảo an toàn cho tài khoản.</string>
+    <string name="mat_khau_hien_tai">Mật khẩu hiện tại</string>
+    <string name="hint_mat_khau_hien_tai">Nhập mật khẩu hiện tại</string>
+    <string name="mat_khau_moi">Mật khẩu mới</string>
+    <string name="hint_mat_khau_moi">Nhập mật khẩu mới</string>
+    <string name="xac_nhan_mat_khau_moi">Xác nhận mật khẩu mới</string>
+    <string name="hint_xac_nhan_mat_khau">Nhập lại mật khẩu mới</string>
+    <string name="cap_nhat_mat_khau">Cập nhật mật khẩu</string>
+</resources>

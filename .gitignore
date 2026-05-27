@@ -1,0 +1,60 @@
+# ============================================================
+# Android build outputs
+# ============================================================
+*.iml
+.gradle
+/build
+/captures
+.externalNativeBuild
+.cxx
+
+# ============================================================
+# Cấu hình cá nhân (local) - KHÔNG commit
+# ============================================================
+# Đường dẫn Android SDK của máy cá nhân
+local.properties
+/local.properties
+
+# Keystore & signing config
+*.jks
+*.keystore
+keystore.properties
+signing.properties
+release.properties
+
+# API Keys & Firebase
+google-services.json
+google-services-info.plist
+.env
+.env.local
+.env.*
+secrets.properties
+
+# ============================================================
+# IDE - Android Studio / IntelliJ
+# ============================================================
+.DS_Store
+.idea/caches
+.idea/libraries
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+.idea/deploymentTargetDropDown.xml
+.idea/deploymentTargetSelector.xml
+.idea/migrations.xml
+.idea/deviceManager.xml
+.idea/studiobot.xml
+
+# ============================================================
+# Hệ điều hành
+# ============================================================
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# ============================================================
+# App build outputs
+# ============================================================
+app/build
