@@ -35,7 +35,7 @@
     <string name="dia_chi_nha_hang_label">Địa chỉ nhà hàng</string>
     <!-- Sign in screen -->
     <string name="login_title">Đăng nhập</string>
-    <string name="login_subtitle">Quản lý nhà hàng của bạn dễ dàng.</string>
+    <string name="login_subtitle">Quản lý nhà hàng của bạn một cách dễ dàng.</string>
     <string name="restaurant_name_label">Tên đăng nhập nhà hàng</string>
     <string name="user_name_label">Tên người dùng</string>
     <string name="password_label">Mật khẩu</string>
