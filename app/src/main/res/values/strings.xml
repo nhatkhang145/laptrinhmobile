@@ -25,4 +25,25 @@
     <string name="xac_nhan_mat_khau_moi">Xác nhận mật khẩu mới</string>
     <string name="hint_xac_nhan_mat_khau">Nhập lại mật khẩu mới</string>
     <string name="cap_nhat_mat_khau">Cập nhật mật khẩu</string>
+
+    <!-- Sign up screen -->
+    <string name="ten_nha_hang_label">Tên nhà hàng</string>
+    <string name="ten_dang_nhap_nha_hang_label">Tên đăng nhập nhà hàng</string>
+    <string name="ho_va_ten_quan_ly_label">Họ và tên người quản lý</string>
+    <string name="so_dien_thoai_label">Số điện thoại</string>
+    <string name="admin_username_label">Username (Admin)</string>
+    <string name="dia_chi_nha_hang_label">Địa chỉ nhà hàng</string>
+    <!-- Sign in screen -->
+    <string name="login_title">Đăng nhập</string>
+    <string name="login_subtitle">Quản lý nhà hàng của bạn dễ dàng.</string>
+    <string name="restaurant_name_label">Tên đăng nhập nhà hàng</string>
+    <string name="user_name_label">Tên người dùng</string>
+    <string name="password_label">Mật khẩu</string>
+    <string name="forget_password_label">Quên mật khẩu ?</string>
+    <string name="question_label">Chưa có tài khoản ? </string>
+    <string name="call_to_action_label">Đăng ký ngay</string>
+    <string name="restaurant_name_hint">VD: thecontinental</string>
+    <string name="user_name_hint">tên người dùng</string>
+    <string name="password_hint">••••••••</string>
+    <string name="login_button_label">Đăng nhập</string>
 </resources>

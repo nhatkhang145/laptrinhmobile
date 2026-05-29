@@ -21,4 +21,5 @@
     <color name="card_header_bg">#1E3A5F</color>
     <color name="avatar_bg">#2C4F7A</color>
     <color name="avatar_overlay">#3D6B9E</color>
+    <color name="icon_gray">#75777D</color>
 </resources>
