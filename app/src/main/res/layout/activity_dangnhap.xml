@@ -74,7 +74,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:text="@string/login_title"
+                        android:text="@string/login_label"
                         android:textColor="@color/text_primary"
                         android:textSize="30sp"
                         android:fontFamily="sans-serif-medium"/>
@@ -94,7 +94,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="42dp"
-                        android:text="@string/restaurant_name_label"
+                        android:text="@string/restaurant_login_name_label"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:fontFamily="sans-serif-medium"/>
