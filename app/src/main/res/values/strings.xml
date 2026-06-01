@@ -56,4 +56,9 @@
     <string name="password_hint">••••••••</string>
     <string name="login_button_label">Đăng nhập</string>
     <string name="password_again_label">Nhập lại mật khẩu</string>
+    <!-- Forget password screen-->
+    <string name="forget_password_subtitle">Nhập email của bạn để nhận mã khôi phục mật khẩu.</string>
+    <string name="send_validate">Gửi mã xác nhận</string>
+    <string name="return_to_login">Quay lại trang đăng nhập</string>
+
 </resources>
