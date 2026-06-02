@@ -60,5 +60,17 @@
     <string name="forget_password_subtitle">Nhập email của bạn để nhận mã khôi phục mật khẩu.</string>
     <string name="send_validate">Gửi mã xác nhận</string>
     <string name="return_to_login">Quay lại trang đăng nhập</string>
-
+    <!-- Validate otp screen -->
+    <string name="otp1">-</string>
+    <string name="otp2">-</string>
+    <string name="otp3">-</string>
+    <string name="otp4">-</string>
+    <string name="otp5">-</string>
+    <string name="otp6">-</string>
+    <string name="resent_countdown">(00:59)</string>
+    <string name="confirm">Xác nhận</string>
+    <string name="otp_title">Xác thực OTP</string>
+    <string name="otp_subtitle">Đã gửi mã xác thực tới email của bạn</string>
+    <string name="not_recive_otp_question">Chưa nhận được mã ?</string>
+    <string name="resent_command">Gửi lại mã</string>
 </resources>
