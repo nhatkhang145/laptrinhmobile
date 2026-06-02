@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -41,7 +40,7 @@
                     android:focusable="true"
                     android:scaleType="fitCenter"
                     android:src="@drawable/logo"
-                    tools:ignore="TouchTargetSizeCheck"/>
+                    tools:ignore="TouchTargetSizeCheck" />
 
                 <TextView
                     android:id="@+id/tvAppName"
@@ -52,7 +51,7 @@
                     android:text="Zappy"
                     android:textColor="@color/primary"
                     android:textSize="20sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
@@ -61,8 +60,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingStart="20dp"
-                android:paddingEnd="20dp"
                 android:paddingTop="8dp"
+                android:paddingEnd="20dp"
                 android:paddingBottom="16dp">
 
                 <TextView
@@ -73,7 +72,7 @@
                     android:text="@string/tien_ich"
                     android:textColor="@color/text_primary"
                     android:textSize="28sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvPageSubtitle"
@@ -82,7 +81,7 @@
                     android:layout_marginTop="2dp"
                     android:text="@string/quan_ly_tai_khoan"
                     android:textColor="@color/text_secondary"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp" />
 
             </LinearLayout>
 
@@ -112,7 +111,7 @@
                         <View
                             android:layout_width="88dp"
                             android:layout_height="88dp"
-                            android:background="@drawable/bg_avatar_circle"/>
+                            android:background="@drawable/bg_avatar_circle" />
 
                         <com.mikepenz.iconics.view.IconicsImageView
                             android:id="@+id/ivAvatar"
@@ -122,7 +121,7 @@
                             android:contentDescription="Avatar"
                             app:iiv_color="#B0C4DE"
                             app:iiv_icon="faw-user"
-                            app:iiv_size="36dp"/>
+                            app:iiv_size="36dp" />
 
                         <View
                             android:layout_width="14dp"
@@ -130,7 +129,7 @@
                             android:layout_gravity="bottom|end"
                             android:layout_marginEnd="4dp"
                             android:layout_marginBottom="4dp"
-                            android:background="@drawable/bg_online_dot"/>
+                            android:background="@drawable/bg_online_dot" />
 
                     </FrameLayout>
 
@@ -143,7 +142,7 @@
                         android:text="@string/user_name"
                         android:textColor="#FFFFFF"
                         android:textSize="20sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 
@@ -160,7 +159,7 @@
                 android:text="@string/bao_mat_tai_khoan"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/menuCard"
@@ -201,7 +200,7 @@
                                 android:contentDescription="Lock"
                                 app:iiv_color="@color/text_secondary"
                                 app:iiv_icon="faw-lock"
-                                app:iiv_size="18dp"/>
+                                app:iiv_size="18dp" />
                         </FrameLayout>
 
                         <LinearLayout
@@ -220,7 +219,7 @@
                                 android:text="@string/doi_mat_khau"
                                 android:textColor="@color/text_primary"
                                 android:textSize="15sp"
-                                android:textStyle="bold"/>
+                                android:textStyle="bold" />
 
                             <TextView
                                 android:id="@+id/tvChangePasswordDesc"
@@ -229,7 +228,7 @@
                                 android:layout_marginTop="3dp"
                                 android:text="@string/doi_mat_khau_desc"
                                 android:textColor="@color/text_secondary"
-                                android:textSize="12sp"/>
+                                android:textSize="12sp" />
                         </LinearLayout>
 
                         <com.mikepenz.iconics.view.IconicsImageView
@@ -238,7 +237,7 @@
                             android:contentDescription="Go"
                             app:iiv_color="@color/text_hint"
                             app:iiv_icon="faw-angle-right"
-                            app:iiv_size="18dp"/>
+                            app:iiv_size="18dp" />
 
                     </LinearLayout>
 
@@ -246,7 +245,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginStart="70dp"
-                        android:background="@color/divider"/>
+                        android:background="@color/divider" />
 
                     <LinearLayout
                         android:id="@+id/menuLogout"
@@ -271,7 +270,7 @@
                                 android:contentDescription="Logout"
                                 app:iiv_color="@color/danger"
                                 app:iiv_icon="faw-sign-out-alt"
-                                app:iiv_size="18dp"/>
+                                app:iiv_size="18dp" />
                         </FrameLayout>
 
                         <TextView
@@ -285,7 +284,7 @@
                             android:text="@string/dang_xuat"
                             android:textColor="@color/danger"
                             android:textSize="15sp"
-                            android:textStyle="bold"/>
+                            android:textStyle="bold" />
 
                         <com.mikepenz.iconics.view.IconicsImageView
                             android:layout_width="20dp"
@@ -293,7 +292,7 @@
                             android:contentDescription="Go"
                             app:iiv_color="@color/danger"
                             app:iiv_icon="faw-angle-right"
-                            app:iiv_size="18dp"/>
+                            app:iiv_size="18dp" />
 
                     </LinearLayout>
 
@@ -331,7 +330,7 @@
                 android:contentDescription="Order"
                 app:iiv_color="@color/nav_icon_inactive"
                 app:iiv_icon="faw-clipboard-list"
-                app:iiv_size="22dp"/>
+                app:iiv_size="22dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -339,7 +338,7 @@
                 android:layout_marginTop="3dp"
                 android:text="@string/nav_order"
                 android:textColor="@color/nav_icon_inactive"
-                android:textSize="11sp"/>
+                android:textSize="11sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -360,7 +359,7 @@
                 android:contentDescription="So do"
                 app:iiv_color="@color/nav_icon_inactive"
                 app:iiv_icon="faw-th-large"
-                app:iiv_size="22dp"/>
+                app:iiv_size="22dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -368,7 +367,7 @@
                 android:layout_marginTop="3dp"
                 android:text="@string/nav_so_do"
                 android:textColor="@color/nav_icon_inactive"
-                android:textSize="11sp"/>
+                android:textSize="11sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -390,8 +389,8 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 android:paddingStart="18dp"
-                android:paddingEnd="18dp"
                 android:paddingTop="7dp"
+                android:paddingEnd="18dp"
                 android:paddingBottom="7dp">
 
                 <com.mikepenz.iconics.view.IconicsImageView
@@ -401,7 +400,7 @@
                     android:contentDescription="Tien ich"
                     app:iiv_color="@color/accent"
                     app:iiv_icon="faw-cog"
-                    app:iiv_size="22dp"/>
+                    app:iiv_size="22dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -410,7 +409,7 @@
                     android:text="@string/nav_tien_ich"
                     android:textColor="@color/accent"
                     android:textSize="11sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
             </LinearLayout>
 
         </LinearLayout>
