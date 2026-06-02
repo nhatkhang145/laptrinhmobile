@@ -73,4 +73,8 @@
     <string name="otp_subtitle">Đã gửi mã xác thực tới email của bạn</string>
     <string name="not_recive_otp_question">Chưa nhận được mã ?</string>
     <string name="resent_command">Gửi lại mã</string>
+    <!-- Set new password screen   -->
+    <string name="set_new_password_title">Đặt lại mật khẩu</string>
+    <string name="set_new_password_subtitle">Vui lòng nhập mật khẩu mới của bạn để&#10;hoàn tất việc khôi phục tài khoản.</string>
+
 </resources>
