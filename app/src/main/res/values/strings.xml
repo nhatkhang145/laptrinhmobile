@@ -4,7 +4,7 @@
     <!-- Tiện ích screen -->
     <string name="tien_ich">Tiện ích</string>
     <string name="quan_ly_tai_khoan">Quản lý tài khoản</string>
-    <string name="user_name">Nguyễn Văn A</string>
+    <string name="user_name">Nguyễn Văn Z</string>
     <string name="bao_mat_tai_khoan">Bảo mật &amp; Tài khoản</string>
     <string name="doi_mat_khau">Đổi mật khẩu</string>
     <string name="doi_mat_khau_desc">Cập nhật mật khẩu định kỳ để bảo vệ tài khoản</string>
@@ -25,4 +25,56 @@
     <string name="xac_nhan_mat_khau_moi">Xác nhận mật khẩu mới</string>
     <string name="hint_xac_nhan_mat_khau">Nhập lại mật khẩu mới</string>
     <string name="cap_nhat_mat_khau">Cập nhật mật khẩu</string>
+
+    <!-- Sign up and sign in screen-->
+    <string name="restaurant_name_label">Tên nhà hàng</string>
+    <string name="manager_name_label">Họ và tên người quản lý</string>
+    <string name="email_label">Email</string>
+    <string name="admin_username_label">Username (Admin)</string>
+    <string name="restaurant_address_label">Địa chỉ nhà hàng</string>
+    <string name="signup_subtitle">Tạo tài khoản quản lý nhà hàng</string>
+    <string name="restaurant_name_hint">VD: The Continental</string>
+    <string name="restaurant_username_hint">thecontinental</string>
+    <string name="restaurant_url_suffix">.zappy</string>
+    <string name="restaurant_url_desc">Đây sẽ là đường dẫn truy cập riêng của nhà hàng.</string>
+    <string name="email_hint">lmao2005@gmail.com</string>
+    <string name="admin_username_hint">admin</string>
+    <string name="restaurant_address_hint">Số nhà, đường, quận/huyện...</string>
+    <string name="signup_button_label">Đăng ký</string>
+    <string name="already_have_account_label">Đã có tài khoản?</string>
+    <string name="login_label">Đăng nhập</string>
+    <string name="signup_label">Đăng ký</string>
+
+    <string name="login_subtitle">Quản lý nhà hàng của bạn một cách dễ dàng.</string>
+    <string name="restaurant_login_name_label">Tên đăng nhập nhà hàng</string>
+    <string name="user_name_label">Tên người dùng</string>
+    <string name="password_label">Mật khẩu</string>
+    <string name="forget_password_label">Quên mật khẩu ?</string>
+    <string name="question_label">Chưa có tài khoản ? </string>
+    <string name="call_to_action_label">Đăng ký ngay</string>
+    <string name="user_name_hint">tên người dùng</string>
+    <string name="password_hint">••••••••</string>
+    <string name="login_button_label">Đăng nhập</string>
+    <string name="password_again_label">Nhập lại mật khẩu</string>
+    <!-- Forget password screen-->
+    <string name="forget_password_subtitle">Nhập email của bạn để nhận mã khôi phục mật khẩu.</string>
+    <string name="send_validate">Gửi mã xác nhận</string>
+    <string name="return_to_login">Quay lại trang đăng nhập</string>
+    <!-- Validate otp screen -->
+    <string name="otp1">-</string>
+    <string name="otp2">-</string>
+    <string name="otp3">-</string>
+    <string name="otp4">-</string>
+    <string name="otp5">-</string>
+    <string name="otp6">-</string>
+    <string name="resent_countdown">(00:59)</string>
+    <string name="confirm">Xác nhận</string>
+    <string name="otp_title">Xác thực OTP</string>
+    <string name="otp_subtitle">Đã gửi mã xác thực tới email của bạn</string>
+    <string name="not_recive_otp_question">Chưa nhận được mã ?</string>
+    <string name="resent_command">Gửi lại mã</string>
+    <!-- Set new password screen   -->
+    <string name="set_new_password_title">Đặt lại mật khẩu</string>
+    <string name="set_new_password_subtitle">Vui lòng nhập mật khẩu mới của bạn để&#10;hoàn tất việc khôi phục tài khoản.</string>
+
 </resources>
