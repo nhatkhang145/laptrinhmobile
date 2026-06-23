@@ -16,6 +16,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppOrderFood"
         android:usesCleartextTraffic="true">
+
+        <activity
+            android:name=".Activity.FoodManageActivity"
+            android:exported="true" />
+
         <activity
             android:name=".Activity.TienIchActivity"
             android:exported="true" />

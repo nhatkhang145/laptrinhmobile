@@ -12,6 +12,12 @@
     </style>
 
     <style name="Theme.AppOrderFood" parent="Base.Theme.AppOrderFood" />
+
+    <style name="RoundedSquare" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
     <!-- Style của các ô otp   -->
     <style name="OtpBoxStyle">
         <item name="android:layout_height">72dp</item>
