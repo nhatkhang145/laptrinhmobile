@@ -1,5 +1,6 @@
 package com.example.apporderfood.Activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -35,10 +36,8 @@ public class DangKyActivity extends AppCompatActivity {
         initViews();
 
         tvLogin.setOnClickListener(v -> {
-            // TODO: Chuyen qua Dang Nhap
-            Toast.makeText(this, "Chuyển sang màn hình đăng nhập...", Toast.LENGTH_SHORT).show();
-            // startActivity(new Intent(DangKyActivity.this, DangNhapActivity.class));
-            // finish();
+            startActivity(new Intent(DangKyActivity.this, DangNhapActivity.class));
+            finish();
         });
 
         btnSignUp.setOnClickListener(v -> handleSignUp());
@@ -119,8 +118,9 @@ public class DangKyActivity extends AppCompatActivity {
             public void onResponse(Call<User> call, Response<User> response) {
                 btnSignUp.setEnabled(true);
                 if (response.isSuccessful()) {
-                    Toast.makeText(DangKyActivity.this, "Đăng ký thành công! Hãy đăng nhập.", Toast.LENGTH_LONG).show();
-                    // TODO: Chuyen qua man hinh dang nhap hoac chinh
+                    Toast.makeText(DangKyActivity.this, "Đăng ký thành công, vui lòng đăng nhập vào nhà hàng", Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(DangKyActivity.this, DangNhapActivity.class));
+                    finish();
                 } else {
                     Toast.makeText(DangKyActivity.this, "Lỗi tạo tài khoản quản lý", Toast.LENGTH_SHORT).show();
                 }
