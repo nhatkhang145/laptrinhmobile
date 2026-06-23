@@ -45,6 +45,12 @@ dependencies {
     implementation(libs.credentials)
     implementation(libs.credentials.play.services.auth)
     implementation(libs.googleid)
+    // Retrofit - goi HTTP API den Spring Boot backend
+    implementation(libs.retrofit.core)
+    // Gson converter - tu dong chuyen JSON <-> Object Java
+    implementation(libs.retrofit.gson)
+    implementation(libs.gsonfull)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
