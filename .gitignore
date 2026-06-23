@@ -58,3 +58,10 @@ ehthumbs.db
 # App build outputs
 # ============================================================
 app/build
+
+# ============================================================
+# Spring Boot Backend - Maven build output (KHÔNG commit)
+# ============================================================
+backend/target/
+backend/.mvn/
+!backend/.mvn/wrapper/maven-wrapper.jar
