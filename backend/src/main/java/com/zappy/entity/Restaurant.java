@@ -9,9 +9,12 @@ import lombok.NoArgsConstructor;
  * BANG: restaurants
  * Thong tin he thong nha hang / chi nhanh
  */
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name = "restaurants")
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @NoArgsConstructor
 @AllArgsConstructor
 public class Restaurant {

@@ -57,7 +57,7 @@ public class MenuItemController {
         Integer catId    = (Integer) data.get("catId");
         Integer unitId   = (Integer) data.get("unitId");
         String itemName  = (String)  data.get("itemName");
-        Double priceRaw  = (Double)  data.get("price");
+        Number priceRaw  = (Number)  data.get("price");  // co the la Integer hoac Double
 
         Category category = categoryRepo.findById(catId).orElse(null);
         Unit unit         = unitRepo.findById(unitId).orElse(null);
@@ -71,7 +71,7 @@ public class MenuItemController {
         item.setCategory(category);
         item.setUnit(unit);
         item.setItemName(itemName);
-        item.setPrice(BigDecimal.valueOf(priceRaw));
+        item.setPrice(BigDecimal.valueOf(priceRaw.doubleValue()));
         return ResponseEntity.status(HttpStatus.CREATED).body(menuItemRepo.save(item));
     }
 
@@ -82,8 +82,10 @@ public class MenuItemController {
         return menuItemRepo.findById(id).map(item -> {
             if (data.containsKey("itemName"))
                 item.setItemName((String) data.get("itemName"));
-            if (data.containsKey("price"))
-                item.setPrice(BigDecimal.valueOf((Double) data.get("price")));
+            if (data.containsKey("price")) {
+                Number p = (Number) data.get("price");
+                item.setPrice(BigDecimal.valueOf(p.doubleValue()));
+            }
             return ResponseEntity.ok(menuItemRepo.save(item));
         }).orElse(ResponseEntity.notFound().build());
     }

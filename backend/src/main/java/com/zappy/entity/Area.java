@@ -3,6 +3,7 @@ package com.zappy.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.NoArgsConstructor;
 
 /**
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "areas")
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @NoArgsConstructor
 @AllArgsConstructor
 public class Area {
@@ -28,3 +30,4 @@ public class Area {
     @Column(name = "area_name", nullable = false)
     private String areaName;
 }
+

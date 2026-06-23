@@ -3,6 +3,7 @@ package com.zappy.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
@@ -20,6 +21,7 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "order_details")
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDetail {
@@ -53,3 +55,4 @@ public class OrderDetail {
     @Column(name = "status", nullable = false)
     private Integer status = 0;
 }
+

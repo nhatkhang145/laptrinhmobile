@@ -3,6 +3,7 @@ package com.zappy.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "menu_items")
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @NoArgsConstructor
 @AllArgsConstructor
 public class MenuItem {
@@ -40,3 +42,4 @@ public class MenuItem {
     @Column(name = "price", nullable = false, precision = 12, scale = 2)
     private BigDecimal price;
 }
+
