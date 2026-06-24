@@ -37,4 +37,8 @@
         <item name="android:inputType">number</item>
         <item name="android:textColor">@color/text_primary</item>
     </style>
+
+    <style name="CircleImage">
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>
