@@ -55,7 +55,7 @@
         <ImageView
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:background="@drawable/nav_active_bg"
+            android:background="@drawable/bg_tab_active_dark"
             android:padding="12dp"
             android:src="@android:drawable/ic_menu_camera"
             app:tint="@color/accent" />

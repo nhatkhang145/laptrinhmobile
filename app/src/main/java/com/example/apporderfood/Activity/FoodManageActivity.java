@@ -49,7 +49,6 @@ public class FoodManageActivity extends AppCompatActivity {
 
         rvFoodList  = findViewById(R.id.rvFoodList);
         fabAddFood  = findViewById(R.id.fab_add_food);
-        progressBar = findViewById(R.id.progressBar);
 
         rvFoodList.setLayoutManager(new LinearLayoutManager(this));
 
@@ -68,15 +67,12 @@ public class FoodManageActivity extends AppCompatActivity {
             return;
         }
 
-        if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
-
         ZappyApiService api = RetrofitClient.getApiService();
         api.getMenuByRestaurant(resId).enqueue(new Callback<List<MenuItem>>() {
             @Override
             public void onResponse(Call<List<MenuItem>> call, Response<List<MenuItem>> response) {
-                if (progressBar != null) progressBar.setVisibility(View.GONE);
-
                 if (response.isSuccessful() && response.body() != null) {
+
                     List<MenuItem> menuItems = response.body();
                     List<FoodManageAdapter.FoodItem> foodList = new ArrayList<>();
 
@@ -109,10 +105,10 @@ public class FoodManageActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<MenuItem>> call, Throwable t) {
-                if (progressBar != null) progressBar.setVisibility(View.GONE);
                 Toast.makeText(FoodManageActivity.this,
                         "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
+
         });
     }
 

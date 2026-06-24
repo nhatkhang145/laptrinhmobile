@@ -48,7 +48,7 @@ public class HoaDonActivity extends AppCompatActivity {
 
     private void initViews() {
         btnBack      = findViewById(R.id.btnBack);
-        btnThanhToan = findViewById(R.id.btnThanhToan);
+        btnThanhToan = findViewById(R.id.btnConfirmPayment);
     }
 
     private void setupClickListeners() {
