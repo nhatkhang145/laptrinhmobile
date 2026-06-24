@@ -25,6 +25,7 @@
     <string name="xac_nhan_mat_khau_moi">Xác nhận mật khẩu mới</string>
     <string name="hint_xac_nhan_mat_khau">Nhập lại mật khẩu mới</string>
     <string name="cap_nhat_mat_khau">Cập nhật mật khẩu</string>
+
     <!-- Thống kê doanh thu screen -->
     <string name="title_thong_ke">Thống kê doanh thu</string>
     <string name="tab_hom_nay">Hôm nay</string>
@@ -39,4 +40,32 @@
     <string name="format_don_hang">%1$d đơn</string>
     <string name="format_mon">%1$d món</string>
     <string name="format_ban">%1$d bàn</string>
+
+    <!-- Quản lý nhân viên screen -->
+    <string name="title_quan_ly_nhan_vien">Quản lý nhân viên</string>
+    <string name="hint_tim_nhan_vien">Tìm nhân viên...</string>
+
+    <string name="tab_tat_ca">Tất cả</string>
+    <string name="tab_admin">Admin</string>
+    <string name="tab_quan_ly">Quản lý</string>
+    <string name="tab_thu_ngan">Thu ngân</string>
+    <string name="tab_phuc_vu">Phục vụ</string>
+    <string name="tab_bep">Bếp</string>
+
+    <string name="label_tong_so">Tổng số</string>
+    <string name="label_online">Online</string>
+    <string name="label_offline">Offline</string>
+
+    <string name="label_them_nhan_vien">Thêm nhân viên</string>
+
+    <!-- Bottom Navigation Quản lý nhân viên screen -->
+    <string name="nav_tables">Tables</string>
+    <string name="nav_orders">Orders</string>
+    <string name="nav_menu">Menu</string>
+    <string name="nav_more">More</string>
+
+    <!-- Trạng thái chi tiết trong item list -->
+    <string name="status_online">đang online</string>
+    <string name="status_working">đang làm việc</string>
+    <string name="status_offline_detail">Offline</string>
 </resources>
