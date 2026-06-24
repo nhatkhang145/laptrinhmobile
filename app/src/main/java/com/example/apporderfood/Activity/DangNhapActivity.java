@@ -80,17 +80,21 @@ public class DangNhapActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     User user = response.body();
                     Toast.makeText(DangNhapActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                    
-                    // TODO: Luu thong tin dang nhap vao SharedPreferences neu can
-                    
-                    // Chuyen sang man hinh chinh (TienIchActivity)
+
+                    // Lưu thông tin đăng nhập vào SharedPreferences để dùng toàn app
+                    getSharedPreferences("ZappySession", MODE_PRIVATE)
+                            .edit()
+                            .putInt("USER_ID", user.getId())
+                            .putInt("RES_ID",  user.getResId())
+                            .putInt("ROLE",    user.getRole())
+                            .putString("USERNAME", user.getUsername())
+                            .apply();
+
+                    // Chuyển sang màn hình chính
                     Intent intent = new Intent(DangNhapActivity.this, TienIchActivity.class);
-                    // Truyen data sang man hinh tiep theo
-                    intent.putExtra("USER_ID", user.getId());
-                    intent.putExtra("RES_ID", user.getResId());
-                    intent.putExtra("ROLE", user.getRole());
                     startActivity(intent);
                     finish();
+
                 } else {
                     Toast.makeText(DangNhapActivity.this, "Sai thông tin đăng nhập hoặc nhà hàng!", Toast.LENGTH_SHORT).show();
                 }
