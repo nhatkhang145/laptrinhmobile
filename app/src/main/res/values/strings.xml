@@ -68,4 +68,23 @@
     <string name="status_online">đang online</string>
     <string name="status_working">đang làm việc</string>
     <string name="status_offline_detail">Offline</string>
+
+    <!-- Chi tiết nhân viên screen -->
+    <string name="title_chi_tiet_nhan_vien">Chi tiết nhân viên</string>
+    <string name="label_dang_lam">ĐANG LÀM</string>
+    <string name="label_phuc_vu_fulltime">Phục vụ • Full-time</string>
+    <string name="label_so_gio_lam">Số giờ làm</string>
+    <string name="label_don_hang">Đơn hàng</string>
+    <string name="label_danh_gia">Đánh giá</string>
+    <string name="title_thong_tin_ca_nhan">Thông tin cá nhân</string>
+    <string name="label_ma_nhan_vien">Mã nhân viên</string>
+    <string name="label_so_dien_thoai">Số điện thoại</string>
+    <string name="label_email">Email</string>
+    <string name="label_dia_chi">Địa chỉ</string>
+    <string name="title_chi_tiet_cong_viec">Chi tiết công việc</string>
+    <string name="label_bo_phan">Bộ phận</string>
+    <string name="label_ngay_gia_nhap">Ngày gia nhập</string>
+    <string name="label_muc_luong">Mức lương</string>
+    <string name="btn_phan_ca">Phân ca làm việc</string>
+    <string name="btn_xem_lich_su">Xem lịch sử</string>
 </resources>
