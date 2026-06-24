@@ -18,6 +18,10 @@
         android:usesCleartextTraffic="true">
 
         <activity
+            android:name=".Activity.CategoryManageActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".Activity.ThemBanMoiActivity"
             android:exported="false" />
 
