@@ -87,4 +87,18 @@
     <string name="label_muc_luong">Mức lương</string>
     <string name="btn_phan_ca">Phân ca làm việc</string>
     <string name="btn_xem_lich_su">Xem lịch sử</string>
+
+    <!-- Thêm nhân viên screen -->
+    <string name="title_them_nhan_vien">Thêm nhân viên</string>
+    <string name="label_tai_anh_len">Tải ảnh lên</string>
+    <string name="label_ho_va_ten">Họ và tên</string>
+    <string name="hint_ho_va_ten">Nhập tên nhân viên</string>
+    <string name="label_so_dien_thoai_input">Số điện thoại</string>
+    <string name="hint_so_dien_thoai">Nhập số điện thoại</string>
+    <string name="label_ten_dang_nhap">Tên đăng nhập</string>
+    <string name="hint_ten_dang_nhap">vd: nhanvien01</string>
+    <string name="label_mat_khau">Mật khẩu</string>
+    <string name="label_phan_quyen">Phân quyền vị trí</string>
+    <string name="label_trang_thai_hoat_dong">Trạng thái hoạt động</string>
+    <string name="btn_xac_nhan_them">Xác nhận thêm</string>
 </resources>
