@@ -54,6 +54,43 @@
             android:name=".Activity.ChangePasswordActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize"/>
+
+        <!-- ===== Màn hình Sơ đồ bàn ===== -->
+        <activity
+            android:name=".Activity.SoDobanActivity"
+            android:exported="true" />
+
+        <!-- ===== Popup thông tin bàn có khách ===== -->
+        <activity
+            android:name=".Activity.ThongTinBanActivity"
+            android:exported="false" />
+
+        <!-- ===== Lập order (bàn trống) ===== -->
+        <activity
+            android:name=".Activity.LapOrderActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- ===== Xác nhận order / Gửi đơn bếp ===== -->
+        <activity
+            android:name=".Activity.XacNhanOrderActivity"
+            android:exported="false" />
+
+        <!-- ===== Danh sách bàn đang order (tab Order) ===== -->
+        <activity
+            android:name=".Activity.DanhSachOrderActivity"
+            android:exported="true" />
+
+        <!-- ===== Chi tiết bàn đang phục vụ ===== -->
+        <activity
+            android:name=".Activity.ChiTietBanActivity"
+            android:exported="false" />
+
+        <!-- ===== Hóa đơn / Thanh toán ===== -->
+        <activity
+            android:name=".Activity.HoaDonActivity"
+            android:exported="false" />
+
         </application>
 
 </manifest>
