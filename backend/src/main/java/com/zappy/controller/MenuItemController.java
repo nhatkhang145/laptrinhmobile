@@ -106,6 +106,16 @@ public class MenuItemController {
             if (data.containsKey("isAvailable")) {
                 item.setIsAvailable((Boolean) data.get("isAvailable"));
             }
+            if (data.containsKey("catId")) {
+                Integer catId = (Integer) data.get("catId");
+                Category category = categoryRepo.findById(catId).orElse(null);
+                if (category != null) item.setCategory(category);
+            }
+            if (data.containsKey("unitId")) {
+                Integer unitId = (Integer) data.get("unitId");
+                Unit unit = unitRepo.findById(unitId).orElse(null);
+                if (unit != null) item.setUnit(unit);
+            }
             return ResponseEntity.ok(menuItemRepo.save(item));
         }).orElse(ResponseEntity.notFound().build());
     }

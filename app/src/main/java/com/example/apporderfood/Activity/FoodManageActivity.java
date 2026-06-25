@@ -31,16 +31,20 @@ import retrofit2.Response;
 
 public class FoodManageActivity extends AppCompatActivity {
 
-    private RecyclerView rvFoodList;
+    private RecyclerView rvFoodList, rvCategoryList;
     private FoodManageAdapter adapter;
+    private com.example.apporderfood.adapter.CategoryFilterAdapter categoryAdapter;
     private FloatingActionButton fabAddFood;
     private ProgressBar progressBar;
+    private android.widget.TextView tvTotalItems, tvAvailableItems, tvOutOfStockItems;
 
     private int resId = -1;
 
     private List<com.example.apporderfood.model.Category> currentCategories = new ArrayList<>();
     private List<com.example.apporderfood.model.Unit> currentUnits = new ArrayList<>();
     private boolean isAvailable = true;
+    private String currentKeyword = "";
+    private Integer currentFilterCatId = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,29 +55,85 @@ public class FoodManageActivity extends AppCompatActivity {
         resId = prefs.getInt("RES_ID", -1);
 
         rvFoodList  = findViewById(R.id.rvFoodList);
+        rvCategoryList = findViewById(R.id.rvCategoryList);
         fabAddFood  = findViewById(R.id.fab_add_food);
+        tvTotalItems = findViewById(R.id.tvTotalItems);
+        tvAvailableItems = findViewById(R.id.tvAvailableItems);
+        tvOutOfStockItems = findViewById(R.id.tvOutOfStockItems);
+
+        findViewById(R.id.btn_back).setOnClickListener(v -> finish());
 
         rvFoodList.setLayoutManager(new LinearLayoutManager(this));
+        rvCategoryList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        loadMenuFromApi();
+        loadCategoriesForFilter();
 
-        fabAddFood.setOnClickListener(v -> showAddFoodBottomSheet());
+        loadMenuFromApi(currentKeyword);
+
+        android.widget.EditText etSearchFood = findViewById(R.id.etSearchFood);
+        etSearchFood.addTextChangedListener(new android.text.TextWatcher() {
+            private android.os.Handler handler = new android.os.Handler(android.os.Looper.getMainLooper());
+            private Runnable runnable;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (runnable != null) handler.removeCallbacks(runnable);
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {
+                currentKeyword = s.toString().trim();
+                runnable = () -> loadMenuFromApi(currentKeyword);
+                handler.postDelayed(runnable, 300); // 300ms debounce để tránh gọi API liên tục
+            }
+        });
+
+        fabAddFood.setOnClickListener(v -> showFoodBottomSheet(null));
 
         setupBottomNav();
+    }
+
+    private void loadCategoriesForFilter() {
+        if (resId == -1) return;
+        ZappyApiService api = RetrofitClient.getApiService();
+        api.getCategories(resId).enqueue(new Callback<List<com.example.apporderfood.model.Category>>() {
+            @Override
+            public void onResponse(Call<List<com.example.apporderfood.model.Category>> call, Response<List<com.example.apporderfood.model.Category>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<com.example.apporderfood.model.Category> filterList = new ArrayList<>();
+                    com.example.apporderfood.model.Category allCat = new com.example.apporderfood.model.Category();
+                    allCat.setId(null);
+                    allCat.setCatName("Tất cả");
+                    filterList.add(allCat);
+                    filterList.addAll(response.body());
+
+                    categoryAdapter = new com.example.apporderfood.adapter.CategoryFilterAdapter(filterList, category -> {
+                        currentFilterCatId = category.getId();
+                        loadMenuFromApi(currentKeyword);
+                    });
+                    rvCategoryList.setAdapter(categoryAdapter);
+                }
+            }
+            @Override
+            public void onFailure(Call<List<com.example.apporderfood.model.Category>> call, Throwable t) {}
+        });
     }
 
     /**
      * Gọi API GET /api/menu-items/restaurant/{resId}
      * Lấy danh sách món ăn thực tế từ database
      */
-    private void loadMenuFromApi() {
+    private void loadMenuFromApi(String keyword) {
         if (resId == -1) {
             Toast.makeText(this, "Không xác định được nhà hàng!", Toast.LENGTH_SHORT).show();
             return;
         }
 
         ZappyApiService api = RetrofitClient.getApiService();
-        api.getMenuByRestaurant(resId).enqueue(new Callback<List<MenuItem>>() {
+        api.getMenuByRestaurant(resId, keyword).enqueue(new Callback<List<MenuItem>>() {
             @Override
             public void onResponse(Call<List<MenuItem>> call, Response<List<MenuItem>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -83,19 +143,34 @@ public class FoodManageActivity extends AppCompatActivity {
 
                     NumberFormat fmt = NumberFormat.getInstance(new Locale("vi", "VN"));
 
+                    int total = 0;
+                    int available = 0;
+
                     for (MenuItem item : menuItems) {
+                        if (currentFilterCatId != null && (item.getCategory() == null || !item.getCategory().getId().equals(currentFilterCatId))) {
+                            continue;
+                        }
                         String tenMon   = item.getItemName();
                         String danhMuc  = (item.getCategory() != null) ? item.getCategory().getCatName() : "—";
                         String donVi    = (item.getUnit() != null)     ? item.getUnit().getUnitName()    : "";
                         String giaHien  = fmt.format(item.getPrice()) + "đ";
 
-                        // Trạng thái mặc định "CÒN MÓN" – sau này có thể thêm trường status
-                        foodList.add(new FoodManageAdapter.FoodItem(
-                                tenMon, danhMuc, donVi, giaHien, "CÒN MÓN"
-                        ));
-                    }
+                        boolean isAvail = (item.getIsAvailable() != null) ? item.getIsAvailable() : true;
+                        if (isAvail) available++;
+                        String statusStr = isAvail ? "CÒN MÓN" : "HẾT MÓN";
 
-                    adapter = new FoodManageAdapter(foodList);
+                        foodList.add(new FoodManageAdapter.FoodItem(
+                                tenMon, danhMuc, donVi, giaHien, statusStr, item
+                        ));
+                        total++;
+                    }
+                    
+                    int outOfStock = total - available;
+                    if (tvTotalItems != null) tvTotalItems.setText(String.valueOf(total));
+                    if (tvAvailableItems != null) tvAvailableItems.setText(String.valueOf(available));
+                    if (tvOutOfStockItems != null) tvOutOfStockItems.setText(String.valueOf(outOfStock));
+
+                    adapter = new FoodManageAdapter(foodList, foodItem -> showFoodBottomSheet(foodItem.getRawItem()));
                     rvFoodList.setAdapter(adapter);
 
                     if (menuItems.isEmpty()) {
@@ -117,7 +192,7 @@ public class FoodManageActivity extends AppCompatActivity {
         });
     }
 
-    private void loadCategoriesAndUnits(Spinner spinnerCategory) {
+    private void loadCategoriesAndUnits(Spinner spinnerCategory, MenuItem existingFood) {
         ZappyApiService api = RetrofitClient.getApiService();
         api.getCategories(resId).enqueue(new Callback<List<com.example.apporderfood.model.Category>>() {
             @Override
@@ -125,12 +200,18 @@ public class FoodManageActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     currentCategories = response.body();
                     List<String> catNames = new ArrayList<>();
-                    for (com.example.apporderfood.model.Category c : currentCategories) {
+                    int selectedIndex = 0;
+                    for (int i = 0; i < currentCategories.size(); i++) {
+                        com.example.apporderfood.model.Category c = currentCategories.get(i);
                         catNames.add(c.getCatName());
+                        if (existingFood != null && existingFood.getCategory() != null && existingFood.getCategory().getId().equals(c.getId())) {
+                            selectedIndex = i;
+                        }
                     }
                     ArrayAdapter<String> adapterCategory = new ArrayAdapter<>(FoodManageActivity.this,
                             android.R.layout.simple_spinner_dropdown_item, catNames);
                     spinnerCategory.setAdapter(adapterCategory);
+                    spinnerCategory.setSelection(selectedIndex);
                 }
             }
             @Override
@@ -149,13 +230,38 @@ public class FoodManageActivity extends AppCompatActivity {
         });
     }
 
-    private void showAddFoodBottomSheet() {
+    private void showFoodBottomSheet(MenuItem existingFood) {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this, R.style.BottomSheetDialogTheme);
         View view = getLayoutInflater().inflate(R.layout.activity_them_mon_an, null);
         bottomSheetDialog.setContentView(view);
 
+        // Fix the jumping issue
+        com.google.android.material.bottomsheet.BottomSheetBehavior<View> behavior = com.google.android.material.bottomsheet.BottomSheetBehavior.from((View) view.getParent());
+        behavior.setState(com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED);
+        behavior.setSkipCollapsed(true);
+        behavior.setHideable(false); // Initially false to prevent light flings
+        
+        behavior.addBottomSheetCallback(new com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(View bottomSheet, int newState) {
+                if (newState == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED) {
+                    behavior.setHideable(false);
+                }
+            }
+
+            @Override
+            public void onSlide(View bottomSheet, float slideOffset) {
+                // Khi kéo xuống dưới một nửa (slideOffset < 0.5), mới cho phép ẩn
+                if (slideOffset < 0.5f) {
+                    behavior.setHideable(true);
+                } else {
+                    behavior.setHideable(false);
+                }
+            }
+        });
+
         Spinner spinnerCategory = view.findViewById(R.id.spinner_category);
-        loadCategoriesAndUnits(spinnerCategory);
+        loadCategoriesAndUnits(spinnerCategory, existingFood);
 
         android.widget.EditText edtFoodName = view.findViewById(R.id.edt_food_name);
         android.widget.EditText edtPrice = view.findViewById(R.id.edt_price);
@@ -164,6 +270,15 @@ public class FoodManageActivity extends AppCompatActivity {
         view.findViewById(R.id.btn_cancel).setOnClickListener(v -> bottomSheetDialog.dismiss());
         
         setupStatusToggle(view);
+
+        if (existingFood != null) {
+            ((android.widget.TextView) view.findViewById(R.id.tv_title)).setText("Chỉnh sửa món ăn");
+            ((com.google.android.material.button.MaterialButton) view.findViewById(R.id.btn_save)).setText("Cập nhật");
+            edtFoodName.setText(existingFood.getItemName());
+            if (existingFood.getPrice() != null) {
+                edtPrice.setText(String.valueOf(existingFood.getPrice().intValue()));
+            }
+        }
 
         view.findViewById(R.id.btn_save).setOnClickListener(v -> {
             String name = edtFoodName.getText().toString().trim();
@@ -193,23 +308,43 @@ public class FoodManageActivity extends AppCompatActivity {
             data.put("isAvailable", isAvailable);
 
             ZappyApiService api = RetrofitClient.getApiService();
-            api.createMenuItem(data).enqueue(new Callback<MenuItem>() {
-                @Override
-                public void onResponse(Call<MenuItem> call, Response<MenuItem> response) {
-                    if (response.isSuccessful()) {
-                        Toast.makeText(FoodManageActivity.this, "Thêm món thành công!", Toast.LENGTH_SHORT).show();
-                        bottomSheetDialog.dismiss();
-                        loadMenuFromApi();
-                    } else {
-                        Toast.makeText(FoodManageActivity.this, "Lỗi thêm món: " + response.code(), Toast.LENGTH_SHORT).show();
+            if (existingFood == null) {
+                api.createMenuItem(data).enqueue(new Callback<MenuItem>() {
+                    @Override
+                    public void onResponse(Call<MenuItem> call, Response<MenuItem> response) {
+                        if (response.isSuccessful()) {
+                            Toast.makeText(FoodManageActivity.this, "Thêm món thành công!", Toast.LENGTH_SHORT).show();
+                            bottomSheetDialog.dismiss();
+                            loadMenuFromApi(currentKeyword);
+                        } else {
+                            Toast.makeText(FoodManageActivity.this, "Lỗi thêm món: " + response.code(), Toast.LENGTH_SHORT).show();
+                        }
                     }
-                }
 
-                @Override
-                public void onFailure(Call<MenuItem> call, Throwable t) {
-                    Toast.makeText(FoodManageActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
+                    @Override
+                    public void onFailure(Call<MenuItem> call, Throwable t) {
+                        Toast.makeText(FoodManageActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                api.updateMenuItem(existingFood.getId(), data).enqueue(new Callback<MenuItem>() {
+                    @Override
+                    public void onResponse(Call<MenuItem> call, Response<MenuItem> response) {
+                        if (response.isSuccessful()) {
+                            Toast.makeText(FoodManageActivity.this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
+                            bottomSheetDialog.dismiss();
+                            loadMenuFromApi(currentKeyword);
+                        } else {
+                            Toast.makeText(FoodManageActivity.this, "Lỗi cập nhật: " + response.code(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<MenuItem> call, Throwable t) {
+                        Toast.makeText(FoodManageActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
         });
 
         bottomSheetDialog.show();

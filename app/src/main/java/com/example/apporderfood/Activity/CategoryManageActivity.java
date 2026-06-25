@@ -57,6 +57,31 @@ public class CategoryManageActivity extends AppCompatActivity {
         View view = getLayoutInflater().inflate(R.layout.activity_them_danh_muc, null);
         bottomSheetDialog.setContentView(view);
 
+        // Fix the jumping issue
+        com.google.android.material.bottomsheet.BottomSheetBehavior<View> behavior = com.google.android.material.bottomsheet.BottomSheetBehavior.from((View) view.getParent());
+        behavior.setState(com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED);
+        behavior.setSkipCollapsed(true);
+        behavior.setHideable(false); // Initially false to prevent light flings
+        
+        behavior.addBottomSheetCallback(new com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(View bottomSheet, int newState) {
+                if (newState == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED) {
+                    behavior.setHideable(false);
+                }
+            }
+
+            @Override
+            public void onSlide(View bottomSheet, float slideOffset) {
+                // Khi kéo xuống dưới một nửa (slideOffset < 0.5), mới cho phép ẩn
+                if (slideOffset < 0.5f) {
+                    behavior.setHideable(true);
+                } else {
+                    behavior.setHideable(false);
+                }
+            }
+        });
+
         EditText edtName = view.findViewById(R.id.edt_category_name);
         TextView tvPreviewName = view.findViewById(R.id.tv_preview_name);
 
