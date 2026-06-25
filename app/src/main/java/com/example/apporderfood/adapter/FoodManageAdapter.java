@@ -13,9 +13,15 @@ import java.util.List;
 public class FoodManageAdapter extends RecyclerView.Adapter<FoodManageAdapter.FoodViewHolder> {
 
     private List<FoodItem> foodList;
+    private OnFoodItemClickListener listener;
 
-    public FoodManageAdapter(List<FoodItem> foodList) {
+    public interface OnFoodItemClickListener {
+        void onFoodItemClick(FoodItem item);
+    }
+
+    public FoodManageAdapter(List<FoodItem> foodList, OnFoodItemClickListener listener) {
         this.foodList = foodList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -44,6 +50,12 @@ public class FoodManageAdapter extends RecyclerView.Adapter<FoodManageAdapter.Fo
             holder.tvStatus.setBackgroundResource(R.drawable.bg_status_paused);
             holder.tvStatus.setTextColor(holder.itemView.getContext().getColor(android.R.color.holo_orange_dark));
         }
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onFoodItemClick(item);
+            }
+        });
     }
 
     @Override
@@ -72,13 +84,15 @@ public class FoodManageAdapter extends RecyclerView.Adapter<FoodManageAdapter.Fo
         private String tag;
         private String price;
         private String status;
+        private com.example.apporderfood.model.MenuItem rawItem; // To hold the actual object
 
-        public FoodItem(String name, String category, String tag, String price, String status) {
+        public FoodItem(String name, String category, String tag, String price, String status, com.example.apporderfood.model.MenuItem rawItem) {
             this.name = name;
             this.category = category;
             this.tag = tag;
             this.price = price;
             this.status = status;
+            this.rawItem = rawItem;
         }
 
         public String getName() { return name; }
@@ -86,5 +100,7 @@ public class FoodManageAdapter extends RecyclerView.Adapter<FoodManageAdapter.Fo
         public String getTag() { return tag; }
         public String getPrice() { return price; }
         public String getStatus() { return status; }
+        public com.example.apporderfood.model.MenuItem getRawItem() { return rawItem; }
     }
+
 }

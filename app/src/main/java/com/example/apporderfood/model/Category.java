@@ -8,4 +8,7 @@ public class Category {
 
     public Integer getId()     { return id; }
     public String getCatName() { return catName; }
+
+    public void setId(Integer id) { this.id = id; }
+    public void setCatName(String catName) { this.catName = catName; }
 }
