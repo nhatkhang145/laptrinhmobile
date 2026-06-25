@@ -38,8 +38,12 @@ public class MenuItem {
     @Column(name = "item_name", nullable = false)
     private String itemName;
 
-    // Gia ban niem yet
+   
     @Column(name = "price", nullable = false, precision = 12, scale = 2)
     private BigDecimal price;
+
+ 
+    @Column(name = "is_available")
+    private Boolean isAvailable = true;
 }
 

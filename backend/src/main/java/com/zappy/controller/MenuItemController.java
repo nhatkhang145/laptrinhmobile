@@ -15,14 +15,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-/**
- * API Mon an trong Menu
- * GET  /api/menu-items/restaurant/{resId} -> Toan bo menu cua nha hang
- * GET  /api/menu-items/category/{catId}   -> Mon an theo danh muc
- * POST /api/menu-items                    -> Them mon moi
- * PUT  /api/menu-items/{id}              -> Sua thong tin mon
- * DELETE /api/menu-items/{id}            -> Xoa mon
- */
+
 @RestController
 @RequestMapping("/api/menu-items")
 public class MenuItemController {
@@ -31,15 +24,36 @@ public class MenuItemController {
     @Autowired private CategoryRepository categoryRepo;
     @Autowired private UnitRepository unitRepo;
 
-    // Lay tat ca mon an cua 1 nha hang
+    // Lay tat ca mon an cua 1 nha hang (co ho tro tim kiem)
     @GetMapping("/restaurant/{resId}")
-    public List<MenuItem> getByRestaurant(@PathVariable Integer resId) {
+    public List<MenuItem> getByRestaurant(@PathVariable Integer resId,
+                                          @RequestParam(required = false) String keyword) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            return menuItemRepo.findByCategoryRestaurantIdAndItemNameContainingIgnoreCase(resId, keyword.trim());
+        }
         return menuItemRepo.findByCategoryRestaurantId(resId);
     }
 
-    // Lay mon an theo danh muc
+    // API Thong ke: Tong mon, Dang ban, Het hang
+    @GetMapping("/restaurant/{resId}/stats")
+    public ResponseEntity<Map<String, Long>> getStats(@PathVariable Integer resId) {
+        long total = menuItemRepo.countByCategoryRestaurantId(resId);
+        long available = menuItemRepo.countByCategoryRestaurantIdAndIsAvailable(resId, true);
+        long outOfStock = total - available;
+        return ResponseEntity.ok(Map.of(
+                "total", total,
+                "available", available,
+                "outOfStock", outOfStock
+        ));
+    }
+
+    // Lay mon an theo danh muc (co ho tro tim kiem)
     @GetMapping("/category/{catId}")
-    public List<MenuItem> getByCategory(@PathVariable Integer catId) {
+    public List<MenuItem> getByCategory(@PathVariable Integer catId,
+                                        @RequestParam(required = false) String keyword) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            return menuItemRepo.findByCategoryIdAndItemNameContainingIgnoreCase(catId, keyword.trim());
+        }
         return menuItemRepo.findByCategoryId(catId);
     }
 
@@ -72,6 +86,9 @@ public class MenuItemController {
         item.setUnit(unit);
         item.setItemName(itemName);
         item.setPrice(BigDecimal.valueOf(priceRaw.doubleValue()));
+        if (data.containsKey("isAvailable")) {
+            item.setIsAvailable((Boolean) data.get("isAvailable"));
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(menuItemRepo.save(item));
     }
 
@@ -85,6 +102,9 @@ public class MenuItemController {
             if (data.containsKey("price")) {
                 Number p = (Number) data.get("price");
                 item.setPrice(BigDecimal.valueOf(p.doubleValue()));
+            }
+            if (data.containsKey("isAvailable")) {
+                item.setIsAvailable((Boolean) data.get("isAvailable"));
             }
             return ResponseEntity.ok(menuItemRepo.save(item));
         }).orElse(ResponseEntity.notFound().build());

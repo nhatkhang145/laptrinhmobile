@@ -13,10 +13,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class RetrofitClient {
 
-    // ⚠️ THAY IP NÀY = IP máy tính của bạn khi test trên điện thoại thật
-    // Khi dùng máy ảo Android Studio thì giữ nguyên 10.0.2.2
-    private static final String BASE_URL = "http://10.0.2.2:8080/";
-
+    // Lấy IP từ file local.properties (đã được ẩn khỏi Git)
+    private static final String BASE_URL = com.example.apporderfood.BuildConfig.BASE_URL;
+//     private static final String BASE_URL = "http://10.0.2.2:8080/";
     private static Retrofit instance = null;
 
     public static Retrofit getInstance() {
