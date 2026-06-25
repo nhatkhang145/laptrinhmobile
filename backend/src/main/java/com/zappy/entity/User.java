@@ -42,8 +42,5 @@ public class User {
     // Email cua nguoi dung
     @Column(name = "email", nullable = false)
     private String email;
-    // So dien thoai cua nguoi dung
-    @Column(name = "phone", nullable = false)
-    private String phone;
 }
 
