@@ -83,17 +83,21 @@
             android:orientation="horizontal">
 
             <ImageView
+                android:id="@+id/ivCategoryEdit"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginEnd="12dp"
                 android:src="@android:drawable/ic_menu_edit"
-                app:tint="@color/text_secondary" />
+                app:tint="@color/text_secondary"
+                android:contentDescription="Sửa" />
 
             <ImageView
+                android:id="@+id/ivCategoryMore"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:src="@android:drawable/ic_menu_more"
-                app:tint="@color/text_secondary" />
+                app:tint="@color/text_secondary"
+                android:contentDescription="Thêm" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

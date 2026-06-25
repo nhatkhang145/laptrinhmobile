@@ -8,14 +8,23 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.apporderfood.R;
+import com.example.apporderfood.model.TableModel;
 import java.util.List;
 
 public class TableManageAdapter extends RecyclerView.Adapter<TableManageAdapter.TableViewHolder> {
 
-    private List<TableItem> tableList;
+    private List<TableModel> tableList;
+    private OnTableItemClickListener listener;
 
-    public TableManageAdapter(List<TableItem> tableList) {
+    public interface OnTableItemClickListener {
+        void onEditClick(TableModel item);
+        void onMoreClick(TableModel item, View view);
+        void onItemClick(TableModel item);
+    }
+
+    public TableManageAdapter(List<TableModel> tableList, OnTableItemClickListener listener) {
         this.tableList = tableList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -27,32 +36,52 @@ public class TableManageAdapter extends RecyclerView.Adapter<TableManageAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull TableViewHolder holder, int position) {
-        TableItem item = tableList.get(position);
-        holder.tvTableId.setText(item.getTableId());
-        holder.tvTableStatus.setText(item.getStatus());
-        holder.tvTableInfo.setText(item.getArea() + " • " + item.getSeats() + " chỗ ngồi");
-        holder.tvDateCreated.setText("Ngày tạo: " + item.getDateCreated());
+        TableModel item = tableList.get(position);
+        holder.tvTableId.setText(item.getTableName());
+        
+        String status = item.getStatus() != null ? item.getStatus() : "HOẠT ĐỘNG";
+        holder.tvTableStatus.setText(status);
+        
+        String areaName = item.getArea() != null ? item.getArea().getAreaName() : "Chưa rõ";
+        int seats = item.getSeats() != null ? item.getSeats() : 4;
+        holder.tvTableInfo.setText(areaName + " • " + seats + " chỗ ngồi");
+        
+        // Giả lập ngày tạo nếu chưa có trong model
+        holder.tvDateCreated.setText("ID: " + item.getId());
 
         // Update status UI
-        if ("HOẠT ĐỘNG".equals(item.getStatus())) {
+        if ("HOẠT ĐỘNG".equals(status)) {
             holder.tvTableStatus.setBackgroundResource(R.drawable.bg_status_available);
             holder.tvTableStatus.setTextColor(holder.itemView.getContext().getColor(android.R.color.holo_green_dark));
-        } else if ("ĐANG KHÓA".equals(item.getStatus())) {
+        } else if ("ĐANG KHÓA".equals(status)) {
             holder.tvTableStatus.setBackgroundResource(R.drawable.bg_status_unavailable);
             holder.tvTableStatus.setTextColor(holder.itemView.getContext().getColor(android.R.color.holo_red_dark));
         } else {
             holder.tvTableStatus.setBackgroundResource(R.drawable.bg_status_paused);
             holder.tvTableStatus.setTextColor(holder.itemView.getContext().getColor(android.R.color.holo_orange_dark));
         }
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onItemClick(item);
+        });
+
+        holder.ivTableEdit.setOnClickListener(v -> {
+            if (listener != null) listener.onEditClick(item);
+        });
+
+        holder.ivTableMore.setOnClickListener(v -> {
+            if (listener != null) listener.onMoreClick(item, v);
+        });
     }
 
     @Override
     public int getItemCount() {
-        return tableList.size();
+        return tableList != null ? tableList.size() : 0;
     }
 
     public static class TableViewHolder extends RecyclerView.ViewHolder {
         TextView tvTableId, tvTableStatus, tvTableInfo, tvDateCreated;
+        ImageView ivTableEdit, ivTableMore;
 
         public TableViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -60,28 +89,8 @@ public class TableManageAdapter extends RecyclerView.Adapter<TableManageAdapter.
             tvTableStatus = itemView.findViewById(R.id.tvTableStatus);
             tvTableInfo = itemView.findViewById(R.id.tvTableInfo);
             tvDateCreated = itemView.findViewById(R.id.tvDateCreated);
+            ivTableEdit = itemView.findViewById(R.id.ivTableEdit);
+            ivTableMore = itemView.findViewById(R.id.ivTableMore);
         }
-    }
-
-    public static class TableItem {
-        private String tableId;
-        private String status;
-        private String area;
-        private int seats;
-        private String dateCreated;
-
-        public TableItem(String tableId, String status, String area, int seats, String dateCreated) {
-            this.tableId = tableId;
-            this.status = status;
-            this.area = area;
-            this.seats = seats;
-            this.dateCreated = dateCreated;
-        }
-
-        public String getTableId() { return tableId; }
-        public String getStatus() { return status; }
-        public String getArea() { return area; }
-        public int getSeats() { return seats; }
-        public String getDateCreated() { return dateCreated; }
     }
 }
