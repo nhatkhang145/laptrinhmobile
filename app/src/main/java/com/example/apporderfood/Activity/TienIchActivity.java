@@ -29,6 +29,7 @@ public class TienIchActivity extends AppCompatActivity {
     private LinearLayout navSoDo;
     private LinearLayout navTienIch;
     private TextView tvUserName;
+    private LinearLayout menuQuanLyNhanVien;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +59,7 @@ public class TienIchActivity extends AppCompatActivity {
         navSoDo            = findViewById(R.id.navSoDo);
         navTienIch         = findViewById(R.id.navTienIch);
         tvUserName         = findViewById(R.id.tvUserName);
+        menuQuanLyNhanVien = findViewById(R.id.menuQuanLyNhanVien);
     }
 
     private void loadUserInfo() {
@@ -117,6 +119,11 @@ public class TienIchActivity extends AppCompatActivity {
         });
 
         navTienIch.setOnClickListener(v -> { });
+
+        menuQuanLyNhanVien.setOnClickListener(v -> {
+            animatePress(v);
+            startActivity(new Intent(this, QuanLyNhanVienActivity.class));
+        });
     }
 
     private void animateEntrance() {
