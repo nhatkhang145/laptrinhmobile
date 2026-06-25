@@ -44,6 +44,7 @@ public class OrderController {
     @PostMapping("/open")
     public ResponseEntity<?> openTable(@RequestBody Map<String, Integer> data) {
         Integer tableId = data.get("tableId");
+        Integer userId = data.get("userId"); // Nhan vien tao order
 
         RestaurantTable table = tableRepo.findById(tableId).orElse(null);
         if (table == null) return ResponseEntity.badRequest()
@@ -54,9 +55,16 @@ public class OrderController {
                     .body(Map.of("message", "Ban nay dang co khach!"));
         }
 
+        com.zappy.entity.User user = null;
+        if (userId != null) {
+            user = new com.zappy.entity.User();
+            user.setId(userId);
+        }
+
         // Tao hoa don moi
         Order order = new Order();
         order.setTable(table);
+        order.setUser(user);
         order.setStatus(0);
         order.setTotalAmount(BigDecimal.ZERO);
         Order savedOrder = orderRepo.save(order);

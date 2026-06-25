@@ -35,5 +35,7 @@ public class RestaurantTable {
     // true = co khach (do), false = trong (xanh)
     @Column(name = "is_occupied", nullable = false)
     private Boolean isOccupied = false;
+    
+    @Transient
+    private Integer activeUserId;
 }
-

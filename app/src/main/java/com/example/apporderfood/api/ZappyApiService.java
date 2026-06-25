@@ -71,6 +71,9 @@ public interface ZappyApiService {
     @GET("api/tables/area/{areaId}")
     Call<List<TableModel>> getTablesByArea(@Path("areaId") Integer areaId);
 
+    @GET("api/tables/restaurant/{resId}")
+    Call<List<TableModel>> getAllTablesByRestaurant(@Path("resId") Integer resId);
+
     @PUT("api/tables/{id}/status")
     Call<TableModel> updateTableStatus(@Path("id") Integer tableId,
             @Body Map<String, Boolean> data);

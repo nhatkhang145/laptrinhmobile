@@ -82,6 +82,12 @@ public class LapOrderActivity extends AppCompatActivity {
         ZappyApiService api = RetrofitClient.getApiService();
         Map<String, Integer> data = new HashMap<>();
         data.put("tableId", tableId);
+        
+        android.content.SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
+        int userId = prefs.getInt("USER_ID", -1);
+        if (userId != -1) {
+            data.put("userId", userId);
+        }
 
         api.openTable(data).enqueue(new Callback<Map>() {
             @Override

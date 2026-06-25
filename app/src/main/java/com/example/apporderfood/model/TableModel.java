@@ -16,9 +16,13 @@ public class TableModel {
 
     @SerializedName("area")
     private Area area;
+    
+    @SerializedName("activeUserId")
+    private Integer activeUserId;
 
     public Integer getId()        { return id; }
     public String getTableName()  { return tableName; }
     public Boolean isOccupied()   { return isOccupied != null && isOccupied; }
     public Area getArea()         { return area; }
+    public Integer getActiveUserId() { return activeUserId; }
 }
