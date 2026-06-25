@@ -42,5 +42,8 @@ public class User {
     // Email cua nguoi dung
     @Column(name = "email", nullable = false)
     private String email;
+
+    @Column(name = "fullname")
+    private String fullname;
 }
 

@@ -23,6 +23,9 @@ public class User {
     @SerializedName("resDomain")
     private String resDomain;
 
+    @SerializedName("fullname")
+    private String fullname;
+
     // Getters
     public Integer getId()      { return id; }
     public String getUsername() { return username; }
@@ -30,6 +33,7 @@ public class User {
     public Integer getResId()   { return resId; }
     public String getResName()  { return resName; }
     public String getResDomain(){ return resDomain; }
+    public String getFullname() { return fullname; }
 
     /** Kiem tra co phai Quan ly khong */
     public boolean isManager()  { return role != null && role == 1; }

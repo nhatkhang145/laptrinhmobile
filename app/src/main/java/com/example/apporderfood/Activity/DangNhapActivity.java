@@ -118,6 +118,7 @@ public class DangNhapActivity extends AppCompatActivity {
                             .putInt("RES_ID",  user.getResId())
                             .putInt("ROLE",    user.getRole())
                             .putString("USERNAME", user.getUsername())
+                            .putString("FULLNAME", user.getFullname())
                             .apply();
 
                     // Chuyển sang màn hình chính
