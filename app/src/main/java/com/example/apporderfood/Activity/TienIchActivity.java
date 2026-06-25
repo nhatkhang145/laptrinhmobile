@@ -87,11 +87,15 @@ public class TienIchActivity extends AppCompatActivity {
             showLogoutDialog();
         });
 
-        navOrder.setOnClickListener(v ->
-                Toast.makeText(this, "Order", Toast.LENGTH_SHORT).show());
+        navOrder.setOnClickListener(v -> {
+            startActivity(new Intent(this, DanhSachOrderActivity.class));
+            overridePendingTransition(0, 0);
+        });
 
-        navSoDo.setOnClickListener(v ->
-                Toast.makeText(this, "So do", Toast.LENGTH_SHORT).show());
+        navSoDo.setOnClickListener(v -> {
+            startActivity(new Intent(this, SoDobanActivity.class));
+            overridePendingTransition(0, 0);
+        });
 
         navTienIch.setOnClickListener(v -> { });
     }

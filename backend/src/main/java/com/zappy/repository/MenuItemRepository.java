@@ -10,6 +10,16 @@ import java.util.List;
 public interface MenuItemRepository extends JpaRepository<MenuItem, Integer> {
     // Lay tat ca mon an trong 1 danh muc
     List<MenuItem> findByCategoryId(Integer catId);
-    // Lay tat ca mon an cua 1 nha hang (qua category -> restaurant)
+    // Lay tat ca mon an cua 1 nha hang (
     List<MenuItem> findByCategoryRestaurantId(Integer resId);
+
+    // Tim mon an theo ten cho 1 nha hang 
+    List<MenuItem> findByCategoryRestaurantIdAndItemNameContainingIgnoreCase(Integer resId, String keyword);
+
+    // Tim mon an theo ten trong 1 danh muc 
+    List<MenuItem> findByCategoryIdAndItemNameContainingIgnoreCase(Integer catId, String keyword);
+
+    // Thong ke mon an cua 1 nha hang
+    long countByCategoryRestaurantId(Integer resId);
+    long countByCategoryRestaurantIdAndIsAvailable(Integer resId, Boolean isAvailable);
 }

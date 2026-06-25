@@ -48,12 +48,39 @@ public class CategoryManageActivity extends AppCompatActivity {
         findViewById(R.id.btn_back).setOnClickListener(v -> finish());
         
         fabAddCategory.setOnClickListener(v -> showAddCategoryBottomSheet());
+
+        setupBottomNav();
     }
 
     private void showAddCategoryBottomSheet() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this, R.style.BottomSheetDialogTheme);
         View view = getLayoutInflater().inflate(R.layout.activity_them_danh_muc, null);
         bottomSheetDialog.setContentView(view);
+
+        // Fix the jumping issue
+        com.google.android.material.bottomsheet.BottomSheetBehavior<View> behavior = com.google.android.material.bottomsheet.BottomSheetBehavior.from((View) view.getParent());
+        behavior.setState(com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED);
+        behavior.setSkipCollapsed(true);
+        behavior.setHideable(false); // Initially false to prevent light flings
+        
+        behavior.addBottomSheetCallback(new com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(View bottomSheet, int newState) {
+                if (newState == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED) {
+                    behavior.setHideable(false);
+                }
+            }
+
+            @Override
+            public void onSlide(View bottomSheet, float slideOffset) {
+                // Khi kéo xuống dưới một nửa (slideOffset < 0.5), mới cho phép ẩn
+                if (slideOffset < 0.5f) {
+                    behavior.setHideable(true);
+                } else {
+                    behavior.setHideable(false);
+                }
+            }
+        });
 
         EditText edtName = view.findViewById(R.id.edt_category_name);
         TextView tvPreviewName = view.findViewById(R.id.tv_preview_name);
@@ -84,5 +111,31 @@ public class CategoryManageActivity extends AppCompatActivity {
         });
 
         bottomSheetDialog.show();
+    }
+
+    private void setupBottomNav() {
+        android.view.View navOrder = findViewById(R.id.navOrder);
+        android.view.View navSoDo = findViewById(R.id.navSoDo);
+        android.view.View navTienIch = findViewById(R.id.navTienIch);
+
+        if (navOrder != null) {
+            navOrder.setOnClickListener(v -> {
+                startActivity(new android.content.Intent(this, DanhSachOrderActivity.class));
+                overridePendingTransition(0, 0);
+            });
+        }
+        if (navSoDo != null) {
+            navSoDo.setOnClickListener(v -> {
+                startActivity(new android.content.Intent(this, SoDobanActivity.class));
+                overridePendingTransition(0, 0);
+            });
+        }
+        if (navTienIch != null) {
+            navTienIch.setOnClickListener(v -> {
+                startActivity(new android.content.Intent(this, TienIchActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
+            });
+        }
     }
 }

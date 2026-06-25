@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottomNavContainer">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -15,9 +20,10 @@
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:paddingEnd="16dp">
+            android:paddingEnd="14dp">
 
             <ImageButton
+                android:id="@+id/btn_back"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
@@ -45,7 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="14dp">
 
             <!-- Search Bar -->
             <LinearLayout
@@ -59,79 +65,31 @@
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:src="@drawable/ic_user"
+                    android:src="@android:drawable/ic_menu_search"
                     app:tint="@color/text_hint" />
 
                 <EditText
+                    android:id="@+id/etSearchFood"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
                     android:hint="Tìm món ăn..."
+                    android:singleLine="true"
+                    android:imeOptions="actionSearch"
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- Categories -->
-            <HorizontalScrollView
+            <!-- Categories (Dynamic Layout) -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvCategoryList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_tab_active_dark"
-                        android:paddingStart="20dp"
-                        android:paddingTop="8dp"
-                        android:paddingEnd="20dp"
-                        android:paddingBottom="8dp"
-                        android:text="Tất cả"
-                        android:textColor="@color/white" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_tab_inactive"
-                        android:paddingStart="20dp"
-                        android:paddingTop="8dp"
-                        android:paddingEnd="20dp"
-                        android:paddingBottom="8dp"
-                        android:text="Mì Cay"
-                        android:textColor="@color/text_secondary" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_tab_inactive"
-                        android:paddingStart="20dp"
-                        android:paddingTop="8dp"
-                        android:paddingEnd="20dp"
-                        android:paddingBottom="8dp"
-                        android:text="Lẩu"
-                        android:textColor="@color/text_secondary" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_tab_inactive"
-                        android:paddingStart="20dp"
-                        android:paddingTop="8dp"
-                        android:paddingEnd="20dp"
-                        android:paddingBottom="8dp"
-                        android:text="Đồ uống"
-                        android:textColor="@color/text_secondary" />
-                </LinearLayout>
-            </HorizontalScrollView>
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_category_tab" />
 
             <!-- Stats -->
             <LinearLayout
@@ -157,11 +115,12 @@
                         app:tint="@color/text_secondary" />
 
                     <TextView
+                        android:id="@+id/tvTotalItems"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:fontFamily="sans-serif-black"
-                        android:text="124"
+                        android:text="0"
                         android:textColor="@color/text_primary"
                         android:textSize="20sp" />
 
@@ -189,11 +148,12 @@
                         android:src="@drawable/bg_online_dot" />
 
                     <TextView
+                        android:id="@+id/tvAvailableItems"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:fontFamily="sans-serif-black"
-                        android:text="112"
+                        android:text="0"
                         android:textColor="@color/text_primary"
                         android:textSize="20sp" />
 
@@ -221,11 +181,12 @@
                         android:src="@drawable/bg_dot_red" />
 
                     <TextView
+                        android:id="@+id/tvOutOfStockItems"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:fontFamily="sans-serif-black"
-                        android:text="12"
+                        android:text="0"
                         android:textColor="@color/text_primary"
                         android:textSize="20sp" />
 
@@ -240,32 +201,37 @@
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvFoodList"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:padding="16dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:listitem="@layout/item_food_manage" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvFoodList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:padding="16dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:listitem="@layout/item_food_manage" />
+
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_food"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
+        android:layout_above="@id/bottomNavContainer"
+        android:layout_alignParentEnd="true"
         android:layout_margin="16dp"
-        android:layout_marginBottom="72dp"
         android:backgroundTint="@color/primary"
         android:src="@android:drawable/ic_input_add"
         app:tint="@color/white" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
+    <FrameLayout
+        android:id="@+id/bottomNavContainer"
         android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:layout_gravity="bottom"
-        android:background="@color/surface"
-        app:elevation="8dp"
-        app:menu="@menu/bottom_nav_menu" />
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        <include layout="@layout/layout_bottom_nav" />
+
+    </FrameLayout>
+
+</RelativeLayout>

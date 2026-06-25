@@ -1,5 +1,6 @@
 package com.example.apporderfood.Activity;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -81,10 +82,18 @@ public class ThongKeActivity extends AppCompatActivity {
         });
 
         // Bottom Navigation Listeners
-        navOrder.setOnClickListener(v -> Toast.makeText(this, "Order", Toast.LENGTH_SHORT).show());
-        navSoDo.setOnClickListener(v -> Toast.makeText(this, "Sơ đồ", Toast.LENGTH_SHORT).show());
+        navOrder.setOnClickListener(v -> {
+            startActivity(new Intent(this, DanhSachOrderActivity.class));
+            overridePendingTransition(0, 0);
+        });
+        navSoDo.setOnClickListener(v -> {
+            startActivity(new Intent(this, SoDobanActivity.class));
+            overridePendingTransition(0, 0);
+        });
         navTienIch.setOnClickListener(v -> {
-            // Đã ở màn hình Tiện ích/Thống kê nên không cần làm gì
+            startActivity(new Intent(this, TienIchActivity.class));
+            overridePendingTransition(0, 0);
+            finish();
         });
     }
 
