@@ -108,6 +108,10 @@ public interface ZappyApiService {
     @PUT("api/menu-items/{id}")
     Call<MenuItem> updateMenuItem(@Path("id") Integer id, @Body Map<String, Object> data);
 
+    @retrofit2.http.Multipart
+    @POST("api/upload/image")
+    Call<Map<String, String>> uploadImage(@retrofit2.http.Part okhttp3.MultipartBody.Part file);
+
     // ==========================================
     // ORDERS (Hoa don & Nghiep vu chinh)
     // ==========================================

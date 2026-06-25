@@ -24,6 +24,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -45,6 +46,41 @@ public class FoodManageActivity extends AppCompatActivity {
     private boolean isAvailable = true;
     private String currentKeyword = "";
     private Integer currentFilterCatId = null;
+
+    private android.net.Uri selectedImageUri = null;
+    private android.widget.ImageView ivFoodPreview;
+    private View layoutUploadPlaceholder;
+
+    private final androidx.activity.result.ActivityResultLauncher<android.content.Intent> imagePickerLauncher =
+            registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                            selectedImageUri = result.getData().getData();
+                            if (ivFoodPreview != null && layoutUploadPlaceholder != null) {
+                                com.bumptech.glide.Glide.with(this).load(selectedImageUri).into(ivFoodPreview);
+                                ivFoodPreview.setVisibility(View.VISIBLE);
+                                layoutUploadPlaceholder.setVisibility(View.GONE);
+                            }
+                        }
+                    });
+
+    private java.io.File getFileFromUri(android.net.Uri uri) {
+        try {
+            java.io.InputStream inputStream = getContentResolver().openInputStream(uri);
+            java.io.File tempFile = java.io.File.createTempFile("upload", ".jpg", getCacheDir());
+            java.io.FileOutputStream out = new java.io.FileOutputStream(tempFile);
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = inputStream.read(buf)) > 0) out.write(buf, 0, len);
+            out.close();
+            inputStream.close();
+            return tempFile;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -260,6 +296,26 @@ public class FoodManageActivity extends AppCompatActivity {
             }
         });
 
+        View layoutUploadImage = view.findViewById(R.id.layout_upload_image);
+        ivFoodPreview = view.findViewById(R.id.iv_food_preview);
+        layoutUploadPlaceholder = view.findViewById(R.id.layout_upload_placeholder);
+
+        layoutUploadImage.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_PICK);
+            intent.setType("image/*");
+            imagePickerLauncher.launch(intent);
+        });
+
+        selectedImageUri = null;
+        if (existingFood != null && existingFood.getImageUrl() != null) {
+            com.bumptech.glide.Glide.with(this).load(existingFood.getImageUrl()).into(ivFoodPreview);
+            ivFoodPreview.setVisibility(View.VISIBLE);
+            layoutUploadPlaceholder.setVisibility(View.GONE);
+        } else {
+            ivFoodPreview.setVisibility(View.GONE);
+            layoutUploadPlaceholder.setVisibility(View.VISIBLE);
+        }
+
         Spinner spinnerCategory = view.findViewById(R.id.spinner_category);
         loadCategoriesAndUnits(spinnerCategory, existingFood);
 
@@ -308,46 +364,71 @@ public class FoodManageActivity extends AppCompatActivity {
             data.put("isAvailable", isAvailable);
 
             ZappyApiService api = RetrofitClient.getApiService();
-            if (existingFood == null) {
-                api.createMenuItem(data).enqueue(new Callback<MenuItem>() {
-                    @Override
-                    public void onResponse(Call<MenuItem> call, Response<MenuItem> response) {
-                        if (response.isSuccessful()) {
-                            Toast.makeText(FoodManageActivity.this, "Thêm món thành công!", Toast.LENGTH_SHORT).show();
-                            bottomSheetDialog.dismiss();
-                            loadMenuFromApi(currentKeyword);
-                        } else {
-                            Toast.makeText(FoodManageActivity.this, "Lỗi thêm món: " + response.code(), Toast.LENGTH_SHORT).show();
+            if (selectedImageUri != null) {
+                java.io.File file = getFileFromUri(selectedImageUri);
+                if (file != null) {
+                    okhttp3.RequestBody requestFile = okhttp3.RequestBody.create(okhttp3.MediaType.parse("image/*"), file);
+                    okhttp3.MultipartBody.Part body = okhttp3.MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+                    api.uploadImage(body).enqueue(new Callback<Map<String, String>>() {
+                        @Override
+                        public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
+                            if (response.isSuccessful() && response.body() != null) {
+                                data.put("imageUrl", response.body().get("url"));
+                                saveFoodData(api, data, existingFood, bottomSheetDialog);
+                            } else {
+                                Toast.makeText(FoodManageActivity.this, "Lỗi upload ảnh", Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-
-                    @Override
-                    public void onFailure(Call<MenuItem> call, Throwable t) {
-                        Toast.makeText(FoodManageActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                        @Override
+                        public void onFailure(Call<Map<String, String>> call, Throwable t) {
+                            Toast.makeText(FoodManageActivity.this, "Lỗi kết nối upload", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             } else {
-                api.updateMenuItem(existingFood.getId(), data).enqueue(new Callback<MenuItem>() {
-                    @Override
-                    public void onResponse(Call<MenuItem> call, Response<MenuItem> response) {
-                        if (response.isSuccessful()) {
-                            Toast.makeText(FoodManageActivity.this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
-                            bottomSheetDialog.dismiss();
-                            loadMenuFromApi(currentKeyword);
-                        } else {
-                            Toast.makeText(FoodManageActivity.this, "Lỗi cập nhật: " + response.code(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<MenuItem> call, Throwable t) {
-                        Toast.makeText(FoodManageActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                saveFoodData(api, data, existingFood, bottomSheetDialog);
             }
         });
 
         bottomSheetDialog.show();
+    }
+
+    private void saveFoodData(ZappyApiService api, java.util.Map<String, Object> data, MenuItem existingFood, BottomSheetDialog bottomSheetDialog) {
+        if (existingFood == null) {
+            api.createMenuItem(data).enqueue(new Callback<MenuItem>() {
+                @Override
+                public void onResponse(Call<MenuItem> call, Response<MenuItem> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(FoodManageActivity.this, "Thêm món thành công!", Toast.LENGTH_SHORT).show();
+                        bottomSheetDialog.dismiss();
+                        loadMenuFromApi(currentKeyword);
+                    } else {
+                        Toast.makeText(FoodManageActivity.this, "Lỗi thêm món: " + response.code(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onFailure(Call<MenuItem> call, Throwable t) {
+                    Toast.makeText(FoodManageActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            api.updateMenuItem(existingFood.getId(), data).enqueue(new Callback<MenuItem>() {
+                @Override
+                public void onResponse(Call<MenuItem> call, Response<MenuItem> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(FoodManageActivity.this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
+                        bottomSheetDialog.dismiss();
+                        loadMenuFromApi(currentKeyword);
+                    } else {
+                        Toast.makeText(FoodManageActivity.this, "Lỗi cập nhật: " + response.code(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onFailure(Call<MenuItem> call, Throwable t) {
+                    Toast.makeText(FoodManageActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     private void setupStatusToggle(View view) {
