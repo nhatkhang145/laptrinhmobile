@@ -58,6 +58,8 @@ public class FoodManageActivity extends AppCompatActivity {
         loadMenuFromApi();
 
         fabAddFood.setOnClickListener(v -> showAddFoodBottomSheet());
+
+        setupBottomNav();
     }
 
     /**
@@ -241,5 +243,31 @@ public class FoodManageActivity extends AppCompatActivity {
         available.setOnClickListener(listener);
         soldOut.setOnClickListener(listener);
         paused.setOnClickListener(listener);
+    }
+
+    private void setupBottomNav() {
+        android.view.View navOrder = findViewById(R.id.navOrder);
+        android.view.View navSoDo = findViewById(R.id.navSoDo);
+        android.view.View navTienIch = findViewById(R.id.navTienIch);
+
+        if (navOrder != null) {
+            navOrder.setOnClickListener(v -> {
+                startActivity(new android.content.Intent(this, DanhSachOrderActivity.class));
+                overridePendingTransition(0, 0);
+            });
+        }
+        if (navSoDo != null) {
+            navSoDo.setOnClickListener(v -> {
+                startActivity(new android.content.Intent(this, SoDobanActivity.class));
+                overridePendingTransition(0, 0);
+            });
+        }
+        if (navTienIch != null) {
+            navTienIch.setOnClickListener(v -> {
+                startActivity(new android.content.Intent(this, TienIchActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
+            });
+        }
     }
 }

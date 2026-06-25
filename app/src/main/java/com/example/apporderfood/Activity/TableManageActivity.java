@@ -41,5 +41,32 @@ public class TableManageActivity extends AppCompatActivity {
             Intent intent = new Intent(TableManageActivity.this, ThemBanMoiActivity.class);
             startActivity(intent);
         });
+
+        setupBottomNav();
+    }
+    private void setupBottomNav() {
+        android.view.View navOrder = findViewById(R.id.navOrder);
+        android.view.View navSoDo = findViewById(R.id.navSoDo);
+        android.view.View navTienIch = findViewById(R.id.navTienIch);
+
+        if (navOrder != null) {
+            navOrder.setOnClickListener(v -> {
+                startActivity(new Intent(this, DanhSachOrderActivity.class));
+                overridePendingTransition(0, 0);
+            });
+        }
+        if (navSoDo != null) {
+            navSoDo.setOnClickListener(v -> {
+                startActivity(new Intent(this, SoDobanActivity.class));
+                overridePendingTransition(0, 0);
+            });
+        }
+        if (navTienIch != null) {
+            navTienIch.setOnClickListener(v -> {
+                startActivity(new Intent(this, TienIchActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
+            });
+        }
     }
 }

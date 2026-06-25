@@ -48,6 +48,8 @@ public class CategoryManageActivity extends AppCompatActivity {
         findViewById(R.id.btn_back).setOnClickListener(v -> finish());
         
         fabAddCategory.setOnClickListener(v -> showAddCategoryBottomSheet());
+
+        setupBottomNav();
     }
 
     private void showAddCategoryBottomSheet() {
@@ -84,5 +86,31 @@ public class CategoryManageActivity extends AppCompatActivity {
         });
 
         bottomSheetDialog.show();
+    }
+
+    private void setupBottomNav() {
+        android.view.View navOrder = findViewById(R.id.navOrder);
+        android.view.View navSoDo = findViewById(R.id.navSoDo);
+        android.view.View navTienIch = findViewById(R.id.navTienIch);
+
+        if (navOrder != null) {
+            navOrder.setOnClickListener(v -> {
+                startActivity(new android.content.Intent(this, DanhSachOrderActivity.class));
+                overridePendingTransition(0, 0);
+            });
+        }
+        if (navSoDo != null) {
+            navSoDo.setOnClickListener(v -> {
+                startActivity(new android.content.Intent(this, SoDobanActivity.class));
+                overridePendingTransition(0, 0);
+            });
+        }
+        if (navTienIch != null) {
+            navTienIch.setOnClickListener(v -> {
+                startActivity(new android.content.Intent(this, TienIchActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
+            });
+        }
     }
 }
