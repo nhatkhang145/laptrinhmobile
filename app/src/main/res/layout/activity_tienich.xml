@@ -149,6 +149,286 @@
             </androidx.cardview.widget.CardView>
 
             <TextView
+                android:id="@+id/tvAdminSectionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Quản lý"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/adminMenuCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Thong ke -->
+                    <LinearLayout
+                        android:id="@+id/menuThongKe"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <FrameLayout
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/bg_icon_gray">
+                            <com.mikepenz.iconics.view.IconicsImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                app:iiv_color="@color/text_secondary"
+                                app:iiv_icon="faw-chart-bar"
+                                app:iiv_size="18dp"/>
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-medium"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="8dp"
+                            android:text="Thống kê"
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp"
+                            android:textStyle="bold"/>
+
+                        <com.mikepenz.iconics.view.IconicsImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            app:iiv_color="@color/text_hint"
+                            app:iiv_icon="faw-angle-right"
+                            app:iiv_size="18dp"/>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="70dp"
+                        android:background="@color/divider"/>
+
+                    <!-- Quan ly nhan vien -->
+                    <LinearLayout
+                        android:id="@+id/menuQuanLyNhanVien"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <FrameLayout
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/bg_icon_gray">
+                            <com.mikepenz.iconics.view.IconicsImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                app:iiv_color="@color/text_secondary"
+                                app:iiv_icon="faw-users"
+                                app:iiv_size="18dp"/>
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-medium"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="8dp"
+                            android:text="Quản lý nhân viên"
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp"
+                            android:textStyle="bold"/>
+
+                        <com.mikepenz.iconics.view.IconicsImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            app:iiv_color="@color/text_hint"
+                            app:iiv_icon="faw-angle-right"
+                            app:iiv_size="18dp"/>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="70dp"
+                        android:background="@color/divider"/>
+
+                    <!-- Quan ly mon an -->
+                    <LinearLayout
+                        android:id="@+id/menuQuanLyMonAn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <FrameLayout
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/bg_icon_gray">
+                            <com.mikepenz.iconics.view.IconicsImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                app:iiv_color="@color/text_secondary"
+                                app:iiv_icon="faw-utensils"
+                                app:iiv_size="18dp"/>
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-medium"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="8dp"
+                            android:text="Quản lý món ăn"
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp"
+                            android:textStyle="bold"/>
+
+                        <com.mikepenz.iconics.view.IconicsImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            app:iiv_color="@color/text_hint"
+                            app:iiv_icon="faw-angle-right"
+                            app:iiv_size="18dp"/>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="70dp"
+                        android:background="@color/divider"/>
+
+                    <!-- Quan ly ban -->
+                    <LinearLayout
+                        android:id="@+id/menuQuanLyBan"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <FrameLayout
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/bg_icon_gray">
+                            <com.mikepenz.iconics.view.IconicsImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                app:iiv_color="@color/text_secondary"
+                                app:iiv_icon="faw-chair"
+                                app:iiv_size="18dp"/>
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-medium"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="8dp"
+                            android:text="Quản lý bàn"
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp"
+                            android:textStyle="bold"/>
+
+                        <com.mikepenz.iconics.view.IconicsImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            app:iiv_color="@color/text_hint"
+                            app:iiv_icon="faw-angle-right"
+                            app:iiv_size="18dp"/>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="70dp"
+                        android:background="@color/divider"/>
+
+                    <!-- Quan ly danh muc -->
+                    <LinearLayout
+                        android:id="@+id/menuQuanLyDanhMuc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <FrameLayout
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/bg_icon_gray">
+                            <com.mikepenz.iconics.view.IconicsImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                app:iiv_color="@color/text_secondary"
+                                app:iiv_icon="faw-list-alt"
+                                app:iiv_size="18dp"/>
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-medium"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="8dp"
+                            android:text="Quản lý danh mục"
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp"
+                            android:textStyle="bold"/>
+
+                        <com.mikepenz.iconics.view.IconicsImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            app:iiv_color="@color/text_hint"
+                            app:iiv_icon="faw-angle-right"
+                            app:iiv_size="18dp"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <TextView
                 android:id="@+id/tvSectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

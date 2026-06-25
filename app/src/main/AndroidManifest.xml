@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Quyen ket noi Internet de goi API Spring Boot backend -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".ZappyApp"
         android:allowBackup="true"
@@ -11,20 +14,83 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppOrderFood">
+        android:theme="@style/Theme.AppOrderFood"
+        android:usesCleartextTraffic="true">
+
+        <activity
+            android:name=".Activity.CategoryManageActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".Activity.ThemBanMoiActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".Activity.TableManageActivity"
+            android:exported="true" />
+
+        <activity
+            android:name=".Activity.FoodManageActivity"
+            android:exported="true" />
+
         <activity
             android:name=".Activity.TienIchActivity"
+            android:exported="true" />
+
+        <activity
+            android:name=".Activity.DangKyActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".Activity.DangNhapActivity"
+            android:exported="true" />
+
         <activity
             android:name=".Activity.ChangePasswordActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize"/>
+
+        <!-- ===== Màn hình Sơ đồ bàn ===== -->
+        <activity
+            android:name=".Activity.SoDobanActivity"
+            android:exported="true" />
+
+        <!-- ===== Popup thông tin bàn có khách ===== -->
+        <activity
+            android:name=".Activity.ThongTinBanActivity"
+            android:exported="false" />
+
+        <!-- ===== Lập order (bàn trống) ===== -->
+        <activity
+            android:name=".Activity.LapOrderActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- ===== Xác nhận order / Gửi đơn bếp ===== -->
+        <activity
+            android:name=".Activity.XacNhanOrderActivity"
+            android:exported="false" />
+
+        <!-- ===== Danh sách bàn đang order (tab Order) ===== -->
+        <activity
+            android:name=".Activity.DanhSachOrderActivity"
+            android:exported="true" />
+
+        <!-- ===== Chi tiết bàn đang phục vụ ===== -->
+        <activity
+            android:name=".Activity.ChiTietBanActivity"
+            android:exported="false" />
+
+        <!-- ===== Hóa đơn / Thanh toán ===== -->
+        <activity
+            android:name=".Activity.HoaDonActivity"
+            android:exported="false" />
+
         </application>
 
 </manifest>

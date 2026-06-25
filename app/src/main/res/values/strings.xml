@@ -77,4 +77,80 @@
     <string name="set_new_password_title">Đặt lại mật khẩu</string>
     <string name="set_new_password_subtitle">Vui lòng nhập mật khẩu mới của bạn để&#10;hoàn tất việc khôi phục tài khoản.</string>
 
+
+    <!-- Thống kê doanh thu screen -->
+    <string name="title_thong_ke">Thống kê doanh thu</string>
+    <string name="tab_hom_nay">Hôm nay</string>
+    <string name="tab_tuan_nay">Tuần này</string>
+    <string name="tab_thang_nay">Tháng này</string>
+    <string name="label_tong_doanh_thu">TỔNG DOANH THU</string>
+    <string name="format_tien_te">%1$s đ</string> <!-- Dùng để format 15.250.000 đ -->
+    <string name="format_growth">%1$s so với hôm qua</string>
+    <string name="label_tong_don_hang">Tổng đơn hàng</string>
+    <string name="label_mon_da_huy">Món đã hủy</string>
+    <string name="label_ban_chua_thanh_toan">Bàn chưa thanh toán</string>
+    <string name="format_don_hang">%1$d đơn</string>
+    <string name="format_mon">%1$d món</string>
+    <string name="format_ban">%1$d bàn</string>
+
+    <!-- Quản lý nhân viên screen -->
+    <string name="title_quan_ly_nhan_vien">Quản lý nhân viên</string>
+    <string name="hint_tim_nhan_vien">Tìm nhân viên...</string>
+
+    <string name="tab_tat_ca">Tất cả</string>
+    <string name="tab_admin">Admin</string>
+    <string name="tab_quan_ly">Quản lý</string>
+    <string name="tab_thu_ngan">Thu ngân</string>
+    <string name="tab_phuc_vu">Phục vụ</string>
+    <string name="tab_bep">Bếp</string>
+
+    <string name="label_tong_so">Tổng số</string>
+    <string name="label_online">Online</string>
+    <string name="label_offline">Offline</string>
+
+    <string name="label_them_nhan_vien">Thêm nhân viên</string>
+
+    <!-- Bottom Navigation Quản lý nhân viên screen -->
+    <string name="nav_tables">Tables</string>
+    <string name="nav_orders">Orders</string>
+    <string name="nav_menu">Menu</string>
+    <string name="nav_more">More</string>
+
+    <!-- Trạng thái chi tiết trong item list -->
+    <string name="status_online">đang online</string>
+    <string name="status_working">đang làm việc</string>
+    <string name="status_offline_detail">Offline</string>
+
+    <!-- Chi tiết nhân viên screen -->
+    <string name="title_chi_tiet_nhan_vien">Chi tiết nhân viên</string>
+    <string name="label_dang_lam">ĐANG LÀM</string>
+    <string name="label_phuc_vu_fulltime">Phục vụ • Full-time</string>
+    <string name="label_so_gio_lam">Số giờ làm</string>
+    <string name="label_don_hang">Đơn hàng</string>
+    <string name="label_danh_gia">Đánh giá</string>
+    <string name="title_thong_tin_ca_nhan">Thông tin cá nhân</string>
+    <string name="label_ma_nhan_vien">Mã nhân viên</string>
+    <string name="label_so_dien_thoai">Số điện thoại</string>
+    <string name="label_email">Email</string>
+    <string name="label_dia_chi">Địa chỉ</string>
+    <string name="title_chi_tiet_cong_viec">Chi tiết công việc</string>
+    <string name="label_bo_phan">Bộ phận</string>
+    <string name="label_ngay_gia_nhap">Ngày gia nhập</string>
+    <string name="label_muc_luong">Mức lương</string>
+    <string name="btn_phan_ca">Phân ca làm việc</string>
+    <string name="btn_xem_lich_su">Xem lịch sử</string>
+
+    <!-- Thêm nhân viên screen -->
+    <string name="title_them_nhan_vien">Thêm nhân viên</string>
+    <string name="label_tai_anh_len">Tải ảnh lên</string>
+    <string name="label_ho_va_ten">Họ và tên</string>
+    <string name="hint_ho_va_ten">Nhập tên nhân viên</string>
+    <string name="label_so_dien_thoai_input">Số điện thoại</string>
+    <string name="hint_so_dien_thoai">Nhập số điện thoại</string>
+    <string name="label_ten_dang_nhap">Tên đăng nhập</string>
+    <string name="hint_ten_dang_nhap">vd: nhanvien01</string>
+    <string name="label_mat_khau">Mật khẩu</string>
+    <string name="label_phan_quyen">Phân quyền vị trí</string>
+    <string name="label_trang_thai_hoat_dong">Trạng thái hoạt động</string>
+    <string name="btn_xac_nhan_them">Xác nhận thêm</string>
 </resources>

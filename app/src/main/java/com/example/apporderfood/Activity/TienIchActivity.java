@@ -20,6 +20,9 @@ public class TienIchActivity extends AppCompatActivity {
 
     private LinearLayout menuChangePassword;
     private LinearLayout menuLogout;
+    private LinearLayout menuQuanLyMonAn;
+    private LinearLayout menuQuanLyBan;
+    private LinearLayout menuQuanLyDanhMuc;
     private LinearLayout navOrder;
     private LinearLayout navSoDo;
     private LinearLayout navTienIch;
@@ -44,6 +47,9 @@ public class TienIchActivity extends AppCompatActivity {
     private void initViews() {
         menuChangePassword = findViewById(R.id.menuChangePassword);
         menuLogout         = findViewById(R.id.menuLogout);
+        menuQuanLyMonAn    = findViewById(R.id.menuQuanLyMonAn);
+        menuQuanLyBan      = findViewById(R.id.menuQuanLyBan);
+        menuQuanLyDanhMuc  = findViewById(R.id.menuQuanLyDanhMuc);
         navOrder           = findViewById(R.id.navOrder);
         navSoDo            = findViewById(R.id.navSoDo);
         navTienIch         = findViewById(R.id.navTienIch);
@@ -54,6 +60,21 @@ public class TienIchActivity extends AppCompatActivity {
         findViewById(R.id.btnClose).setOnClickListener(v -> {
             animatePress(v);
             finish();
+        });
+
+        menuQuanLyMonAn.setOnClickListener(v -> {
+            animatePress(v);
+            startActivity(new Intent(this, FoodManageActivity.class));
+        });
+
+        menuQuanLyBan.setOnClickListener(v -> {
+            animatePress(v);
+            startActivity(new Intent(this, TableManageActivity.class));
+        });
+
+        menuQuanLyDanhMuc.setOnClickListener(v -> {
+            animatePress(v);
+            startActivity(new Intent(this, CategoryManageActivity.class));
         });
 
         menuChangePassword.setOnClickListener(v -> {

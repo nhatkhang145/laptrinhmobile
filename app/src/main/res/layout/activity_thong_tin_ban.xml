@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <!-- ==================== TOP APP BAR ==================== -->
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/surface"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <!-- Hamburger icon -->
+        <com.mikepenz.iconics.view.IconicsImageView
+            android:id="@+id/btnMenu"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="8dp"
+            app:iiv_color="@color/text_primary"
+            app:iiv_icon="faw-bars"
+            app:iiv_size="20dp" />
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Sơ đồ bàn"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Avatar button -->
+        <FrameLayout
+            android:id="@+id/btnAvatar"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_avatar_dark"
+            android:clickable="true"
+            android:focusable="true">
+
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                app:iiv_color="#B0C4DE"
+                app:iiv_icon="faw-user"
+                app:iiv_size="18dp" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <!-- Header divider -->
+    <View
+        android:id="@+id/headerDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/headerLayout"
+        android:background="@color/divider" />
+
+    <!-- ==================== BOTTOM NAVIGATION ==================== -->
+    <LinearLayout
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/bg_bottom_nav"
+        android:elevation="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- Order Tab -->
+        <LinearLayout
+            android:id="@+id/navOrder"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:id="@+id/navOrderIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="Order"
+                app:iiv_color="@color/nav_icon_inactive"
+                app:iiv_icon="faw-clipboard-list"
+                app:iiv_size="22dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="@string/nav_order"
+                android:textColor="@color/nav_icon_inactive"
+                android:textSize="11sp" />
+
+        </LinearLayout>
+
+        <!-- Sơ đồ Tab (Active) -->
+        <LinearLayout
+            android:id="@+id/navSoDo"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/navSoDoPill"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_nav_active"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingStart="18dp"
+                android:paddingTop="7dp"
+                android:paddingEnd="18dp"
+                android:paddingBottom="7dp">
+
+                <com.mikepenz.iconics.view.IconicsImageView
+                    android:id="@+id/navSoDoIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:contentDescription="So do ban"
+                    app:iiv_color="@color/accent"
+                    app:iiv_icon="faw-th-large"
+                    app:iiv_size="22dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="@string/nav_so_do"
+                    android:textColor="@color/accent"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Tiện ích Tab -->
+        <LinearLayout
+            android:id="@+id/navTienIch"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:id="@+id/navTienIchIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="Tien ich"
+                app:iiv_color="@color/nav_icon_inactive"
+                app:iiv_icon="faw-cog"
+                app:iiv_size="22dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="@string/nav_tien_ich"
+                android:textColor="@color/nav_icon_inactive"
+                android:textSize="11sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- ==================== DIM OVERLAY + POPUP ==================== -->
+    <!-- Semi-transparent dim background -->
+    <FrameLayout
+        android:id="@+id/dimOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottomNav"
+        android:layout_below="@id/headerDivider"
+        android:background="#99475569"
+        android:clickable="true"
+        android:focusable="true">
+
+        <!-- Popup Card (centered) -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/popupCard"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:cardBackgroundColor="@color/surface"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingStart="28dp"
+                android:paddingTop="28dp"
+                android:paddingEnd="28dp"
+                android:paddingBottom="20dp">
+
+                <!-- Label: THÔNG TIN BÀN -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.08"
+                    android:text="THÔNG TIN BÀN"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp" />
+
+                <!-- Table name -->
+                <TextView
+                    android:id="@+id/tvPopupTableName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Bàn 02"
+                    android:textColor="@color/text_primary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <!-- Amount -->
+                <TextView
+                    android:id="@+id/tvPopupAmount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="450.000đ"
+                    android:textColor="@color/text_primary"
+                    android:textSize="36sp"
+                    android:textStyle="bold" />
+
+                <!-- Time elapsed -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <com.mikepenz.iconics.view.IconicsImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginEnd="5dp"
+                        app:iiv_color="#F97316"
+                        app:iiv_icon="faw-clock"
+                        app:iiv_size="14dp" />
+
+                    <TextView
+                        android:id="@+id/tvPopupTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="45 phút đã trôi qua"
+                        android:textColor="#F97316"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+                <!-- Button: XEM CHI TIẾT ĐƠN -->
+                <LinearLayout
+                    android:id="@+id/btnViewDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="24dp"
+                    android:background="@drawable/bg_btn_primary"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.05"
+                        android:text="XEM CHI TIẾT ĐƠN"
+                        android:textColor="@color/surface"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <com.mikepenz.iconics.view.IconicsImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_marginStart="6dp"
+                        app:iiv_color="@color/surface"
+                        app:iiv_icon="faw-angle-right"
+                        app:iiv_size="16dp" />
+
+                </LinearLayout>
+
+                <!-- Button: ĐÓNG -->
+                <TextView
+                    android:id="@+id/btnClose"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.06"
+                    android:paddingStart="16dp"
+                    android:paddingTop="6dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="6dp"
+                    android:text="ĐÓNG"
+                    android:textColor="@color/accent"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </FrameLayout>
+
+</RelativeLayout>

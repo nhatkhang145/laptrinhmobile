@@ -1,0 +1,127 @@
+package com.zappy.controller;
+
+import com.zappy.entity.Restaurant;
+import com.zappy.entity.User;
+import com.zappy.repository.RestaurantRepository;
+import com.zappy.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * API Dang nhap & Quan ly tai khoan
+ *
+ * POST /api/users/login             -> Dang nhap
+ * GET  /api/users/restaurant/{resId}-> Lay danh sach nhan vien cua nha hang
+ * POST /api/users                   -> Quan ly tao tai khoan nhan vien
+ * PUT  /api/users/{id}/password     -> Doi mat khau
+ * DELETE /api/users/{id}            -> Quan ly xoa tai khoan
+ */
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+
+    @Autowired
+    private UserRepository userRepo;
+
+    @Autowired
+    private RestaurantRepository restaurantRepo;
+
+    // ==========================================
+    // DANG NHAP
+    // ==========================================
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
+        String domain   = loginData.get("domain");    // domain nha hang
+        String username = loginData.get("username");
+        String password = loginData.get("password");
+
+        // B1: Tim nha hang theo domain
+        Restaurant restaurant = restaurantRepo.findByResDomain(domain)
+                .orElse(null);
+        if (restaurant == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Khong tim thay nha hang voi domain: " + domain));
+        }
+
+        // B2: Tim user trong nha hang do
+        User user = userRepo.findByUsernameAndRestaurantId(username, restaurant.getId())
+                .orElse(null);
+        if (user == null || !user.getPassword().equals(password)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Sai username hoac mat khau!"));
+        }
+
+        // B3: Dang nhap thanh cong - tra ve thong tin user
+        return ResponseEntity.ok(Map.of(
+                "id",         user.getId(),
+                "username",   user.getUsername(),
+                "role",       user.getRole(),
+                "resId",      restaurant.getId(),
+                "resName",    restaurant.getResName(),
+                "resDomain",  restaurant.getResDomain()
+        ));
+    }
+
+    // Lay danh sach nhan vien cua 1 nha hang
+    @GetMapping("/restaurant/{resId}")
+    public List<User> getByRestaurant(@PathVariable Integer resId) {
+        return userRepo.findByRestaurantId(resId);
+    }
+
+    // Quan ly tao tai khoan nhan vien moi
+    @PostMapping
+    public ResponseEntity<?> create(@RequestBody Map<String, Object> data) {
+        Integer resId    = (Integer) data.get("resId");
+        String username  = (String)  data.get("username");
+        String password  = (String)  data.get("password");
+        Integer role     = (Integer) data.get("role");
+
+        Restaurant restaurant = restaurantRepo.findById(resId)
+                .orElse(null);
+        if (restaurant == null) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Khong tim thay nha hang!"));
+        }
+
+        User user = new User();
+        user.setRestaurant(restaurant);
+        user.setUsername(username);
+        user.setPassword(password); // TODO: nen hash bang BCrypt
+        user.setRole(role != null ? role : 0);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(userRepo.save(user));
+    }
+
+    // Doi mat khau
+    @PutMapping("/{id}/password")
+    public ResponseEntity<?> changePassword(@PathVariable Integer id,
+                                            @RequestBody Map<String, String> data) {
+        String oldPassword = data.get("oldPassword");
+        String newPassword = data.get("newPassword");
+
+        return userRepo.findById(id).map(user -> {
+            if (!user.getPassword().equals(oldPassword)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("message", "Mat khau cu khong dung!"));
+            }
+            user.setPassword(newPassword); // TODO: hash
+            userRepo.save(user);
+            return ResponseEntity.ok(Map.of("message", "Doi mat khau thanh cong!"));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    // Quan ly xoa tai khoan nhan vien
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Integer id) {
+        if (!userRepo.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        userRepo.deleteById(id);
+        return ResponseEntity.ok(Map.of("message", "Da xoa tai khoan!"));
+    }
+}
