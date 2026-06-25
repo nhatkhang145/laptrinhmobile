@@ -28,13 +28,13 @@ INSERT INTO users (res_id, username, password, role, email, fullname) VALUES
 
 -- Chi nhánh 2: Mỳ Cay Seoul Bình Thạnh (res_id = 2)
 INSERT INTO users (res_id, username, password, role, email, fullname) VALUES
-(2, 'admin',   '123456', 1, 'admin2@gmail.com', 'Admin BT'),
+(2, 'admin2',   '123456', 1, 'admin2@gmail.com', 'Admin BT'),
 (2, 'nv_binhthanh01', '123456', 0, 'nv3@gmail.com', 'Nhân viên 3'),
 (2, 'nv_binhthanh02', '123456', 0, 'nv4@gmail.com', 'Nhân viên 4');
 
 -- Chi nhánh 3: Phở Hà Nội 1975 (res_id = 3)
 INSERT INTO users (res_id, username, password, role, email, fullname) VALUES
-(3, 'admin',   '123456', 1, 'admin3@gmail.com', 'Admin HN'),
+(3, 'admin3',   '123456', 1, 'admin3@gmail.com', 'Admin HN'),
 (3, 'nv_pho01', '123456', 0, 'nv5@gmail.com', 'Nhân viên 5');
 
 -- ============================================================
