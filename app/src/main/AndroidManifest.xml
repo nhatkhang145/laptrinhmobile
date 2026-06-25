@@ -4,6 +4,8 @@
 
     <!-- Quyen ket noi Internet de goi API Spring Boot backend -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
         android:name=".ZappyApp"
@@ -18,11 +20,17 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".Activity.CategoryManageActivity"
-            android:exported="false" />
+            android:name=".Activity.ThemDanhMucActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".Activity.ThemBanMoiActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".Activity.CategoryManageActivity"
             android:exported="false" />
 
         <activity
