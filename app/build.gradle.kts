@@ -71,6 +71,7 @@ dependencies {
     // Gson converter - tu dong chuyen JSON <-> Object Java
     implementation(libs.retrofit.gson)
     implementation(libs.gsonfull)
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

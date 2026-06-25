@@ -39,6 +39,15 @@ public class FoodManageAdapter extends RecyclerView.Adapter<FoodManageAdapter.Fo
         holder.tvPrice.setText(item.getPrice());
         holder.tvStatus.setText(item.getStatus());
 
+        if (item.getRawItem() != null && item.getRawItem().getImageUrl() != null) {
+            com.bumptech.glide.Glide.with(holder.itemView.getContext())
+                .load(item.getRawItem().getImageUrl())
+                .placeholder(R.drawable.bg_food_image)
+                .into(holder.ivFood);
+        } else {
+            holder.ivFood.setImageResource(R.drawable.bg_food_image);
+        }
+
         // Update status UI
         if ("CÒN MÓN".equals(item.getStatus())) {
             holder.tvStatus.setBackgroundResource(R.drawable.bg_status_available);

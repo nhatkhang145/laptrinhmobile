@@ -89,6 +89,9 @@ public class MenuItemController {
         if (data.containsKey("isAvailable")) {
             item.setIsAvailable((Boolean) data.get("isAvailable"));
         }
+        if (data.containsKey("imageUrl")) {
+            item.setImageUrl((String) data.get("imageUrl"));
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(menuItemRepo.save(item));
     }
 
@@ -105,6 +108,9 @@ public class MenuItemController {
             }
             if (data.containsKey("isAvailable")) {
                 item.setIsAvailable((Boolean) data.get("isAvailable"));
+            }
+            if (data.containsKey("imageUrl")) {
+                item.setImageUrl((String) data.get("imageUrl"));
             }
             if (data.containsKey("catId")) {
                 Integer catId = (Integer) data.get("catId");

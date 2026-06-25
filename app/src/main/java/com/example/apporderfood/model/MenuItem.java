@@ -10,6 +10,7 @@ public class MenuItem {
     @SerializedName("category") private Category category;
     @SerializedName("unit")     private Unit unit;
     @SerializedName("isAvailable") private Boolean isAvailable;
+    @SerializedName("imageUrl") private String imageUrl;
 
     public Integer getId()         { return id; }
     public String getItemName()    { return itemName; }
@@ -18,4 +19,6 @@ public class MenuItem {
     public Unit getUnit()          { return unit; }
     public Boolean getIsAvailable() { return isAvailable; }
     public void setIsAvailable(Boolean isAvailable) { this.isAvailable = isAvailable; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }
