@@ -200,6 +200,14 @@
                             android:textColor="@color/text_primary"
                             android:textColorHint="@color/text_hint"
                             android:textSize="15sp" />
+
+                        <ImageButton
+                            android:id="@+id/btnTogglePassword"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:background="@android:color/transparent"
+                            android:src="@drawable/ic_visibility_hidden"
+                            app:tint="@color/text_hint" />
                     </LinearLayout>
 
                     <!-- FORGOT PASSWORD -->
