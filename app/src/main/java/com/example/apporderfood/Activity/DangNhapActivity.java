@@ -2,11 +2,14 @@ package com.example.apporderfood.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
+import android.widget.ImageButton;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.apporderfood.R;
@@ -26,6 +29,8 @@ public class DangNhapActivity extends AppCompatActivity {
     private EditText etRestaurantUsername, etUsername, etPassword;
     private LinearLayout btnLogin;
     private TextView tvRegister, tvForgotPassword;
+    private ImageButton btnTogglePassword;
+    private boolean isPasswordVisible = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +49,30 @@ public class DangNhapActivity extends AppCompatActivity {
         });
 
         btnLogin.setOnClickListener(v -> handleLogin());
+        btnTogglePassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                togglePasswordVisibility();
+            }
+        });
+    }
+
+    private void togglePasswordVisibility() {
+        if (isPasswordVisible) {
+            etPassword.setTransformationMethod(
+                    PasswordTransformationMethod.getInstance()
+            );
+            btnTogglePassword.setImageResource(R.drawable.ic_visibility_hidden);
+            isPasswordVisible = false;
+        } else {
+            etPassword.setTransformationMethod(
+                    HideReturnsTransformationMethod.getInstance()
+            );
+            btnTogglePassword.setImageResource(R.drawable.ic_visibility_reveal);
+            isPasswordVisible = true;
+        }
+
+        etPassword.setSelection(etPassword.getText().length());
     }
 
     private void initViews() {
@@ -53,6 +82,7 @@ public class DangNhapActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         tvRegister = findViewById(R.id.tvRegister);
         tvForgotPassword = findViewById(R.id.tvForgotPassword);
+        btnTogglePassword = findViewById(R.id.btnTogglePassword);
     }
 
     private void handleLogin() {
