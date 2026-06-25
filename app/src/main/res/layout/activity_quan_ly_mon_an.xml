@@ -59,79 +59,31 @@
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:src="@drawable/ic_user"
+                    android:src="@android:drawable/ic_menu_search"
                     app:tint="@color/text_hint" />
 
                 <EditText
+                    android:id="@+id/etSearchFood"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
                     android:hint="Tìm món ăn..."
+                    android:singleLine="true"
+                    android:imeOptions="actionSearch"
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- Categories -->
-            <HorizontalScrollView
+            <!-- Categories (Dynamic Layout) -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvCategoryList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_tab_active_dark"
-                        android:paddingStart="20dp"
-                        android:paddingTop="8dp"
-                        android:paddingEnd="20dp"
-                        android:paddingBottom="8dp"
-                        android:text="Tất cả"
-                        android:textColor="@color/white" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_tab_inactive"
-                        android:paddingStart="20dp"
-                        android:paddingTop="8dp"
-                        android:paddingEnd="20dp"
-                        android:paddingBottom="8dp"
-                        android:text="Mì Cay"
-                        android:textColor="@color/text_secondary" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_tab_inactive"
-                        android:paddingStart="20dp"
-                        android:paddingTop="8dp"
-                        android:paddingEnd="20dp"
-                        android:paddingBottom="8dp"
-                        android:text="Lẩu"
-                        android:textColor="@color/text_secondary" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_tab_inactive"
-                        android:paddingStart="20dp"
-                        android:paddingTop="8dp"
-                        android:paddingEnd="20dp"
-                        android:paddingBottom="8dp"
-                        android:text="Đồ uống"
-                        android:textColor="@color/text_secondary" />
-                </LinearLayout>
-            </HorizontalScrollView>
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_category_tab" />
 
             <!-- Stats -->
             <LinearLayout
@@ -157,11 +109,12 @@
                         app:tint="@color/text_secondary" />
 
                     <TextView
+                        android:id="@+id/tvTotalItems"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:fontFamily="sans-serif-black"
-                        android:text="124"
+                        android:text="0"
                         android:textColor="@color/text_primary"
                         android:textSize="20sp" />
 
@@ -189,11 +142,12 @@
                         android:src="@drawable/bg_online_dot" />
 
                     <TextView
+                        android:id="@+id/tvAvailableItems"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:fontFamily="sans-serif-black"
-                        android:text="112"
+                        android:text="0"
                         android:textColor="@color/text_primary"
                         android:textSize="20sp" />
 
@@ -221,11 +175,12 @@
                         android:src="@drawable/bg_dot_red" />
 
                     <TextView
+                        android:id="@+id/tvOutOfStockItems"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:fontFamily="sans-serif-black"
-                        android:text="12"
+                        android:text="0"
                         android:textColor="@color/text_primary"
                         android:textSize="20sp" />
 
