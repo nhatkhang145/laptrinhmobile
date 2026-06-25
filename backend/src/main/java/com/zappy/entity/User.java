@@ -39,5 +39,11 @@ public class User {
     // 1 = Quan ly, 0 = Nhan vien
     @Column(name = "role", nullable = false)
     private Integer role = 0;
+    // Email cua nguoi dung
+    @Column(name = "email", nullable = false)
+    private String email;
+    // So dien thoai cua nguoi dung
+    @Column(name = "phone", nullable = false)
+    private String phone;
 }
 

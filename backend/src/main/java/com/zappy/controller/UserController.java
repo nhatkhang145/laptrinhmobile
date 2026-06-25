@@ -39,7 +39,7 @@ public class UserController {
         String domain   = loginData.get("domain");    // domain nha hang
         String username = loginData.get("username");
         String password = loginData.get("password");
-
+        
         // B1: Tim nha hang theo domain
         Restaurant restaurant = restaurantRepo.findByResDomain(domain)
                 .orElse(null);
@@ -80,7 +80,8 @@ public class UserController {
         String username  = (String)  data.get("username");
         String password  = (String)  data.get("password");
         Integer role     = (Integer) data.get("role");
-
+        String email = (String) data.get("email");
+        String phone = (String) data.get("phone");
         Restaurant restaurant = restaurantRepo.findById(resId)
                 .orElse(null);
         if (restaurant == null) {
@@ -93,6 +94,8 @@ public class UserController {
         user.setUsername(username);
         user.setPassword(password); // TODO: nen hash bang BCrypt
         user.setRole(role != null ? role : 0);
+        user.setEmail(email);
+        user.setPhone(phone);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(userRepo.save(user));
     }
