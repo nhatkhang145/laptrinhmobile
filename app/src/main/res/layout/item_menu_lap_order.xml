@@ -63,16 +63,81 @@
 
     </LinearLayout>
 
-    <!-- Nút (+) Thêm -->
-    <com.mikepenz.iconics.view.IconicsImageView
-        android:id="@+id/btnAddItem"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:layout_marginStart="8dp"
-        android:background="@drawable/bg_circle_primary"
-        android:clickable="true"
-        android:focusable="true"
-        android:padding="6dp"
-        app:iiv_color="@color/surface"
-        app:iiv_icon="faw-plus" />
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp">
+
+        <!-- Nút (+) Thêm ban đầu (hiện khi qty == 0) -->
+        <com.mikepenz.iconics.view.IconicsImageView
+            android:id="@+id/btnAddItem"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_gravity="center_vertical|end"
+            android:background="@drawable/bg_circle_primary"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="6dp"
+            app:iiv_color="@color/surface"
+            app:iiv_icon="faw-plus" />
+
+        <!-- Bảng điều khiển (hiện khi qty > 0) -->
+        <LinearLayout
+            android:id="@+id/llQuantityControl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <!-- Nút Ghi chú -->
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:id="@+id/btnNote"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="@drawable/bg_circle_primary"
+                android:backgroundTint="#F59E0B"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="6dp"
+                android:layout_marginEnd="8dp"
+                app:iiv_color="@color/surface"
+                app:iiv_icon="faw-edit" />
+
+            <!-- Nút (-) -->
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:id="@+id/btnMinus"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="@drawable/bg_circle_outline"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="6dp"
+                app:iiv_color="@color/primary_dark"
+                app:iiv_icon="faw-minus" />
+
+            <!-- Số lượng -->
+            <TextView
+                android:id="@+id/tvQuantity"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="1"
+                android:textColor="#1A2B4A"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <!-- Nút (+) -->
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:id="@+id/btnPlus"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="@drawable/bg_circle_primary"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="6dp"
+                app:iiv_color="@color/surface"
+                app:iiv_icon="faw-plus" />
+        </LinearLayout>
+    </FrameLayout>
 </LinearLayout>

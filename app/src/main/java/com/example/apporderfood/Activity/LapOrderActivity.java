@@ -13,6 +13,7 @@ import com.example.apporderfood.adapter.MenuItemLapOrderAdapter;
 import com.example.apporderfood.api.RetrofitClient;
 import com.example.apporderfood.api.ZappyApiService;
 import com.example.apporderfood.model.Category;
+import com.example.apporderfood.model.CartItem;
 import com.example.apporderfood.model.MenuItem;
 import com.google.android.material.tabs.TabLayout;
 
@@ -101,9 +102,11 @@ public class LapOrderActivity extends AppCompatActivity {
         }
     }
 
+    private Map<Integer, CartItem> cartMap = new HashMap<>();
+
     private void setupRecyclerView() {
-        adapter = new MenuItemLapOrderAdapter(this, new ArrayList<>(), item -> {
-            addItemToOrder(item);
+        adapter = new MenuItemLapOrderAdapter(this, new ArrayList<>(), cartMap, updatedCart -> {
+            cartMap = updatedCart;
         });
         rvMenuItems.setLayoutManager(new LinearLayoutManager(this));
         rvMenuItems.setAdapter(adapter);
@@ -231,34 +234,6 @@ public class LapOrderActivity extends AppCompatActivity {
         });
     }
 
-    private void addItemToOrder(MenuItem item) {
-        if (orderId == -1) {
-            Toast.makeText(this, "Chưa tạo được hóa đơn!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("menuItemId", item.getId());
-        data.put("quantity", 1);
-        data.put("price", item.getPrice());
-
-        apiService.addItem(orderId, data).enqueue(new Callback<com.example.apporderfood.model.OrderDetail>() {
-            @Override
-            public void onResponse(Call<com.example.apporderfood.model.OrderDetail> call, Response<com.example.apporderfood.model.OrderDetail> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(LapOrderActivity.this, "Đã thêm " + item.getItemName(), Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(LapOrderActivity.this, "Lỗi khi thêm món", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<com.example.apporderfood.model.OrderDetail> call, Throwable t) {
-                Toast.makeText(LapOrderActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     private void setupSearch() {
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override
@@ -285,12 +260,41 @@ public class LapOrderActivity extends AppCompatActivity {
                 Toast.makeText(this, "Đang tạo đơn, vui lòng thử lại!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Intent intent = new Intent(this, XacNhanOrderActivity.class);
-            intent.putExtra("ORDER_ID", orderId);
-            intent.putExtra("TABLE_NAME", tableName);
-            intent.putExtra("TABLE_ID", tableId);
-            startActivity(intent);
-            finish();
+            if (cartMap.isEmpty()) {
+                Toast.makeText(this, "Vui lòng chọn ít nhất 1 món!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            List<Map<String, Object>> batchData = new ArrayList<>();
+            for (CartItem ci : cartMap.values()) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("itemId", ci.getMenuItem().getId());
+                data.put("quantity", ci.getQuantity());
+                data.put("note", ci.getNote() != null ? ci.getNote() : "");
+                batchData.add(data);
+            }
+
+            apiService.addBatchItems(orderId, batchData).enqueue(new Callback<Map<String, String>>() {
+                @Override
+                public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(LapOrderActivity.this, "Đã thêm món vào order!", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(LapOrderActivity.this, XacNhanOrderActivity.class);
+                        intent.putExtra("ORDER_ID", orderId);
+                        intent.putExtra("TABLE_NAME", tableName);
+                        intent.putExtra("TABLE_ID", tableId);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toast.makeText(LapOrderActivity.this, "Lỗi thêm món hàng loạt", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Map<String, String>> call, Throwable t) {
+                    Toast.makeText(LapOrderActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());

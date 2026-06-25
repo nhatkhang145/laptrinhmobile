@@ -132,6 +132,11 @@ public interface ZappyApiService {
     Call<OrderDetail> addItem(@Path("orderId") Integer orderId,
             @Body Map<String, Object> data);
 
+    /** Nhan vien gui nhieu mon vao gio (batch) */
+    @POST("api/orders/{orderId}/items/batch")
+    Call<Map<String, String>> addBatchItems(@Path("orderId") Integer orderId,
+            @Body java.util.List<Map<String, Object>> itemsData);
+
     /** Lay chi tiet mon cua 1 hoa don */
     @GET("api/orders/{orderId}/details")
     Call<List<OrderDetail>> getOrderDetails(@Path("orderId") Integer orderId);
