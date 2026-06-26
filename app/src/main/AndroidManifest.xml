@@ -130,6 +130,11 @@
         <activity
             android:name=".Activity.QuanLyCaActivity"
             android:exported="false" />
+            
+        <!-- ===== Lịch sử ca làm ===== -->
+        <activity
+            android:name=".Activity.LichSuCaActivity"
+            android:exported="false" />
 
     </application>
 
