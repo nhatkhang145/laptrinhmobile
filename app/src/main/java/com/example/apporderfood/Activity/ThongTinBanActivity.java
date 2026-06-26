@@ -19,6 +19,7 @@ public class ThongTinBanActivity extends AppCompatActivity {
     private TextView btnClose;
     private TextView tvPopupTableName;
     private TextView tvPopupAmount;
+    private int currentOrderId = -1;
     private TextView tvPopupTime;
 
     @Override
@@ -68,6 +69,7 @@ public class ThongTinBanActivity extends AppCompatActivity {
                         Object orderIdObj = body.get("id");
                         if (orderIdObj != null) {
                             int orderId = ((Number) orderIdObj).intValue();
+                            currentOrderId = orderId;
                             com.example.apporderfood.api.RetrofitClient.getApiService().getOrderDetails(orderId)
                                 .enqueue(new retrofit2.Callback<java.util.List<com.example.apporderfood.model.OrderDetail>>() {
                                     @Override
@@ -134,12 +136,17 @@ public class ThongTinBanActivity extends AppCompatActivity {
         btnClose.setOnClickListener(v -> finish());
 
         btnViewDetail.setOnClickListener(v -> {
-            int tableId = getIntent().getIntExtra("TABLE_ID", -1);
-            Intent intent = new Intent(this, ChiTietBanActivity.class);
-            intent.putExtra("TABLE_ID", tableId);
-            intent.putExtra("TABLE_NAME", getIntent().getStringExtra("TABLE_NAME"));
-            startActivity(intent);
-            finish();
+            if (currentOrderId != -1) {
+                int tableId = getIntent().getIntExtra("TABLE_ID", -1);
+                Intent intent = new Intent(this, XacNhanOrderActivity.class);
+                intent.putExtra("TABLE_ID", tableId);
+                intent.putExtra("TABLE_NAME", getIntent().getStringExtra("TABLE_NAME"));
+                intent.putExtra("ORDER_ID", currentOrderId);
+                startActivity(intent);
+                finish();
+            } else {
+                android.widget.Toast.makeText(this, "Đang tải dữ liệu...", android.widget.Toast.LENGTH_SHORT).show();
+            }
         });
 
         navOrder.setOnClickListener(v -> {
