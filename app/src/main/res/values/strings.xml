@@ -145,8 +145,8 @@
     <string name="label_tai_anh_len">Tải ảnh lên</string>
     <string name="label_ho_va_ten">Họ và tên</string>
     <string name="hint_ho_va_ten">Nhập tên nhân viên</string>
-    <string name="label_so_dien_thoai_input">Số điện thoại</string>
-    <string name="hint_so_dien_thoai">Nhập số điện thoại</string>
+    <string name="label_so_dien_thoai_input">Email</string>
+    <string name="hint_so_dien_thoai">Nhập email</string>
     <string name="label_ten_dang_nhap">Tên đăng nhập</string>
     <string name="hint_ten_dang_nhap">vd: nhanvien01</string>
     <string name="label_mat_khau">Mật khẩu</string>

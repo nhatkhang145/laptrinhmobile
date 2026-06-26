@@ -15,6 +15,15 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import java.util.Map;
+import java.util.List;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import android.widget.TextView;
+import android.view.View;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.example.apporderfood.adapter.OrderDetailAdapter;
+import com.example.apporderfood.model.OrderDetail;
 
 /**
  * ChiTietBanActivity - Chi tiết đơn đang phục vụ tại bàn
@@ -28,9 +37,16 @@ import java.util.Map;
  */
 public class ChiTietBanActivity extends AppCompatActivity {
 
-    private LinearLayout btnBack;
-    private LinearLayout btnThemMon;
-    private LinearLayout btnTinhTien;
+    private View btnBack;
+    private View btnThemMon;
+    private View btnTinhTien;
+    
+    private TextView tvTitle;
+    private TextView tvBadgeCount;
+    private TextView tvTotalAmount;
+    private RecyclerView rvOrderDetails;
+    private OrderDetailAdapter adapter;
+    private final DecimalFormat formatter = new DecimalFormat("#,###");
 
     private int orderId   = -1;
     private int tableId   = -1;
@@ -47,13 +63,100 @@ public class ChiTietBanActivity extends AppCompatActivity {
                 ? getIntent().getStringExtra("TABLE_NAME") : "Bàn";
 
         initViews();
+        setupRecyclerView();
         setupClickListeners();
     }
 
     private void initViews() {
         btnBack     = findViewById(R.id.btnBack);
-        btnThemMon  = findViewById(R.id.btnThemMon);
+        btnThemMon  = findViewById(R.id.btnAddItem); // changed to btnAddItem based on xml id
         btnTinhTien = findViewById(R.id.btnTinhTien);
+        
+        tvTitle = findViewById(R.id.tvTitle);
+        tvBadgeCount = findViewById(R.id.tvBadgeCount);
+        tvTotalAmount = findViewById(R.id.tvTotalAmount);
+        rvOrderDetails = findViewById(R.id.rvOrderDetails);
+
+        if (tvTitle != null) {
+            tvTitle.setText(tableName + " • Đang phục vụ");
+        }
+
+        // We use btnAddItem from the XML instead of btnThemMon since XML has id btnAddItem
+        if (btnThemMon == null) {
+            btnThemMon = findViewById(R.id.btnThemMon);
+        }
+    }
+
+    private void setupRecyclerView() {
+        android.content.SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
+        boolean isAdmin = prefs.getInt("ROLE", 0) == 1;
+
+        adapter = new OrderDetailAdapter(this, new java.util.ArrayList<>(), isAdmin, this::cancelItem);
+        rvOrderDetails.setLayoutManager(new LinearLayoutManager(this));
+        rvOrderDetails.setAdapter(adapter);
+        rvOrderDetails.setNestedScrollingEnabled(false);
+    }
+
+    private void cancelItem(OrderDetail detail) {
+        if (detail.getId() == null) return;
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Xác nhận hủy món")
+            .setMessage("Hủy món " + (detail.getMenuItem() != null ? detail.getMenuItem().getItemName() : "") + "?")
+            .setPositiveButton("Hủy món", (dialog, which) -> {
+                ZappyApiService api = RetrofitClient.getApiService();
+                Map<String, Integer> data = new java.util.HashMap<>();
+                api.cancelItem(detail.getId(), data).enqueue(new Callback<Map>() {
+                    @Override
+                    public void onResponse(Call<Map> call, Response<Map> response) {
+                        if (response.isSuccessful()) {
+                            Toast.makeText(ChiTietBanActivity.this, "Đã hủy món!", Toast.LENGTH_SHORT).show();
+                            loadOrderDetails();
+                        } else {
+                            Toast.makeText(ChiTietBanActivity.this, "Lỗi hủy món", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<Map> call, Throwable t) {
+                        Toast.makeText(ChiTietBanActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            })
+            .setNegativeButton("Đóng", null)
+            .show();
+    }
+
+    private void loadOrderDetails() {
+        if (orderId == -1) return;
+        ZappyApiService api = RetrofitClient.getApiService();
+        api.getOrderDetails(orderId).enqueue(new Callback<List<OrderDetail>>() {
+            @Override
+            public void onResponse(Call<List<OrderDetail>> call, Response<List<OrderDetail>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<OrderDetail> details = response.body();
+                    adapter.setItems(details);
+                    updateSummary(details);
+                }
+            }
+            @Override
+            public void onFailure(Call<List<OrderDetail>> call, Throwable t) {}
+        });
+    }
+
+    private void updateSummary(List<OrderDetail> details) {
+        BigDecimal total = BigDecimal.ZERO;
+        for (OrderDetail d : details) {
+            if (d.getStatus() != null && d.getStatus() != 2 && d.getSubTotal() != null) {
+                total = total.add(d.getSubTotal());
+            }
+        }
+        tvTotalAmount.setText(formatter.format(total));
+        tvBadgeCount.setText(details.size() + " MÓN");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadOrderDetails();
     }
 
     private void setupClickListeners() {

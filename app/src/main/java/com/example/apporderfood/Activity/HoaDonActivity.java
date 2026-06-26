@@ -14,7 +14,24 @@ import com.example.apporderfood.api.ZappyApiService;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+
+import android.view.View;
+import android.widget.TextView;
+import android.content.SharedPreferences;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.apporderfood.adapter.InvoiceItemAdapter;
+import com.example.apporderfood.model.OrderDetail;
 
 /**
  * HoaDonActivity - Thanh toán & Đóng hóa đơn
@@ -27,8 +44,17 @@ import java.util.Map;
  */
 public class HoaDonActivity extends AppCompatActivity {
 
-    private LinearLayout btnBack;
-    private LinearLayout btnThanhToan;
+    private View btnBack;
+    private View btnThanhToan;
+    
+    private TextView tvInvoiceDate;
+    private TextView tvTableName;
+    private TextView tvStaffName;
+    private TextView tvTotal;
+    private RecyclerView rvInvoiceItems;
+    
+    private InvoiceItemAdapter adapter;
+    private final DecimalFormat formatter = new DecimalFormat("#,###");
 
     private int orderId = -1;
     private String tableName = "";
@@ -49,6 +75,61 @@ public class HoaDonActivity extends AppCompatActivity {
     private void initViews() {
         btnBack      = findViewById(R.id.btnBack);
         btnThanhToan = findViewById(R.id.btnConfirmPayment);
+        
+        tvInvoiceDate = findViewById(R.id.tvInvoiceDate);
+        tvTableName   = findViewById(R.id.tvTableName);
+        tvStaffName   = findViewById(R.id.tvStaffName);
+        tvTotal       = findViewById(R.id.tvTotal);
+        rvInvoiceItems = findViewById(R.id.rvInvoiceItems);
+        
+        tvTableName.setText(tableName);
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy (HH:mm)", new Locale("vi", "VN"));
+        tvInvoiceDate.setText(sdf.format(new Date()));
+        
+        SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
+        String fullname = prefs.getString("FULLNAME", "Nhân viên");
+        tvStaffName.setText(fullname);
+        
+        adapter = new InvoiceItemAdapter(this, new java.util.ArrayList<>());
+        rvInvoiceItems.setLayoutManager(new LinearLayoutManager(this));
+        rvInvoiceItems.setAdapter(adapter);
+        
+        loadInvoiceData();
+    }
+    
+    private void loadInvoiceData() {
+        if (orderId == -1) return;
+        
+        ZappyApiService api = RetrofitClient.getApiService();
+        api.getOrderDetails(orderId).enqueue(new Callback<List<OrderDetail>>() {
+            @Override
+            public void onResponse(Call<List<OrderDetail>> call, Response<List<OrderDetail>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<OrderDetail> details = response.body();
+                    
+                    List<OrderDetail> validItems = new java.util.ArrayList<>();
+                    BigDecimal total = BigDecimal.ZERO;
+                    
+                    for (OrderDetail d : details) {
+                        if (d.getStatus() != null && d.getStatus() != 2) { // Không tính món đã hủy
+                            validItems.add(d);
+                            if (d.getSubTotal() != null) {
+                                total = total.add(d.getSubTotal());
+                            }
+                        }
+                    }
+                    
+                    adapter.setItems(validItems);
+                    tvTotal.setText(formatter.format(total) + "đ");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<OrderDetail>> call, Throwable t) {
+                Toast.makeText(HoaDonActivity.this, "Lỗi tải dữ liệu hóa đơn", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setupClickListeners() {

@@ -94,10 +94,47 @@ public class XacNhanOrderActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        adapter = new OrderDetailAdapter(this, new java.util.ArrayList<>());
+        android.content.SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
+        boolean isAdmin = prefs.getInt("ROLE", 0) == 1;
+
+        adapter = new OrderDetailAdapter(this, new java.util.ArrayList<>(), isAdmin, this::cancelItem);
         rvOrderDetails.setLayoutManager(new LinearLayoutManager(this));
         rvOrderDetails.setAdapter(adapter);
         rvOrderDetails.setNestedScrollingEnabled(false);
+    }
+
+    private void cancelItem(OrderDetail detail) {
+        if (detail.getId() == null) return;
+        
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Xác nhận hủy món")
+            .setMessage("Hủy món " + (detail.getMenuItem() != null ? detail.getMenuItem().getItemName() : "") + "?")
+            .setPositiveButton("Hủy món", (dialog, which) -> {
+                progressBar.setVisibility(View.VISIBLE);
+                ZappyApiService api = RetrofitClient.getApiService();
+                Map<String, Integer> data = new java.util.HashMap<>();
+                
+                api.cancelItem(detail.getId(), data).enqueue(new Callback<Map>() {
+                    @Override
+                    public void onResponse(Call<Map> call, Response<Map> response) {
+                        if (response.isSuccessful()) {
+                            Toast.makeText(XacNhanOrderActivity.this, "Đã hủy món!", Toast.LENGTH_SHORT).show();
+                            loadOrderDetails();
+                        } else {
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(XacNhanOrderActivity.this, "Lỗi hủy món", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Map> call, Throwable t) {
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(XacNhanOrderActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            })
+            .setNegativeButton("Đóng", null)
+            .show();
     }
 
     private void loadOrderDetails() {
@@ -207,9 +244,14 @@ public class XacNhanOrderActivity extends AppCompatActivity {
             public void onResponse(Call<Map> call, Response<Map> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(XacNhanOrderActivity.this,
-                            "Đã gửi lên bếp! Thêm món rồi gửi tiếp.", Toast.LENGTH_SHORT).show();
+                            "Đã gửi lên bếp thành công!", Toast.LENGTH_SHORT).show();
 
-                    loadOrderDetails();
+                    Intent intent = new Intent(XacNhanOrderActivity.this, ChiTietBanActivity.class);
+                    intent.putExtra("ORDER_ID", orderId);
+                    intent.putExtra("TABLE_ID", tableId);
+                    intent.putExtra("TABLE_NAME", tableName);
+                    startActivity(intent);
+                    finish();
                 } else {
                     btnGui.setEnabled(true);
                     btnGui.setAlpha(1.0f);

@@ -84,6 +84,32 @@ public class OrderController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/restaurant/{resId}/active")
+    public ResponseEntity<?> getActiveOrdersByRestaurant(@PathVariable Integer resId) {
+        List<Order> activeOrders = orderRepo.findByRestaurantIdAndStatus(resId, 0);
+        for (Order order : activeOrders) {
+            BigDecimal total = detailRepo.calculateTotalAmount(order.getId());
+            if (total != null) {
+                order.setTotalAmount(total);
+            }
+        }
+        return ResponseEntity.ok(activeOrders);
+    }
+
+    /** Lay danh sach tat ca hoa don da thanh toan cua nha hang */
+    @GetMapping("/restaurant/{resId}/paid")
+    public ResponseEntity<?> getPaidOrdersByRestaurant(@PathVariable Integer resId) {
+        List<Order> paidOrders = orderRepo.findByRestaurantIdAndStatus(resId, 1);
+        
+        // Sap xep moi nhat len tren
+        paidOrders.sort((o1, o2) -> {
+            if (o1.getCreatedAt() == null || o2.getCreatedAt() == null) return 0;
+            return o2.getCreatedAt().compareTo(o1.getCreatedAt());
+        });
+        
+        return ResponseEntity.ok(paidOrders);
+    }
+
     /** Lay thong tin hoa don */
     @GetMapping("/{id}")
     public ResponseEntity<Order> getById(@PathVariable Integer id) {
