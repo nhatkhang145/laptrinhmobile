@@ -133,7 +133,10 @@ public class LapOrderActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Map> call, Response<Map> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    Object id = response.body().get("orderId");
+                    Object id = response.body().get("id");
+                    if (id == null) {
+                        id = response.body().get("orderId");
+                    }
                     if (id != null) {
                         orderId = ((Double) id).intValue();
                     }
