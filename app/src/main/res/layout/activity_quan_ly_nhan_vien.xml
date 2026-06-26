@@ -109,6 +109,7 @@
 
 
                     <TextView
+                        android:id="@+id/tabAll"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_tab_selected_dark"
@@ -118,17 +119,19 @@
                         android:textColor="@color/white"
                         android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_input_selector"
-                        android:paddingHorizontal="20dp"
-                        android:paddingVertical="8dp"
-                        android:text="@string/tab_admin"
-                        android:textColor="@color/text_secondary" />
+<!--                    <TextView-->
+<!--                        android:id="@+id/tabAdmin"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginStart="8dp"-->
+<!--                        android:background="@drawable/bg_input_selector"-->
+<!--                        android:paddingHorizontal="20dp"-->
+<!--                        android:paddingVertical="8dp"-->
+<!--                        android:text="@string/tab_admin"-->
+<!--                        android:textColor="@color/text_secondary" />-->
 
                     <TextView
+                        android:id="@+id/tabManager"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
@@ -139,6 +142,7 @@
                         android:textColor="@color/text_secondary" />
 
                     <TextView
+                        android:id="@+id/tabCashier"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
@@ -149,24 +153,17 @@
                         android:textColor="@color/text_secondary" />
 
                     <TextView
+                        android:id="@+id/tabStaff"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:background="@drawable/bg_input_selector"
                         android:paddingHorizontal="20dp"
                         android:paddingVertical="8dp"
-                        android:text="@string/tab_phuc_vu"
+                        android:text="Nhân viên"
                         android:textColor="@color/text_secondary" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_input_selector"
-                        android:paddingHorizontal="20dp"
-                        android:paddingVertical="8dp"
-                        android:text="@string/tab_bep"
-                        android:textColor="@color/text_secondary" />
+
                 </LinearLayout>
             </HorizontalScrollView>
 

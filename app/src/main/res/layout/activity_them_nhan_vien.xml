@@ -98,6 +98,7 @@
                 android:textSize="14sp" />
 
             <EditText
+                android:id="@+id/etFullName"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:layout_marginTop="8dp"
@@ -117,6 +118,7 @@
                 android:textSize="14sp" />
 
             <EditText
+                android:id="@+id/etPhone"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:layout_marginTop="8dp"
@@ -136,6 +138,7 @@
                 android:textSize="14sp" />
 
             <EditText
+                android:id="@+id/etUsername"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:layout_marginTop="8dp"
@@ -162,6 +165,7 @@
                 android:background="@drawable/bg_input_gray_filled">
 
                 <EditText
+                    android:id="@+id/etPassword"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@android:color/transparent"
@@ -188,6 +192,7 @@
                 android:textSize="14sp" />
 
             <FrameLayout
+                android:id="@+id/flRoleDropdown"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:layout_marginTop="8dp"
@@ -196,6 +201,7 @@
                 android:paddingHorizontal="16dp">
 
                 <TextView
+                    android:id="@+id/tvSelectedRole"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
@@ -211,30 +217,7 @@
                     app:iiv_icon="faw_chevron_down" />
             </FrameLayout>
 
-            <!-- Status Toggle -->
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="@string/label_trang_thai_hoat_dong"
-                    android:textColor="@color/text_primary"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <com.google.android.material.materialswitch.MaterialSwitch
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:checked="true"
-                    app:trackTint="@color/switch_track_selector"
-                    app:thumbTint="@color/white"
-                    app:trackDecorationTint="@android:color/transparent" />
-            </RelativeLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
