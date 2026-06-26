@@ -7,7 +7,9 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.apporderfood.R;
@@ -39,6 +41,7 @@ public class OTPActivity extends AppCompatActivity {
         otp4 = findViewById(R.id.otp4);
         otp5 = findViewById(R.id.otp5);
         otp6 = findViewById(R.id.otp6);
+        setupOtpInputs();
         btnVerify = findViewById(R.id.btnVerify);
 
         btnVerify.setOnClickListener(v -> {
@@ -80,6 +83,36 @@ public class OTPActivity extends AppCompatActivity {
 
         );
 
+    }
+
+    private void setupOtpInputs() {
+        EditText[] otpBoxes = {otp1, otp2, otp3, otp4, otp5, otp6};
+        for (int i = 0; i < otpBoxes.length; i++) {
+            int index = i;
+            otpBoxes[index].addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (s.length() == 1 && index < otpBoxes.length - 1) {
+                        otpBoxes[index + 1].requestFocus();
+                    }
+                }
+                @Override
+                public void afterTextChanged(Editable s) {}
+            });
+            otpBoxes[index].setOnKeyListener((v, keyCode, event) -> {
+                if (keyCode == KeyEvent.KEYCODE_DEL
+                        && event.getAction() == KeyEvent.ACTION_DOWN
+                        && otpBoxes[index].getText().toString().isEmpty()
+                        && index > 0) {
+                    otpBoxes[index - 1].requestFocus();
+                    otpBoxes[index - 1].setText("");
+                    return true;
+                }
+                return false;
+            });
+        }
     }
 
     private void startCountdown() {
