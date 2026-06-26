@@ -147,6 +147,10 @@ public interface ZappyApiService {
     @GET("api/orders/{orderId}/details")
     Call<List<OrderDetail>> getOrderDetails(@Path("orderId") Integer orderId);
 
+    /** Lay danh sach tat ca hoa don dang phuc vu cua nha hang */
+    @GET("api/orders/restaurant/{resId}/active")
+    Call<List<Map<String, Object>>> getActiveOrdersByRestaurant(@Path("resId") Integer resId);
+
     /** Nhan vien gui mon -> status=1 (KHOA, nhan vien khong sua/xoa duoc) */
     @PUT("api/orders/{orderId}/send")
     Call<Map> sendOrder(@Path("orderId") Integer orderId);

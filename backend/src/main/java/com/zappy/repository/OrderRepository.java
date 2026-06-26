@@ -13,4 +13,8 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     Optional<Order> findByTableIdAndStatus(Integer tableId, Integer status);
     // Lich su hoa don cua 1 ban
     List<Order> findByTableId(Integer tableId);
+    
+    // Tim tat ca hoa don dang phuc vu cua 1 nha hang
+    @org.springframework.data.jpa.repository.Query("SELECT o FROM Order o WHERE o.table.area.restaurant.id = :resId AND o.status = :status")
+    List<Order> findByRestaurantIdAndStatus(@org.springframework.data.repository.query.Param("resId") Integer resId, @org.springframework.data.repository.query.Param("status") Integer status);
 }
