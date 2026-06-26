@@ -153,4 +153,13 @@ public interface ZappyApiService {
     /** Thanh toan: tinh tong, dong hoa don, ban -> trong */
     @POST("api/orders/{orderId}/checkout")
     Call<Map> checkout(@Path("orderId") Integer orderId);
+    /** Quen mat khau: gui ma otp*/
+    @POST("api/auth/forgot-password/send-otp")
+    Call<Map<String, String>> sendOtp(@Body Map<String, String> data);
+    /** Quen mat khau: Kiem tra ma otp */
+    @POST("api/auth/forgot-password/verify-otp")
+    Call<Map<String, String>> verifyOtp(@Body Map<String, String> data);
+    /** Quen mat khau: Reset password, tao password moi*/
+    @POST("api/auth/forgot-password/reset-password")
+    Call<Map<String, String>> resetPassword(@Body Map<String, String> data);
 }

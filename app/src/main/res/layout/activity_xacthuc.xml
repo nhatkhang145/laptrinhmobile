@@ -231,9 +231,10 @@
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/tvCountdown"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/resent_countdown"
+                            android:text="(60s)"
                             android:textColor="@color/text_secondary"
                             android:textSize="15sp" />
 

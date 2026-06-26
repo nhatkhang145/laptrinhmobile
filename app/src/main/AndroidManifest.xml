@@ -4,7 +4,9 @@
 
     <!-- Quyen ket noi Internet de goi API Spring Boot backend -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
@@ -48,10 +50,21 @@
         <activity
             android:name=".Activity.DangKyActivity"
             android:exported="true" />
+        <activity
+            android:name=".Activity.QuenMatKhauActivity"
+            android:exported="true" />
+        <activity
+            android:name=".Activity.DatLaiMatKhauActivity"
+            android:exported="true" />
+        <activity
+            android:name=".Activity.OTPActivity"
+            android:exported="true" />
+
 
         <activity
             android:name=".Activity.DangNhapActivity"
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -61,7 +74,7 @@
         <activity
             android:name=".Activity.ChangePasswordActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- ===== Màn hình Sơ đồ bàn ===== -->
         <activity
@@ -99,6 +112,6 @@
             android:name=".Activity.HoaDonActivity"
             android:exported="false" />
 
-        </application>
+    </application>
 
 </manifest>
