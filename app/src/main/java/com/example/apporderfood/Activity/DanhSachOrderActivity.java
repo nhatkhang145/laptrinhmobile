@@ -86,7 +86,7 @@ public class DanhSachOrderActivity extends AppCompatActivity {
         adapter = new OrderListAdapter(this, order -> {
             java.util.Map<String, Object> table = (java.util.Map<String, Object>) order.get("table");
             if (table != null) {
-                Intent intent = new Intent(this, XacNhanOrderActivity.class);
+                Intent intent = new Intent(this, ChiTietBanActivity.class);
                 String areaName = "Không rõ";
                 if (table.get("area") != null) {
                     java.util.Map<String, Object> area = (java.util.Map<String, Object>) table.get("area");

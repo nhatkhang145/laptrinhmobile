@@ -138,7 +138,7 @@ public class ThongTinBanActivity extends AppCompatActivity {
         btnViewDetail.setOnClickListener(v -> {
             if (currentOrderId != -1) {
                 int tableId = getIntent().getIntExtra("TABLE_ID", -1);
-                Intent intent = new Intent(this, XacNhanOrderActivity.class);
+                Intent intent = new Intent(this, ChiTietBanActivity.class);
                 intent.putExtra("TABLE_ID", tableId);
                 intent.putExtra("TABLE_NAME", getIntent().getStringExtra("TABLE_NAME"));
                 intent.putExtra("ORDER_ID", currentOrderId);
