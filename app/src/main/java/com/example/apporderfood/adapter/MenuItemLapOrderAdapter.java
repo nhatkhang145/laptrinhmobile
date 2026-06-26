@@ -109,25 +109,36 @@ public class MenuItemLapOrderAdapter extends RecyclerView.Adapter<MenuItemLapOrd
             CartItem current = cartMap.get(item.getId());
             String existingNote = current != null && current.getNote() != null ? current.getNote() : "";
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Ghi chú cho " + item.getItemName());
+            final android.app.Dialog dialog = new android.app.Dialog(context);
+            dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+            dialog.setContentView(R.layout.dialog_edit_note);
 
-            final EditText input = new EditText(context);
-            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+                dialog.getWindow().setLayout(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+
+            TextView tvTitle = dialog.findViewById(R.id.tvDialogTitle);
+            tvTitle.setText("Ghi chú cho " + item.getItemName());
+
+            final EditText input = dialog.findViewById(R.id.etNote);
             input.setText(existingNote);
-            input.setHint("Ví dụ: Ít cay, không hành...");
-            builder.setView(input);
 
-            builder.setPositiveButton("Lưu", (dialog, which) -> {
+            TextView btnSave = dialog.findViewById(R.id.btnSave);
+            TextView btnCancel = dialog.findViewById(R.id.btnCancel);
+
+            btnSave.setOnClickListener(v1 -> {
                 String newNote = input.getText().toString();
                 if (current != null) {
                     current.setNote(newNote);
                     if (listener != null) listener.onCartUpdated(cartMap);
                 }
+                dialog.dismiss();
             });
-            builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
 
-            builder.show();
+            btnCancel.setOnClickListener(v12 -> dialog.dismiss());
+
+            dialog.show();
         });
     }
 

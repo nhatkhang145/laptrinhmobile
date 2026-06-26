@@ -89,8 +89,7 @@
         <!-- ===== Lập order (bàn trống) ===== -->
         <activity
             android:name=".Activity.LapOrderActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:exported="false" />
 
         <!-- ===== Xác nhận order / Gửi đơn bếp ===== -->
         <activity
