@@ -21,6 +21,12 @@ public class TableModel implements Serializable {
     @SerializedName("activeUserId")
     private Integer activeUserId;
 
+    @SerializedName("status")
+    private String status; // HOẠT ĐỘNG, ĐANG KHÓA, BẢO TRÌ
+
+    @SerializedName("seats")
+    private Integer seats;
+
     public TableModel() {}
 
     public TableModel(Integer id, String tableName, Boolean isOccupied, Area area) {
@@ -44,4 +50,10 @@ public class TableModel implements Serializable {
 
     public Integer getActiveUserId() { return activeUserId; }
     public void setActiveUserId(Integer activeUserId) { this.activeUserId = activeUserId; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public Integer getSeats() { return seats; }
+    public void setSeats(Integer seats) { this.seats = seats; }
 }

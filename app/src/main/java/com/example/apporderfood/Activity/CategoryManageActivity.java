@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.apporderfood.R;
 import com.example.apporderfood.adapter.CategoryManageAdapter;
+import com.example.apporderfood.model.Category;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -65,25 +66,26 @@ public class CategoryManageActivity extends AppCompatActivity implements Categor
 
     private void loadCategories() {
         // Show loading
-        pbLoading.setVisibility(View.VISIBLE);
+        if (pbLoading != null) pbLoading.setVisibility(View.VISIBLE);
         rvCategoryList.setVisibility(View.GONE);
 
         // Giả lập delay tải dữ liệu
         new android.os.Handler().postDelayed(() -> {
-            List<CategoryManageAdapter.CategoryItem> categoryList = new ArrayList<>();
-            categoryList.add(new CategoryManageAdapter.CategoryItem("Burger", "HOẠT ĐỘNG", 45, "Các loại burger bò, gà..."));
-            categoryList.add(new CategoryManageAdapter.CategoryItem("Pizza", "HOẠT ĐỘNG", 32, "Pizza truyền thống Ý"));
-            categoryList.add(new CategoryManageAdapter.CategoryItem("Đồ uống", "HOẠT ĐỘNG", 58, "Nước ngọt, cà phê, trà"));
-            categoryList.add(new CategoryManageAdapter.CategoryItem("Tráng miệng", "TẠM ẨN", 12, "Kem, bánh ngọt, chè"));
-            categoryList.add(new CategoryManageAdapter.CategoryItem("Combo", "HOẠT ĐỘNG", 8, "Tiết kiệm cho nhóm"));
-            categoryList.add(new CategoryManageAdapter.CategoryItem("Món ăn nhanh", "TẠM ẨN", 24, "Khoai tây chiên, snack"));
+            List<Category> categoryList = new ArrayList<>();
+            // Category(Integer id, String catName, String description, String imageUrl, Integer status, Integer itemCount)
+            categoryList.add(new Category(1, "Burger", "Các loại burger bò, gà...", null, 1, 45));
+            categoryList.add(new Category(2, "Pizza", "Pizza truyền thống Ý", null, 1, 32));
+            categoryList.add(new Category(3, "Đồ uống", "Nước ngọt, cà phê, trà", null, 1, 58));
+            categoryList.add(new Category(4, "Tráng miệng", "Kem, bánh ngọt, chè", null, 0, 12));
+            categoryList.add(new Category(5, "Combo", "Tiết kiệm cho nhóm", null, 1, 8));
+            categoryList.add(new Category(6, "Món ăn nhanh", "Khoai tây chiên, snack", null, 0, 24));
 
-            pbLoading.setVisibility(View.GONE);
+            if (pbLoading != null) pbLoading.setVisibility(View.GONE);
             if (categoryList.isEmpty()) {
-                tvEmptyState.setVisibility(View.VISIBLE);
+                if (tvEmptyState != null) tvEmptyState.setVisibility(View.VISIBLE);
                 rvCategoryList.setVisibility(View.GONE);
             } else {
-                tvEmptyState.setVisibility(View.GONE);
+                if (tvEmptyState != null) tvEmptyState.setVisibility(View.GONE);
                 rvCategoryList.setVisibility(View.VISIBLE);
                 adapter = new CategoryManageAdapter(categoryList, this);
                 rvCategoryList.setAdapter(adapter);
@@ -101,23 +103,21 @@ public class CategoryManageActivity extends AppCompatActivity implements Categor
     }
 
     @Override
-    public void onEditClick(CategoryManageAdapter.CategoryItem item) {
+    public void onEditClick(Category item) {
         // Logic chỉnh sửa: Truyền object sang màn hình thêm (chế độ sửa)
         Intent intent = new Intent(this, ThemDanhMucActivity.class);
-        intent.putExtra("IS_EDIT", true);
-        intent.putExtra("CATEGORY_NAME", item.getName());
-        intent.putExtra("CATEGORY_DESC", item.getDescription());
+        intent.putExtra("CATEGORY_DATA", item);
         addCategoryLauncher.launch(intent);
     }
 
     @Override
-    public void onMoreClick(CategoryManageAdapter.CategoryItem item, View view) {
-        Toast.makeText(this, "Tùy chọn: " + item.getName(), Toast.LENGTH_SHORT).show();
+    public void onMoreClick(Category item, View view) {
+        Toast.makeText(this, "Tùy chọn: " + item.getCatName(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onItemClick(CategoryManageAdapter.CategoryItem item) {
-        Toast.makeText(this, "Chi tiết: " + item.getName(), Toast.LENGTH_SHORT).show();
+    public void onItemClick(Category item) {
+        Toast.makeText(this, "Chi tiết: " + item.getCatName(), Toast.LENGTH_SHORT).show();
     }
 
     private void setupBottomNav() {
