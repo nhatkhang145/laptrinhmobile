@@ -21,6 +21,8 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
     private Context context;
     private List<User> staffList;
     private List<User> staffListFull; // Dùng để backup dữ liệu gốc khi tìm kiếm
+    private String currentKeyword = "";
+    private Integer currentRole = null; // null nghĩa là đang hiển thị "Tất cả"
 
     public StaffAdapter(Context context, List<User> staffList) {
         this.context = context;
@@ -28,27 +30,44 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
         this.staffListFull = new ArrayList<>(staffList);
     }
 
-    // Hàm cập nhật lại danh sách khi API gọi xong
     public void updateData(List<User> newStaffList) {
         this.staffList.clear();
         this.staffList.addAll(newStaffList);
         this.staffListFull.clear();
         this.staffListFull.addAll(newStaffList);
-        notifyDataSetChanged();
+
+        // Gọi lại bộ lọc để giữ nguyên tab hiện tại khi data mới tải về
+        applyFilters();
     }
 
-    // Hàm lọc danh sách theo từ khóa tìm kiếm
-    public void filter(String text) {
+    // 1. Nhận sự kiện khi gõ vào ô tìm kiếm
+    public void filterByText(String text) {
+        this.currentKeyword = text.toLowerCase().trim();
+        applyFilters();
+    }
+
+    // 2. Nhận sự kiện khi bấm vào các Tab Role (Quản lý, Phục vụ...)
+    public void filterByRole(Integer role) {
+        this.currentRole = role;
+        applyFilters();
+    }
+
+    // 3. Hàm xử lý logic lọc kép
+    private void applyFilters() {
         staffList.clear();
-        if (text.isEmpty()) {
-            staffList.addAll(staffListFull);
-        } else {
-            text = text.toLowerCase();
-            for (User user : staffListFull) {
-                if (user.getUsername().toLowerCase().contains(text) ||
-                        (user.getEmail() != null && user.getEmail().toLowerCase().contains(text))) {
-                    staffList.add(user);
-                }
+        for (User user : staffListFull) {
+            // Kiểm tra khớp từ khóa
+            boolean matchesText = currentKeyword.isEmpty() ||
+                    (user.getUsername() != null && user.getUsername().toLowerCase().contains(currentKeyword)) ||
+                    (user.getEmail() != null && user.getEmail().toLowerCase().contains(currentKeyword)) ||
+                    (user.getFullname() != null && user.getFullname().toLowerCase().contains(currentKeyword));
+
+            // Kiểm tra khớp role
+            boolean matchesRole = currentRole == null || (user.getRole() != null && user.getRole().equals(currentRole));
+
+            // Thỏa mãn cả 2 thì hiển thị
+            if (matchesText && matchesRole) {
+                staffList.add(user);
             }
         }
         notifyDataSetChanged();
@@ -66,24 +85,23 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
         User user = staffList.get(position);
 
         holder.tvName.setText(user.getUsername());
-
-        // Hiển thị email nếu có, không có thì để trống
-        if (user.getEmail() != null && !user.getEmail().isEmpty()) {
-            holder.tvContact.setText(user.getEmail());
+        holder.tvContact.setText(user.getEmail());
+        if (user.getRole() != null) {
+            if (user.getRole() == 1) {
+                holder.tvRoleTag.setText("QUẢN LÝ");
+                holder.tvRoleTag.setBackgroundColor(Color.parseColor("#EF4444")); // Màu Đỏ
+            } else if (user.getRole() == 2) {
+                holder.tvRoleTag.setText("THU NGÂN");
+                holder.tvRoleTag.setBackgroundColor(Color.parseColor("#3B82F6")); // Màu Cam
+            } else {
+                holder.tvRoleTag.setText("NHÂN VIÊN");
+                holder.tvRoleTag.setBackgroundColor(Color.parseColor("#F59E0B")); // Màu Xanh dương
+            }
         } else {
-            holder.tvContact.setText("Chưa cập nhật");
-        }
-
-        // Xử lý hiển thị Tag (1 = Quản lý, 0 = Nhân viên)
-        if (user.isManager()) {
-            holder.tvRoleTag.setText("QUẢN LÝ");
-            holder.tvRoleTag.setBackgroundColor(Color.parseColor("#EF4444")); // Màu đỏ
-        } else {
+            // Mặc định an toàn
             holder.tvRoleTag.setText("NHÂN VIÊN");
-            holder.tvRoleTag.setBackgroundColor(Color.parseColor("#3B82F6")); // Màu xanh lam
+            holder.tvRoleTag.setBackgroundColor(Color.parseColor("#F59E0B"));
         }
-
-        // TODO: Xử lý sự kiện click vào nút Edit/More ở đây
     }
 
     @Override

@@ -26,10 +26,12 @@ public class User {
     @SerializedName("fullname")
     private String fullname;
 
+    @SerializedName("email")
+    private String email;
 
     public User() {}
 
-    public User(Integer id, String username, Integer role, Integer resId, String resName, String resDomain, String fullname) {
+    public User(Integer id, String username, Integer role, Integer resId, String resName, String resDomain, String fullname,String email) {
         this.id = id;
         this.username = username;
         this.role = role;
@@ -37,11 +39,11 @@ public class User {
         this.resName = resName;
         this.resDomain = resDomain;
         this.fullname = fullname;
+        this.email = email;
     }
 
     // Getters and Setters
-    @SerializedName("email")
-    private String email;
+
 
     // Getters
     public Integer getId()      { return id; }
