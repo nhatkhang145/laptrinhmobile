@@ -25,11 +25,28 @@ public class TableController {
 
     @Autowired private TableRepository tableRepo;
     @Autowired private AreaRepository areaRepo;
+    @Autowired private com.zappy.repository.OrderRepository orderRepo;
 
     // Lay tat ca ban trong khu vuc
     @GetMapping("/area/{areaId}")
     public List<RestaurantTable> getByArea(@PathVariable Integer areaId) {
         return tableRepo.findByAreaId(areaId);
+    }
+
+    // Lay tat ca ban trong nha hang (dung cho Danh sach Order)
+    @GetMapping("/restaurant/{resId}")
+    public List<RestaurantTable> getByRestaurant(@PathVariable Integer resId) {
+        List<RestaurantTable> tables = tableRepo.findByAreaRestaurantId(resId);
+        for (RestaurantTable t : tables) {
+            if (t.getIsOccupied()) {
+                orderRepo.findByTableIdAndStatus(t.getId(), 0).ifPresent(order -> {
+                    if (order.getUser() != null) {
+                        t.setActiveUserId(order.getUser().getId());
+                    }
+                });
+            }
+        }
+        return tables;
     }
 
     // Lay ban theo id

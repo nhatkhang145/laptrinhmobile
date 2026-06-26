@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
+import android.content.SharedPreferences;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -26,6 +28,7 @@ public class TienIchActivity extends AppCompatActivity {
     private LinearLayout navOrder;
     private LinearLayout navSoDo;
     private LinearLayout navTienIch;
+    private TextView tvUserName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +45,7 @@ public class TienIchActivity extends AppCompatActivity {
         initViews();
         setupClickListeners();
         animateEntrance();
+        loadUserInfo();
     }
 
     private void initViews() {
@@ -53,6 +57,21 @@ public class TienIchActivity extends AppCompatActivity {
         navOrder           = findViewById(R.id.navOrder);
         navSoDo            = findViewById(R.id.navSoDo);
         navTienIch         = findViewById(R.id.navTienIch);
+        tvUserName         = findViewById(R.id.tvUserName);
+    }
+
+    private void loadUserInfo() {
+        SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
+        String fullname = prefs.getString("FULLNAME", "");
+        String username = prefs.getString("USERNAME", "");
+        
+        if (!fullname.isEmpty()) {
+            tvUserName.setText(fullname);
+        } else if (!username.isEmpty()) {
+            tvUserName.setText(username);
+        } else {
+            tvUserName.setText("Chưa xác định");
+        }
     }
 
     private void setupClickListeners() {
@@ -139,10 +158,16 @@ public class TienIchActivity extends AppCompatActivity {
     private void showLogoutDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Đăng xuất")
-                .setMessage("Ban co chac muon dang xuat khoi tai khoan khong?")
-                .setPositiveButton("Dang xuat", (dialog, which) ->
-                        Toast.makeText(this, "Da dang xuat", Toast.LENGTH_SHORT).show())
-                .setNegativeButton("Huy", null)
+                .setMessage("Bạn có chắc muốn đăng xuất khỏi tài khoản không?")
+                .setPositiveButton("Đăng xuất", (dialog, which) -> {
+                    Toast.makeText(this, "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+                    getSharedPreferences("ZappySession", MODE_PRIVATE).edit().clear().apply();
+                    Intent intent = new Intent(TienIchActivity.this, DangNhapActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                })
+                .setNegativeButton("Hủy", null)
                 .show();
     }
 }

@@ -2,9 +2,10 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background">
+    android:background="@color/background" >
 
     <!-- Scrollable Content -->
     <androidx.core.widget.NestedScrollView
@@ -87,7 +88,7 @@
                         android:id="@+id/tvSelectedArea"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Khu A"
+                        android:text="Khu vực"
                         android:textColor="@color/text_primary"
                         android:textSize="13sp"
                         android:fontFamily="sans-serif-medium" />
@@ -110,67 +111,16 @@
                 android:background="@color/divider" />
 
             <!-- Area Tabs -->
-            <HorizontalScrollView
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabLayoutAreas"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="4dp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <!-- Tab Khu A (active) -->
-                    <TextView
-                        android:id="@+id/tabKhuA"
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:background="@drawable/bg_tab_active_dark"
-                        android:gravity="center"
-                        android:paddingStart="18dp"
-                        android:paddingEnd="18dp"
-                        android:text="Khu A"
-                        android:textColor="@color/surface"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold" />
-
-                    <!-- Tab Khu B -->
-                    <TextView
-                        android:id="@+id/tabKhuB"
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_tab_inactive"
-                        android:gravity="center"
-                        android:paddingStart="18dp"
-                        android:paddingEnd="18dp"
-                        android:text="Khu B"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium" />
-
-                    <!-- Tab Khu C -->
-                    <TextView
-                        android:id="@+id/tabKhuC"
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_tab_inactive"
-                        android:gravity="center"
-                        android:paddingStart="18dp"
-                        android:paddingEnd="18dp"
-                        android:text="Khu C"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium" />
-
-                </LinearLayout>
-            </HorizontalScrollView>
+                app:tabMode="scrollable"
+                app:tabIndicatorColor="@color/text_primary"
+                app:tabSelectedTextColor="@color/text_primary"
+                app:tabTextColor="@color/text_secondary" />
 
             <!-- Status Legend -->
             <LinearLayout
@@ -198,9 +148,10 @@
                         android:layout_marginEnd="6dp" />
 
                     <TextView
+                        android:id="@+id/tvEmptyCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Trống (12)"
+                        android:text="Trống (0)"
                         android:textColor="@color/text_secondary"
                         android:textSize="13sp" />
 
@@ -227,9 +178,10 @@
                         android:layout_marginEnd="6dp" />
 
                     <TextView
+                        android:id="@+id/tvOccupiedCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Có khách (08)"
+                        android:text="Có khách (0)"
                         android:textColor="@color/text_secondary"
                         android:textSize="13sp" />
 
@@ -244,408 +196,25 @@
                 android:layout_marginBottom="12dp" />
 
             <!-- Table Grid -->
-            <GridLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvTables"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:columnCount="2"
-                android:rowCount="4"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
+                android:layout_marginTop="8dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:paddingBottom="16dp"
-                android:useDefaultMargins="false">
-
-                <!-- Ban 01 - Trống -->
-                <LinearLayout
-                    android:id="@+id/cardBan01"
-                    android:layout_width="0dp"
-                    android:layout_height="110dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="6dp"
-                    android:background="@drawable/bg_table_empty"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="vertical"
-                    android:padding="14dp">
-
-                    <TextView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/bg_table_number_empty"
-                        android:gravity="center"
-                        android:text="01"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold" />
-
-                    <Space
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bàn 01"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Trống"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <!-- Ban 02 - Có khách (dark) -->
-                <LinearLayout
-                    android:id="@+id/cardBan02"
-                    android:layout_width="0dp"
-                    android:layout_height="110dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="6dp"
-                    android:background="@drawable/bg_table_occupied"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="vertical"
-                    android:padding="14dp">
-
-                    <TextView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/bg_table_number_occupied"
-                        android:gravity="center"
-                        android:text="02"
-                        android:textColor="#B0C4DE"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold" />
-
-                    <Space
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bàn 02"
-                        android:textColor="@color/surface"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="1h 15m  •  450k"
-                        android:textColor="#B0C4DE"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <!-- Ban 03 - Trống -->
-                <LinearLayout
-                    android:id="@+id/cardBan03"
-                    android:layout_width="0dp"
-                    android:layout_height="110dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="6dp"
-                    android:background="@drawable/bg_table_empty"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="vertical"
-                    android:padding="14dp">
-
-                    <TextView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/bg_table_number_empty"
-                        android:gravity="center"
-                        android:text="03"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold" />
-
-                    <Space
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bàn 03"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Trống"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <!-- Ban 04 - Trống -->
-                <LinearLayout
-                    android:id="@+id/cardBan04"
-                    android:layout_width="0dp"
-                    android:layout_height="110dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="6dp"
-                    android:background="@drawable/bg_table_empty"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="vertical"
-                    android:padding="14dp">
-
-                    <TextView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/bg_table_number_empty"
-                        android:gravity="center"
-                        android:text="04"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold" />
-
-                    <Space
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bàn 04"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Trống"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <!-- Ban 05 - Có khách (dark) -->
-                <LinearLayout
-                    android:id="@+id/cardBan05"
-                    android:layout_width="0dp"
-                    android:layout_height="110dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="6dp"
-                    android:background="@drawable/bg_table_occupied"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="vertical"
-                    android:padding="14dp">
-
-                    <TextView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/bg_table_number_occupied"
-                        android:gravity="center"
-                        android:text="05"
-                        android:textColor="#B0C4DE"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold" />
-
-                    <Space
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bàn 05"
-                        android:textColor="@color/surface"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="45m  •  1.2M"
-                        android:textColor="#B0C4DE"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <!-- Ban 06 - Trống -->
-                <LinearLayout
-                    android:id="@+id/cardBan06"
-                    android:layout_width="0dp"
-                    android:layout_height="110dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="6dp"
-                    android:background="@drawable/bg_table_empty"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="vertical"
-                    android:padding="14dp">
-
-                    <TextView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/bg_table_number_empty"
-                        android:gravity="center"
-                        android:text="06"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold" />
-
-                    <Space
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bàn 06"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Trống"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <!-- Ban 07 - Trống -->
-                <LinearLayout
-                    android:id="@+id/cardBan07"
-                    android:layout_width="0dp"
-                    android:layout_height="110dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="6dp"
-                    android:background="@drawable/bg_table_empty"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="vertical"
-                    android:padding="14dp">
-
-                    <TextView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/bg_table_number_empty"
-                        android:gravity="center"
-                        android:text="07"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold" />
-
-                    <Space
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bàn 07"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Trống"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <!-- Ban 08 - Trống -->
-                <LinearLayout
-                    android:id="@+id/cardBan08"
-                    android:layout_width="0dp"
-                    android:layout_height="110dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="6dp"
-                    android:background="@drawable/bg_table_empty"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="vertical"
-                    android:padding="14dp">
-
-                    <TextView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/bg_table_number_empty"
-                        android:gravity="center"
-                        android:text="08"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold" />
-
-                    <Space
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bàn 08"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Trống"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-            </GridLayout>
+                android:clipToPadding="false"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                app:spanCount="2"
+                tools:listitem="@layout/item_table_card" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
     <include
         android:id="@+id/bottomNav"
-        layout="@layout/layout_bottom_nav"
+        layout="@layout/layout_bottom_nav_sodo"
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:layout_gravity="bottom"

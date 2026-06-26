@@ -39,5 +39,9 @@ public class Order {
     // Tong tien thuc thu (chi cong nhung mon status = 1)
     @Column(name = "total_amount", precision = 12, scale = 2)
     private BigDecimal totalAmount = BigDecimal.ZERO;
+    
+    // Nhan vien tao order
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }
-

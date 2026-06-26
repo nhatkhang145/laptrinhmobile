@@ -60,14 +60,12 @@ public class DangNhapActivity extends AppCompatActivity {
     private void togglePasswordVisibility() {
         if (isPasswordVisible) {
             etPassword.setTransformationMethod(
-                    PasswordTransformationMethod.getInstance()
-            );
+                    PasswordTransformationMethod.getInstance());
             btnTogglePassword.setImageResource(R.drawable.ic_visibility_hidden);
             isPasswordVisible = false;
         } else {
             etPassword.setTransformationMethod(
-                    HideReturnsTransformationMethod.getInstance()
-            );
+                    HideReturnsTransformationMethod.getInstance());
             btnTogglePassword.setImageResource(R.drawable.ic_visibility_reveal);
             isPasswordVisible = true;
         }
@@ -115,9 +113,10 @@ public class DangNhapActivity extends AppCompatActivity {
                     getSharedPreferences("ZappySession", MODE_PRIVATE)
                             .edit()
                             .putInt("USER_ID", user.getId())
-                            .putInt("RES_ID",  user.getResId())
-                            .putInt("ROLE",    user.getRole())
+                            .putInt("RES_ID", user.getResId())
+                            .putInt("ROLE", user.getRole())
                             .putString("USERNAME", user.getUsername())
+                            .putString("FULLNAME", user.getFullname())
                             .apply();
 
                     // Chuyển sang màn hình chính
@@ -126,7 +125,18 @@ public class DangNhapActivity extends AppCompatActivity {
                     finish();
 
                 } else {
-                    Toast.makeText(DangNhapActivity.this, "Sai thông tin đăng nhập hoặc nhà hàng!", Toast.LENGTH_SHORT).show();
+                    String errorMsg = "Sai thông tin đăng nhập hoặc nhà hàng!";
+                    try {
+                        if (response.errorBody() != null) {
+                            String errBody = response.errorBody().string();
+                            // errBody is JSON like {"message":"..."}
+                            org.json.JSONObject jObjError = new org.json.JSONObject(errBody);
+                            errorMsg = jObjError.getString("message");
+                        }
+                    } catch (Exception e) {
+                        errorMsg += " (HTTP " + response.code() + ")";
+                    }
+                    Toast.makeText(DangNhapActivity.this, errorMsg, Toast.LENGTH_LONG).show();
                 }
             }
 

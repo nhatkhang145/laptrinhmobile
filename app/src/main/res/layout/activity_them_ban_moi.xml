@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
@@ -20,7 +21,8 @@
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_arrow_left"
-            app:tint="@color/text_primary" />
+            app:tint="@color/text_primary"
+            android:contentDescription="Quay lại" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -49,9 +51,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-black"
-                android:text="Tên bàn"
+                android:text="TÊN BÀN"
                 android:textColor="@color/text_primary"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
 
             <EditText
                 android:id="@+id/edt_table_name"
@@ -62,7 +64,32 @@
                 android:hint="Ví dụ: Bàn A1"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:inputType="textCapCharacters"
+                android:importantForAutofill="no" />
+
+            <!-- Sức chứa -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:fontFamily="sans-serif-black"
+                android:text="SỨC CHỨA (CHỖ NGỒI)"
+                android:textColor="@color/text_primary"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/edt_table_seats"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_search_bar"
+                android:hint="Ví dụ: 4"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textSize="14sp"
+                android:inputType="number"
+                android:importantForAutofill="no" />
 
             <!-- Khu vực -->
             <TextView
@@ -70,9 +97,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:fontFamily="sans-serif-black"
-                android:text="Khu vực"
+                android:text="KHU VỰC"
                 android:textColor="@color/text_primary"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
 
             <RelativeLayout
                 android:id="@+id/layout_select_area"
@@ -101,7 +128,8 @@
                     android:layout_centerVertical="true"
                     android:src="@drawable/ic_arrow_right"
                     android:rotation="90"
-                    app:tint="@color/text_secondary" />
+                    app:tint="@color/text_secondary"
+                    android:contentDescription="Mở rộng" />
             </RelativeLayout>
 
             <!-- Quick Area Selection -->

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginTop="10dp"
+    android:layout_marginEnd="16dp"
+    android:background="@drawable/bg_order_card"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="12dp">
+
+    <!-- Hình ảnh món -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivFoodImage"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="#D1D5DB"
+        android:scaleType="centerCrop"
+        app:shapeAppearanceOverlay="@style/RoundedSquare" />
+
+    <!-- Thông tin món -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvFoodName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            tools:text="MÌ KIM CHI BÒ MỸ"
+            android:textColor="#1A2B4A"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvFoodDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            tools:text="Sợi mì dai, nước dùng chua cay đặc trưng"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tvFoodPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="sans-serif-medium"
+            tools:text="55.000"
+            android:textColor="#1A2B4A"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp">
+
+        <!-- Nút (+) Thêm ban đầu (hiện khi qty == 0) -->
+        <com.mikepenz.iconics.view.IconicsImageView
+            android:id="@+id/btnAddItem"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_gravity="center_vertical|end"
+            android:background="@drawable/bg_circle_primary"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="6dp"
+            app:iiv_color="@color/surface"
+            app:iiv_icon="faw-plus" />
+
+        <!-- Bảng điều khiển (hiện khi qty > 0) -->
+        <LinearLayout
+            android:id="@+id/llQuantityControl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <!-- Nút Ghi chú -->
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:id="@+id/btnNote"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="@drawable/bg_circle_primary"
+                android:backgroundTint="#F59E0B"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="6dp"
+                android:layout_marginEnd="8dp"
+                app:iiv_color="@color/surface"
+                app:iiv_icon="faw-edit" />
+
+            <!-- Nút (-) -->
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:id="@+id/btnMinus"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="@drawable/bg_circle_outline"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="6dp"
+                app:iiv_color="@color/primary_dark"
+                app:iiv_icon="faw-minus" />
+
+            <!-- Số lượng -->
+            <TextView
+                android:id="@+id/tvQuantity"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="1"
+                android:textColor="#1A2B4A"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <!-- Nút (+) -->
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:id="@+id/btnPlus"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="@drawable/bg_circle_primary"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="6dp"
+                app:iiv_color="@color/surface"
+                app:iiv_icon="faw-plus" />
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>
