@@ -83,7 +83,7 @@ public class OTPActivity extends AppCompatActivity {
     }
 
     private void startCountdown() {
-        countDownTimer = new CountDownTimer(30 * 1000, 1000) {
+        countDownTimer = new CountDownTimer(60 * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 long secondsLeft = millisUntilFinished / 1000;
