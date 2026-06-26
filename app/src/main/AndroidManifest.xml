@@ -111,6 +111,11 @@
             android:name=".Activity.HoaDonActivity"
             android:exported="false" />
 
+        <!-- ===== Quản lý hóa đơn ===== -->
+        <activity
+            android:name=".Activity.InvoiceManageActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>
