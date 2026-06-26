@@ -425,6 +425,57 @@
                             app:iiv_size="18dp"/>
                     </LinearLayout>
 
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="70dp"
+                        android:background="@color/divider"/>
+
+                    <!-- Quan ly hoa don -->
+                    <LinearLayout
+                        android:id="@+id/menuQuanLyHoaDon"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <FrameLayout
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/bg_icon_gray">
+                            <com.mikepenz.iconics.view.IconicsImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                app:iiv_color="@color/text_secondary"
+                                app:iiv_icon="faw-file-invoice-dollar"
+                                app:iiv_size="18dp"/>
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-medium"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="8dp"
+                            android:text="Quản lý hóa đơn"
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp"
+                            android:textStyle="bold"/>
+
+                        <com.mikepenz.iconics.view.IconicsImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            app:iiv_color="@color/text_hint"
+                            app:iiv_icon="faw-angle-right"
+                            app:iiv_size="18dp"/>
+                    </LinearLayout>
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

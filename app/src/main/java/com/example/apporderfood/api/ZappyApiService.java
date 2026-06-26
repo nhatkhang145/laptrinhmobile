@@ -149,7 +149,10 @@ public interface ZappyApiService {
 
     /** Lay danh sach tat ca hoa don dang phuc vu cua nha hang */
     @GET("api/orders/restaurant/{resId}/active")
-    Call<List<Map<String, Object>>> getActiveOrdersByRestaurant(@Path("resId") Integer resId);
+    Call<List<Map<String, Object>>> getActiveOrdersByRestaurant(@Path("resId") int resId);
+
+    @GET("api/orders/restaurant/{resId}/paid")
+    Call<List<Map<String, Object>>> getPaidOrdersByRestaurant(@Path("resId") int resId);
 
     /** Nhan vien gui mon -> status=1 (KHOA, nhan vien khong sua/xoa duoc) */
     @PUT("api/orders/{orderId}/send")

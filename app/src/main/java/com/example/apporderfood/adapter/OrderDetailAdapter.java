@@ -22,13 +22,21 @@ import java.util.List;
  */
 public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.ViewHolder> {
 
+    public interface OnCancelItemListener {
+        void onCancelItem(OrderDetail detail);
+    }
+
     private final Context context;
     private List<OrderDetail> items;
     private final DecimalFormat formatter = new DecimalFormat("#,###");
+    private final boolean isAdmin;
+    private OnCancelItemListener cancelListener;
 
-    public OrderDetailAdapter(Context context, List<OrderDetail> items) {
+    public OrderDetailAdapter(Context context, List<OrderDetail> items, boolean isAdmin, OnCancelItemListener cancelListener) {
         this.context = context;
         this.items = items;
+        this.isAdmin = isAdmin;
+        this.cancelListener = cancelListener;
     }
 
     public void setItems(List<OrderDetail> items) {
@@ -84,6 +92,32 @@ public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.
         } else {
             holder.tvSubTotal.setText("0");
         }
+
+       
+        if (detail.getStatus() != null && detail.getStatus() == 2) {
+            // Món đã hủy
+            holder.tvItemName.setPaintFlags(holder.tvItemName.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+            holder.tvItemName.setTextColor(context.getResources().getColor(android.R.color.darker_gray));
+            holder.tvQtyBadge.setBackgroundResource(R.drawable.bg_badge_light);
+            holder.tvQtyBadge.setTextColor(context.getResources().getColor(android.R.color.darker_gray));
+            holder.btnCancel.setVisibility(View.GONE);
+            holder.tvSubTotal.setPaintFlags(holder.tvSubTotal.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+        } else {
+            holder.tvItemName.setPaintFlags(holder.tvItemName.getPaintFlags() & (~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG));
+            holder.tvItemName.setTextColor(context.getResources().getColor(R.color.text_primary));
+            holder.tvQtyBadge.setBackgroundResource(R.drawable.bg_badge_dark);
+            holder.tvQtyBadge.setTextColor(context.getResources().getColor(R.color.surface));
+            holder.tvSubTotal.setPaintFlags(holder.tvSubTotal.getPaintFlags() & (~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG));
+
+            if (isAdmin && detail.getStatus() != null && detail.getStatus() == 1) {
+                holder.btnCancel.setVisibility(View.VISIBLE);
+                holder.btnCancel.setOnClickListener(v -> {
+                    if (cancelListener != null) cancelListener.onCancelItem(detail);
+                });
+            } else {
+                holder.btnCancel.setVisibility(View.GONE);
+            }
+        }
     }
 
     @Override
@@ -92,7 +126,7 @@ public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvQtyBadge, tvItemName, tvUnitPrice, tvNote, tvSubTotal;
+        TextView tvQtyBadge, tvItemName, tvUnitPrice, tvNote, tvSubTotal, btnCancel;
         LinearLayout llNote;
 
         public ViewHolder(@NonNull View itemView) {
@@ -103,6 +137,7 @@ public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.
             llNote      = itemView.findViewById(R.id.llNote);
             tvNote      = itemView.findViewById(R.id.tvNote);
             tvSubTotal  = itemView.findViewById(R.id.tvSubTotal);
+            btnCancel   = itemView.findViewById(R.id.btnCancel);
         }
     }
 }

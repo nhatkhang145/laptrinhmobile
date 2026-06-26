@@ -120,7 +120,12 @@
             android:name=".Activity.ThemNhanVienActivity"
             android:exported="false" />
 
-        </application>
 
+        <!-- ===== Quản lý hóa đơn ===== -->
+        <activity
+            android:name=".Activity.InvoiceManageActivity"
+            android:exported="false" />
+
+    </application>
 
 </manifest>
