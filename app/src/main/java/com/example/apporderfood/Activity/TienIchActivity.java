@@ -112,7 +112,7 @@ public class TienIchActivity extends AppCompatActivity {
         if (menuQuanLyCaLam != null) {
             menuQuanLyCaLam.setOnClickListener(v -> {
                 animatePress(v);
-                startActivity(new Intent(this, ShiftManageActivity.class));
+                startActivity(new Intent(this, QuanLyCaActivity.class));
             });
         }
 

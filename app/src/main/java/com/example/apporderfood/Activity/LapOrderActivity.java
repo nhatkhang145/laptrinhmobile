@@ -61,6 +61,8 @@ public class LapOrderActivity extends AppCompatActivity {
     private List<Category> categoryList = new ArrayList<>();
     private ZappyApiService apiService;
     private Integer currentSelectedCatId = null; // null = Tất cả
+    private int currentUserId = -1;
+    private int currentUserRole = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +77,8 @@ public class LapOrderActivity extends AppCompatActivity {
 
         android.content.SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
         resId = prefs.getInt("RES_ID", -1);
+        currentUserId = prefs.getInt("USER_ID", -1);
+        currentUserRole = prefs.getInt("ROLE", 0);
         apiService = RetrofitClient.getApiService();
 
         initViews();
@@ -82,7 +86,61 @@ public class LapOrderActivity extends AppCompatActivity {
         setupClickListeners();
         setupSearch();
 
-        loadCategories();
+        checkShiftPermission();
+    }
+
+    private void checkShiftPermission() {
+        apiService.getActiveShift(resId).enqueue(new retrofit2.Callback<java.util.Map<String, Object>>() {
+            @Override
+            public void onResponse(retrofit2.Call<java.util.Map<String, Object>> call, retrofit2.Response<java.util.Map<String, Object>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    java.util.Map<String, Object> shift = response.body();
+                    String employeeIds = "";
+                    if (shift.get("employeeIds") != null) {
+                        employeeIds = (String) shift.get("employeeIds");
+                    }
+                    
+                    boolean isInShift = false;
+                    String[] ids = employeeIds.split(",");
+                    for (String idStr : ids) {
+                        try {
+                            if (Integer.parseInt(idStr.trim()) == currentUserId) {
+                                isInShift = true;
+                                break;
+                            }
+                        } catch (NumberFormatException ignored) {}
+                    }
+                    
+                    if (!isInShift && currentUserRole != 1) {
+                        showErrorAndExit("Bạn không nằm trong ca làm việc hiện tại, không thể gọi món!");
+                    } else {
+                        loadCategories();
+                    }
+                } else {
+                    if (currentUserRole != 1) {
+                        showErrorAndExit("Chưa mở ca làm việc! Vui lòng liên hệ Quản lý để mở ca.");
+                    } else {
+                        // Admin can order even without shift? 
+                        // The prompt says "trừ admin ra", so admin is allowed
+                        loadCategories();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<java.util.Map<String, Object>> call, Throwable t) {
+                showErrorAndExit("Lỗi kiểm tra ca làm việc: " + t.getMessage());
+            }
+        });
+    }
+
+    private void showErrorAndExit(String message) {
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Cảnh báo")
+                .setMessage(message)
+                .setCancelable(false)
+                .setPositiveButton("Đóng", (dialog, which) -> finish())
+                .show();
     }
 
     private void initViews() {

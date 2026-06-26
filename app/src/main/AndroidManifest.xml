@@ -128,7 +128,7 @@
 
         <!-- ===== Quản lý ca làm ===== -->
         <activity
-            android:name=".Activity.ShiftManageActivity"
+            android:name=".Activity.QuanLyCaActivity"
             android:exported="false" />
 
     </application>
