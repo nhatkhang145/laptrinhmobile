@@ -84,6 +84,19 @@ public class OrderController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    /** Lay danh sach tat ca hoa don dang phuc vu cua nha hang */
+    @GetMapping("/restaurant/{resId}/active")
+    public ResponseEntity<?> getActiveOrdersByRestaurant(@PathVariable Integer resId) {
+        List<Order> activeOrders = orderRepo.findByRestaurantIdAndStatus(resId, 0);
+        for (Order order : activeOrders) {
+            BigDecimal total = detailRepo.calculateTotalAmount(order.getId());
+            if (total != null) {
+                order.setTotalAmount(total);
+            }
+        }
+        return ResponseEntity.ok(activeOrders);
+    }
+
     /** Lay thong tin hoa don */
     @GetMapping("/{id}")
     public ResponseEntity<Order> getById(@PathVariable Integer id) {

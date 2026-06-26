@@ -13,7 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.apporderfood.R;
-import com.example.apporderfood.model.TableModel;
 import com.mikepenz.iconics.view.IconicsImageView;
 
 import java.util.ArrayList;
@@ -22,11 +21,11 @@ import java.util.List;
 public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.OrderViewHolder> {
 
     private final Context context;
-    private List<TableModel> tableList = new ArrayList<>();
+    private List<java.util.Map<String, Object>> orderList = new ArrayList<>();
     private final OnItemClickListener listener;
 
     public interface OnItemClickListener {
-        void onItemClick(TableModel table);
+        void onItemClick(java.util.Map<String, Object> orderMap);
     }
 
     public OrderListAdapter(Context context, OnItemClickListener listener) {
@@ -34,8 +33,8 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
         this.listener = listener;
     }
 
-    public void setTableList(List<TableModel> list) {
-        this.tableList = list;
+    public void setOrderList(List<java.util.Map<String, Object>> list) {
+        this.orderList = list;
         notifyDataSetChanged();
     }
 
@@ -48,41 +47,66 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
 
     @Override
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
-        TableModel table = tableList.get(position);
+        java.util.Map<String, Object> order = orderList.get(position);
+        java.util.Map<String, Object> table = (java.util.Map<String, Object>) order.get("table");
         
         // Hien thi ten khu vuc va ban
-        String areaName = (table.getArea() != null) ? table.getArea().getAreaName() : "Không rõ";
-        holder.tvTableName.setText(areaName + " - " + table.getTableName());
-
-        if (table.isOccupied()) {
-            holder.tvStatus.setText("Đang phục vụ");
-            holder.tvStatus.setTextColor(Color.parseColor("#EF4444")); // Red
-            holder.dotStatus.setBackgroundResource(R.drawable.bg_dot_red);
-            holder.tvAmount.setText("Đang tính..."); // Truoc mat chua tinh dc tong tien tu API nay
-            holder.layoutTime.setVisibility(View.VISIBLE);
-            
-            holder.iconAction.setIcon(new com.mikepenz.iconics.IconicsDrawable(context, com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome.Icon.faw_file_alt));
-            holder.tvAction.setText("Chi tiết");
-            holder.btnChiTiet.setBackgroundResource(R.drawable.bg_btn_detail);
-        } else {
-            holder.tvStatus.setText("Trống");
-            holder.tvStatus.setTextColor(Color.parseColor("#10B981")); // Green
-            holder.dotStatus.setBackgroundResource(R.drawable.bg_dot_green);
-            holder.tvAmount.setText("0đ");
-            holder.layoutTime.setVisibility(View.GONE);
-            
-            holder.iconAction.setIcon(new com.mikepenz.iconics.IconicsDrawable(context, com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome.Icon.faw_plus_circle));
-            holder.tvAction.setText("Mở bàn");
-            holder.btnChiTiet.setBackgroundResource(R.drawable.bg_btn_outline);
+        String areaName = "Không rõ";
+        if (table != null && table.get("area") != null) {
+            java.util.Map<String, Object> area = (java.util.Map<String, Object>) table.get("area");
+            areaName = (String) area.get("areaName");
         }
+        String tableName = table != null ? (String) table.get("tableName") : "Bàn";
+        holder.tvTableName.setText(areaName + " - " + tableName);
 
-        holder.btnChiTiet.setOnClickListener(v -> listener.onItemClick(table));
-        holder.itemView.setOnClickListener(v -> listener.onItemClick(table));
+        holder.tvStatus.setText("Đang phục vụ");
+        holder.tvStatus.setTextColor(Color.parseColor("#EF4444")); // Red
+        holder.dotStatus.setBackgroundResource(R.drawable.bg_dot_red);
+        
+        // Hien thi tong tien
+        double amount = 0;
+        if (order.get("totalAmount") != null) {
+            amount = ((Number) order.get("totalAmount")).doubleValue();
+        }
+        java.text.DecimalFormat formatter = new java.text.DecimalFormat("#,###");
+        holder.tvAmount.setText(formatter.format(amount) + "đ");
+        
+        // Hien thi thoi gian
+        holder.layoutTime.setVisibility(View.VISIBLE);
+        if (order.get("createdAt") != null) {
+            String createdAtStr = (String) order.get("createdAt");
+            try {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    java.time.LocalDateTime createdAt = java.time.LocalDateTime.parse(createdAtStr);
+                    long minutes = java.time.temporal.ChronoUnit.MINUTES.between(createdAt, java.time.LocalDateTime.now());
+                    if (minutes < 60) {
+                        holder.tvTime.setText(minutes + " phút");
+                    } else {
+                        long hours = minutes / 60;
+                        long mins = minutes % 60;
+                        holder.tvTime.setText(hours + "h " + mins + "p");
+                    }
+                } else {
+                    holder.tvTime.setText("-");
+                }
+            } catch (Exception e) {
+                holder.tvTime.setText("-");
+            }
+        } else {
+            holder.tvTime.setText("0 phút");
+        }
+        
+        holder.iconAction.setIcon(new com.mikepenz.iconics.IconicsDrawable(context, com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome.Icon.faw_file_alt));
+        holder.tvAction.setText("Chi tiết");
+        holder.btnChiTiet.setBackgroundResource(R.drawable.bg_btn_detail);
+
+        holder.btnChiTiet.setOnClickListener(v -> listener.onItemClick(order));
+        holder.itemView.setOnClickListener(v -> listener.onItemClick(order));
     }
 
     @Override
     public int getItemCount() {
-        return tableList != null ? tableList.size() : 0;
+        return orderList != null ? orderList.size() : 0;
     }
 
     static class OrderViewHolder extends RecyclerView.ViewHolder {
