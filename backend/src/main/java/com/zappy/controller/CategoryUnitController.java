@@ -16,10 +16,6 @@ import java.util.Map;
 
 /**
  * API Danh muc & Don vi tinh
- * GET  /api/categories/restaurant/{resId}
- * POST /api/categories
- * GET  /api/units/restaurant/{resId}
- * POST /api/units
  */
 @RestController
 public class CategoryUnitController {
@@ -36,11 +32,26 @@ public class CategoryUnitController {
 
     @PostMapping("/api/categories")
     public ResponseEntity<?> createCategory(@RequestBody Map<String, Object> data) {
-        Integer resId   = (Integer) data.get("resId");
-        String catName  = (String)  data.get("catName");
+        if (data.get("resId") == null || data.get("catName") == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Thiếu resId hoặc catName!"));
+        }
+
+        Integer resId;
+        try {
+            resId = Integer.parseInt(data.get("resId").toString());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", "resId không hợp lệ!"));
+        }
+
+        String catName = data.get("catName").toString().trim();
+        if (catName.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Tên danh mục không được để trống!"));
+        }
+
         Restaurant r = restaurantRepo.findById(resId).orElse(null);
         if (r == null) return ResponseEntity.badRequest()
                 .body(Map.of("message", "Khong tim thay nha hang!"));
+
         Category c = new Category();
         c.setRestaurant(r);
         c.setCatName(catName);
@@ -62,11 +73,26 @@ public class CategoryUnitController {
 
     @PostMapping("/api/units")
     public ResponseEntity<?> createUnit(@RequestBody Map<String, Object> data) {
-        Integer resId    = (Integer) data.get("resId");
-        String unitName  = (String)  data.get("unitName");
+        if (data.get("resId") == null || data.get("unitName") == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Thiếu resId hoặc unitName!"));
+        }
+
+        Integer resId;
+        try {
+            resId = Integer.parseInt(data.get("resId").toString());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", "resId không hợp lệ!"));
+        }
+
+        String unitName = data.get("unitName").toString().trim();
+        if (unitName.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Tên đơn vị không được để trống!"));
+        }
+
         Restaurant r = restaurantRepo.findById(resId).orElse(null);
         if (r == null) return ResponseEntity.badRequest()
                 .body(Map.of("message", "Khong tim thay nha hang!"));
+
         Unit u = new Unit();
         u.setRestaurant(r);
         u.setUnitName(unitName);

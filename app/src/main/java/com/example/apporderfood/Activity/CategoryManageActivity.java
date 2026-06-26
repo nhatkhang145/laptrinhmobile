@@ -1,6 +1,8 @@
 package com.example.apporderfood.Activity;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -15,11 +17,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.apporderfood.R;
 import com.example.apporderfood.adapter.CategoryManageAdapter;
+import com.example.apporderfood.api.RetrofitClient;
+import com.example.apporderfood.api.ZappyApiService;
 import com.example.apporderfood.model.Category;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CategoryManageActivity extends AppCompatActivity implements CategoryManageAdapter.OnCategoryItemClickListener {
 
@@ -28,15 +36,15 @@ public class CategoryManageActivity extends AppCompatActivity implements Categor
     private FloatingActionButton fabAddCategory;
     private ProgressBar pbLoading;
     private TextView tvEmptyState;
+    private TextView tvTotalCategories, tvActiveCategories, tvHiddenCategories;
 
-    // ActivityResultLauncher to handle return from Add Category screen
+    private int resId = -1;
+
     private final ActivityResultLauncher<Intent> addCategoryLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if (result.getResultCode() == RESULT_OK) {
-                    // Refresh data
+                if (result.getResultCode() == Activity.RESULT_OK) {
                     loadCategories();
-                    Toast.makeText(this, "Danh sách đã được cập nhật", Toast.LENGTH_SHORT).show();
                 }
             }
     );
@@ -45,6 +53,10 @@ public class CategoryManageActivity extends AppCompatActivity implements Categor
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quan_ly_danh_muc);
+
+        // Lấy resId của nhà hàng hiện tại từ session đăng nhập
+        SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
+        resId = prefs.getInt("RES_ID", -1);
 
         initViews();
         setupRecyclerView();
@@ -58,53 +70,89 @@ public class CategoryManageActivity extends AppCompatActivity implements Categor
         fabAddCategory = findViewById(R.id.fab_add_category);
         pbLoading = findViewById(R.id.pbCategoryLoading);
         tvEmptyState = findViewById(R.id.tvCategoryEmptyState);
+        
+        tvTotalCategories = findViewById(R.id.tvTotalCategories);
+        tvActiveCategories = findViewById(R.id.tvActiveCategories);
+        tvHiddenCategories = findViewById(R.id.tvHiddenCategories);
     }
 
     private void setupRecyclerView() {
-        rvCategoryList.setLayoutManager(new LinearLayoutManager(this));
+        if (rvCategoryList != null) {
+            rvCategoryList.setLayoutManager(new LinearLayoutManager(this));
+        }
     }
 
     private void loadCategories() {
-        // Show loading
+        if (resId == -1) {
+            Toast.makeText(this, "Không tìm thấy thông tin nhà hàng!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (pbLoading != null) pbLoading.setVisibility(View.VISIBLE);
-        rvCategoryList.setVisibility(View.GONE);
+        if (rvCategoryList != null) rvCategoryList.setVisibility(View.GONE);
+        if (tvEmptyState != null) tvEmptyState.setVisibility(View.GONE);
 
-        // Giả lập delay tải dữ liệu
-        new android.os.Handler().postDelayed(() -> {
-            List<Category> categoryList = new ArrayList<>();
-            // Category(Integer id, String catName, String description, String imageUrl, Integer status, Integer itemCount)
-            categoryList.add(new Category(1, "Burger", "Các loại burger bò, gà...", null, 1, 45));
-            categoryList.add(new Category(2, "Pizza", "Pizza truyền thống Ý", null, 1, 32));
-            categoryList.add(new Category(3, "Đồ uống", "Nước ngọt, cà phê, trà", null, 1, 58));
-            categoryList.add(new Category(4, "Tráng miệng", "Kem, bánh ngọt, chè", null, 0, 12));
-            categoryList.add(new Category(5, "Combo", "Tiết kiệm cho nhóm", null, 1, 8));
-            categoryList.add(new Category(6, "Món ăn nhanh", "Khoai tây chiên, snack", null, 0, 24));
-
-            if (pbLoading != null) pbLoading.setVisibility(View.GONE);
-            if (categoryList.isEmpty()) {
-                if (tvEmptyState != null) tvEmptyState.setVisibility(View.VISIBLE);
-                rvCategoryList.setVisibility(View.GONE);
-            } else {
-                if (tvEmptyState != null) tvEmptyState.setVisibility(View.GONE);
-                rvCategoryList.setVisibility(View.VISIBLE);
-                adapter = new CategoryManageAdapter(categoryList, this);
-                rvCategoryList.setAdapter(adapter);
+        ZappyApiService api = RetrofitClient.getApiService();
+        api.getCategories(resId).enqueue(new Callback<List<Category>>() {
+            @Override
+            public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
+                if (pbLoading != null) pbLoading.setVisibility(View.GONE);
+                
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Category> categoryList = response.body();
+                    if (categoryList.isEmpty()) {
+                        if (tvEmptyState != null) tvEmptyState.setVisibility(View.VISIBLE);
+                    } else {
+                        if (tvEmptyState != null) tvEmptyState.setVisibility(View.GONE);
+                        adapter = new CategoryManageAdapter(categoryList, CategoryManageActivity.this);
+                        if (rvCategoryList != null) {
+                            rvCategoryList.setVisibility(View.VISIBLE);
+                            rvCategoryList.setAdapter(adapter);
+                        }
+                        updateStats(categoryList);
+                    }
+                } else {
+                    Toast.makeText(CategoryManageActivity.this, "Lỗi tải danh mục", Toast.LENGTH_SHORT).show();
+                }
             }
-        }, 1000);
+
+            @Override
+            public void onFailure(Call<List<Category>> call, Throwable t) {
+                if (pbLoading != null) pbLoading.setVisibility(View.GONE);
+                Toast.makeText(CategoryManageActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateStats(List<Category> list) {
+        int total = list.size();
+        int active = 0;
+        int hidden = 0;
+        for (Category item : list) {
+            if (item.getStatus() != null && item.getStatus() == 1) active++;
+            else hidden++;
+        }
+        if (tvTotalCategories != null) tvTotalCategories.setText(String.valueOf(total));
+        if (tvActiveCategories != null) tvActiveCategories.setText(String.valueOf(active));
+        if (tvHiddenCategories != null) tvHiddenCategories.setText(String.format(Locale.getDefault(), "%02d", hidden));
     }
 
     private void setupListeners() {
-        findViewById(R.id.btn_back).setOnClickListener(v -> finish());
+        View btnBack = findViewById(R.id.btn_back);
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> finish());
+        }
         
-        fabAddCategory.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ThemDanhMucActivity.class);
-            addCategoryLauncher.launch(intent);
-        });
+        if (fabAddCategory != null) {
+            fabAddCategory.setOnClickListener(v -> {
+                Intent intent = new Intent(this, ThemDanhMucActivity.class);
+                addCategoryLauncher.launch(intent);
+            });
+        }
     }
 
     @Override
     public void onEditClick(Category item) {
-        // Logic chỉnh sửa: Truyền object sang màn hình thêm (chế độ sửa)
         Intent intent = new Intent(this, ThemDanhMucActivity.class);
         intent.putExtra("CATEGORY_DATA", item);
         addCategoryLauncher.launch(intent);
@@ -112,7 +160,7 @@ public class CategoryManageActivity extends AppCompatActivity implements Categor
 
     @Override
     public void onMoreClick(Category item, View view) {
-        Toast.makeText(this, "Tùy chọn: " + item.getCatName(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Tùy chọn cho: " + item.getCatName(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
