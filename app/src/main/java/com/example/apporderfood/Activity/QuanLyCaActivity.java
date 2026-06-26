@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -24,7 +23,6 @@ import com.mikepenz.iconics.view.IconicsImageView;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -89,8 +87,7 @@ public class QuanLyCaActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
         
         btnHistory.setOnClickListener(v -> {
-            Toast.makeText(this, "Tính năng xem Lịch sử ca làm đang phát triển", Toast.LENGTH_SHORT).show();
-            // Tương lai: Mở ShiftHistoryActivity
+            startActivity(new android.content.Intent(this, LichSuCaActivity.class));
         });
 
         btnOpenShift.setOnClickListener(v -> handleOpenShift());
