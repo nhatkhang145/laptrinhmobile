@@ -115,6 +115,10 @@
         <activity
             android:name=".Activity.QuanLyNhanVienActivity"
             android:exported="false" />
+        <!-- ===== Thêm nhân viên ===== -->
+        <activity
+            android:name=".Activity.ThemNhanVienActivity"
+            android:exported="false" />
 
         </application>
 
