@@ -1,6 +1,7 @@
 package com.example.apporderfood.Activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -17,6 +18,17 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.apporderfood.R;
+import com.example.apporderfood.api.RetrofitClient;
+import com.example.apporderfood.api.ZappyApiService;
+import com.example.apporderfood.model.Category;
+import com.google.android.material.button.MaterialButton;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ThemDanhMucActivity extends AppCompatActivity {
 
@@ -24,8 +36,12 @@ public class ThemDanhMucActivity extends AppCompatActivity {
     private TextView tvTitle, tvPreviewName, tvPreviewStatus, tvStatusActive, tvStatusHidden;
     private ImageView ivBanner, btnRemoveImage;
     private View layoutUpload, llUploadPlaceholder;
+    private MaterialButton btnSave;
     private Uri selectedImageUri;
     private boolean isEditMode = false;
+    private boolean isActive = true; // trạng thái mặc định
+    private int resId = -1;
+    private Integer editingCategoryId = null;
 
     private final ActivityResultLauncher<Intent> pickImageLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -45,6 +61,9 @@ public class ThemDanhMucActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_them_danh_muc);
 
+        SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
+        resId = prefs.getInt("RES_ID", -1);
+
         initViews();
         checkEditMode();
         setupListeners();
@@ -62,6 +81,7 @@ public class ThemDanhMucActivity extends AppCompatActivity {
         btnRemoveImage = findViewById(R.id.btn_remove_image);
         layoutUpload = findViewById(R.id.layout_upload_banner);
         llUploadPlaceholder = findViewById(R.id.ll_upload_placeholder);
+        btnSave = findViewById(R.id.btn_save);
     }
 
     private void checkEditMode() {
@@ -69,13 +89,21 @@ public class ThemDanhMucActivity extends AppCompatActivity {
         if (intent != null && intent.getBooleanExtra("IS_EDIT", false)) {
             isEditMode = true;
             tvTitle.setText("Chỉnh sửa danh mục");
-            String name = intent.getStringExtra("CATEGORY_NAME");
-            String desc = intent.getStringExtra("CATEGORY_DESC");
-            
-            edtName.setText(name);
-            edtDesc.setText(desc);
-            tvPreviewName.setText(name);
-            // Giả lập trạng thái cũ là Hoạt động
+            if (btnSave != null) btnSave.setText("CẬP NHẬT");
+
+            // Nhận Category object từ Intent
+            Category cat = (Category) intent.getSerializableExtra("CATEGORY_DATA");
+            if (cat != null) {
+                editingCategoryId = cat.getId();
+                edtName.setText(cat.getCatName());
+                edtDesc.setText(cat.getDescription());
+                tvPreviewName.setText(cat.getCatName());
+                boolean active = cat.getStatus() == null || cat.getStatus() == 1;
+                updateStatusUI(active);
+            } else {
+                updateStatusUI(true);
+            }
+        } else {
             updateStatusUI(true);
         }
     }
@@ -108,17 +136,18 @@ public class ThemDanhMucActivity extends AppCompatActivity {
         tvStatusActive.setOnClickListener(v -> updateStatusUI(true));
         tvStatusHidden.setOnClickListener(v -> updateStatusUI(false));
 
-        findViewById(R.id.btn_save).setOnClickListener(v -> validateAndSave());
+        if (btnSave != null) btnSave.setOnClickListener(v -> validateAndSave());
     }
 
-    private void updateStatusUI(boolean isActive) {
+    private void updateStatusUI(boolean active) {
+        this.isActive = active;
         // Reset styles
         tvStatusActive.setBackgroundResource(R.drawable.bg_search_bar);
         tvStatusActive.setTextColor(getColor(R.color.text_secondary));
         tvStatusHidden.setBackgroundResource(R.drawable.bg_search_bar);
         tvStatusHidden.setTextColor(getColor(R.color.text_secondary));
 
-        if (isActive) {
+        if (active) {
             tvStatusActive.setBackgroundResource(R.drawable.bg_tab_active_dark);
             tvStatusActive.setTextColor(getColor(R.color.white));
             tvPreviewStatus.setText("Hoạt động");
@@ -141,10 +170,53 @@ public class ThemDanhMucActivity extends AppCompatActivity {
             return;
         }
 
-        String msg = isEditMode ? "Đã cập nhật danh mục: " : "Đã thêm danh mục mới: ";
-        Toast.makeText(this, msg + name + ". Chờ kết nối API server.", Toast.LENGTH_LONG).show();
-        
-        setResult(RESULT_OK);
-        finish();
+        if (resId == -1) {
+            Toast.makeText(this, "Không tìm thấy thông tin nhà hàng!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        setFormEnabled(false);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("resId", resId);
+        body.put("catName", name);
+        body.put("status", isActive ? 1 : 0);
+        String desc = edtDesc.getText().toString().trim();
+        if (!desc.isEmpty()) body.put("description", desc);
+
+        ZappyApiService api = RetrofitClient.getApiService();
+        api.createCategory(body).enqueue(new Callback<Category>() {
+            @Override
+            public void onResponse(Call<Category> call, Response<Category> response) {
+                setFormEnabled(true);
+                if (response.isSuccessful() && response.body() != null) {
+                    String msg = isEditMode ? "Đã cập nhật danh mục: " : "Đã thêm danh mục mới: ";
+                    Toast.makeText(ThemDanhMucActivity.this,
+                            msg + response.body().getCatName(), Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK);
+                    finish();
+                } else {
+                    Toast.makeText(ThemDanhMucActivity.this,
+                            "Lưu thất bại (lỗi " + response.code() + ")",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Category> call, Throwable t) {
+                setFormEnabled(true);
+                Toast.makeText(ThemDanhMucActivity.this,
+                        "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void setFormEnabled(boolean enabled) {
+        if (btnSave != null) {
+            btnSave.setEnabled(enabled);
+            btnSave.setText(enabled ? (isEditMode ? "CẬP NHẬT" : "LƯU DANH MỤC") : "Đang lưu...");
+        }
+        edtName.setEnabled(enabled);
+        edtDesc.setEnabled(enabled);
     }
 }

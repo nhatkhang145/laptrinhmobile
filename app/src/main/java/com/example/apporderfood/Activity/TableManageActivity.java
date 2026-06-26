@@ -1,6 +1,8 @@
 package com.example.apporderfood.Activity;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -15,28 +17,34 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.apporderfood.R;
 import com.example.apporderfood.adapter.TableManageAdapter;
-import com.example.apporderfood.model.Area;
+import com.example.apporderfood.api.RetrofitClient;
+import com.example.apporderfood.api.ZappyApiService;
 import com.example.apporderfood.model.TableModel;
-import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class TableManageActivity extends AppCompatActivity implements TableManageAdapter.OnTableItemClickListener {
 
     private RecyclerView rvTableList;
     private TableManageAdapter adapter;
-    private MaterialButton btnAddTable;
+    private FloatingActionButton btnAddTable;
     private ProgressBar pbLoading;
     private TextView tvEmptyState;
     private TextView tvTotalTables, tvActiveTables, tvLockedTables;
 
+    private int resId = -1;
+
     private final ActivityResultLauncher<Intent> addTableLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if (result.getResultCode() == RESULT_OK) {
-                    loadTables();
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    loadTables(); // Tự động làm mới danh sách khi thêm/sửa thành công
                     Toast.makeText(this, "Đã cập nhật danh sách bàn", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -46,6 +54,10 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quan_ly_ban);
+
+        // Lấy resId của nhà hàng hiện tại
+        SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
+        resId = prefs.getInt("RES_ID", -1);
 
         initViews();
         setupRecyclerView();
@@ -66,46 +78,47 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
     }
 
     private void setupRecyclerView() {
-        rvTableList.setLayoutManager(new LinearLayoutManager(this));
+        if (rvTableList != null) {
+            rvTableList.setLayoutManager(new LinearLayoutManager(this));
+        }
     }
 
     private void loadTables() {
+        if (resId == -1) return;
+
         if (pbLoading != null) pbLoading.setVisibility(View.VISIBLE);
-        rvTableList.setVisibility(View.GONE);
+        if (rvTableList != null) rvTableList.setVisibility(View.GONE);
+        if (tvEmptyState != null) tvEmptyState.setVisibility(View.GONE);
 
-        // Giả lập tải dữ liệu từ API
-        new android.os.Handler().postDelayed(() -> {
-            List<TableModel> tableList = new ArrayList<>();
-            tableList.add(createMockTable(1, "B01", "HOẠT ĐỘNG", "Tầng 1", 4));
-            tableList.add(createMockTable(2, "VIP01", "ĐANG KHÓA", "Phòng VIP", 10));
-            tableList.add(createMockTable(3, "B05", "BẢO TRÌ", "Sân vườn", 2));
-            tableList.add(createMockTable(4, "B02", "HOẠT ĐỘNG", "Tầng 1", 4));
-            tableList.add(createMockTable(5, "B03", "HOẠT ĐỘNG", "Tầng 2", 6));
-
-            if (pbLoading != null) pbLoading.setVisibility(View.GONE);
-            
-            if (tableList.isEmpty()) {
-                if (tvEmptyState != null) tvEmptyState.setVisibility(View.VISIBLE);
-                rvTableList.setVisibility(View.GONE);
-            } else {
-                if (tvEmptyState != null) tvEmptyState.setVisibility(View.GONE);
-                rvTableList.setVisibility(View.VISIBLE);
-                adapter = new TableManageAdapter(tableList, this);
-                rvTableList.setAdapter(adapter);
-                updateStats(tableList);
+        ZappyApiService api = RetrofitClient.getApiService();
+        api.getAllTablesByRestaurant(resId).enqueue(new Callback<List<TableModel>>() {
+            @Override
+            public void onResponse(Call<List<TableModel>> call, Response<List<TableModel>> response) {
+                if (pbLoading != null) pbLoading.setVisibility(View.GONE);
+                
+                if (response.isSuccessful() && response.body() != null) {
+                    List<TableModel> tableList = response.body();
+                    if (tableList.isEmpty()) {
+                        if (tvEmptyState != null) tvEmptyState.setVisibility(View.VISIBLE);
+                    } else {
+                        adapter = new TableManageAdapter(tableList, TableManageActivity.this);
+                        if (rvTableList != null) {
+                            rvTableList.setVisibility(View.VISIBLE);
+                            rvTableList.setAdapter(adapter);
+                        }
+                        updateStats(tableList);
+                    }
+                } else {
+                    Toast.makeText(TableManageActivity.this, "Không thể lấy dữ liệu bàn", Toast.LENGTH_SHORT).show();
+                }
             }
-        }, 800);
-    }
 
-    private TableModel createMockTable(int id, String name, String status, String areaName, int seats) {
-        TableModel table = new TableModel();
-        table.setId(id);
-        table.setTableName(name);
-        table.setStatus(status);
-        table.setArea(new Area(null, areaName));
-        table.setSeats(seats);
-        table.setOccupied("ĐANG KHÓA".equals(status));
-        return table;
+            @Override
+            public void onFailure(Call<List<TableModel>> call, Throwable t) {
+                if (pbLoading != null) pbLoading.setVisibility(View.GONE);
+                Toast.makeText(TableManageActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void updateStats(List<TableModel> list) {
@@ -115,7 +128,7 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
         for (TableModel item : list) {
             String status = item.getStatus() != null ? item.getStatus() : "HOẠT ĐỘNG";
             if ("HOẠT ĐỘNG".equals(status)) active++;
-            if ("ĐANG KHÓA".equals(status) || "BẢO TRÌ".equals(status)) locked++;
+            else locked++;
         }
         if (tvTotalTables != null) tvTotalTables.setText(String.valueOf(total));
         if (tvActiveTables != null) tvActiveTables.setText(String.valueOf(active));
@@ -123,7 +136,10 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
     }
 
     private void setupListeners() {
-        findViewById(R.id.btn_back).setOnClickListener(v -> finish());
+        View btnBack = findViewById(R.id.btn_back);
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> finish());
+        }
 
         if (btnAddTable != null) {
             btnAddTable.setOnClickListener(v -> {
@@ -137,22 +153,18 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
     public void onEditClick(TableModel item) {
         Intent intent = new Intent(this, ThemBanMoiActivity.class);
         intent.putExtra("IS_EDIT", true);
-        intent.putExtra("TABLE_ID", item.getTableName());
-        if (item.getArea() != null) {
-            intent.putExtra("TABLE_AREA", item.getArea().getAreaName());
-        }
-        intent.putExtra("TABLE_SEATS", item.getSeats() != null ? item.getSeats() : 4);
+        intent.putExtra("TABLE_DATA", item); // Truyền toàn bộ object (đã implement Serializable)
         addTableLauncher.launch(intent);
     }
 
     @Override
     public void onMoreClick(TableModel item, View view) {
-        Toast.makeText(this, "Tùy chọn: " + item.getTableName(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Lựa chọn khác cho bàn: " + item.getTableName(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onItemClick(TableModel item) {
-        Toast.makeText(this, "Chi tiết: " + item.getTableName(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Xem chi tiết: " + item.getTableName(), Toast.LENGTH_SHORT).show();
     }
 
     private void setupBottomNav() {
