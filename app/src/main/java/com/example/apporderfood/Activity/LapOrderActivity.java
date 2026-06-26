@@ -13,6 +13,7 @@ import com.example.apporderfood.adapter.MenuItemLapOrderAdapter;
 import com.example.apporderfood.api.RetrofitClient;
 import com.example.apporderfood.api.ZappyApiService;
 import com.example.apporderfood.model.Category;
+import com.example.apporderfood.model.CartItem;
 import com.example.apporderfood.model.MenuItem;
 import com.google.android.material.tabs.TabLayout;
 
@@ -36,12 +37,12 @@ import retrofit2.Response;
 /**
  * LapOrderActivity - Màn hình chọn món khi ấn vào bàn TRỐNG
  * Layout: activity_lap_order.xml
- * Flow:
- *  1. Nhận TABLE_ID, TABLE_NAME từ SoDobanActivity
- *  2. Gọi API POST /api/orders/open để tạo hóa đơn mới, bàn -> is_occupied = TRUE
- *  3. NV chọn món (thêm vào giỏ RAM tạm)
- *  4. Nút ĐỒNG Ý -> Gọi API thêm từng món -> Chuyển sang XacNhanOrderActivity
- *  5. Nút HỦY BỎ -> finish() về SoDobanActivity
+ * Flow đúng:
+ * 1. Nhận TABLE_ID, TABLE_NAME từ SoDobanActivity
+ * 2. Tải danh mục & thực đơn (CHƯA tạo order, bàn vẫn trống)
+ * 3. NV chọn món (thêm vào giỏ RAM tạm)
+ * 4. Nút ĐỒNG Ý -> Gọi openTable() tạo order -> addBatchItems() -> sang XacNhanOrderActivity
+ * 5. Nút HỦY BỎ -> finish() về SoDobanActivity (bàn vẫn trống vì chưa tạo order)
  */
 public class LapOrderActivity extends AppCompatActivity {
 
@@ -53,7 +54,7 @@ public class LapOrderActivity extends AppCompatActivity {
 
     private int tableId = -1;
     private String tableName = "";
-    private int orderId = -1; // Sẽ được set sau khi gọi API openTable thành công
+    private int orderId = -1; // Chỉ được set SAU KHI ấn ĐỒNG Ý và openTable() thành công
     private int resId = -1;
 
     private MenuItemLapOrderAdapter adapter;
@@ -67,9 +68,10 @@ public class LapOrderActivity extends AppCompatActivity {
         setContentView(R.layout.activity_lap_order);
 
         // Nhận dữ liệu từ SoDobanActivity
-        tableId   = getIntent().getIntExtra("TABLE_ID", -1);
+        tableId = getIntent().getIntExtra("TABLE_ID", -1);
         tableName = getIntent().getStringExtra("TABLE_NAME") != null
-                ? getIntent().getStringExtra("TABLE_NAME") : "Bàn";
+                ? getIntent().getStringExtra("TABLE_NAME")
+                : "Bàn";
 
         android.content.SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
         resId = prefs.getInt("RES_ID", -1);
@@ -79,18 +81,17 @@ public class LapOrderActivity extends AppCompatActivity {
         setupRecyclerView();
         setupClickListeners();
         setupSearch();
-        
-        openTable(); // Bước 1: Tạo hóa đơn ngay khi mở màn hình
-        loadCategories(); // Bước 2: Tải danh mục
+
+        loadCategories();
     }
 
     private void initViews() {
-        btnHuyBo   = findViewById(R.id.btnHuyBo);
-        btnDongY   = findViewById(R.id.btnDongY);
+        btnHuyBo = findViewById(R.id.btnHuyBo);
+        btnDongY = findViewById(R.id.btnDongY);
         tabLayoutCategories = findViewById(R.id.tabLayoutCategories);
         rvMenuItems = findViewById(R.id.rvMenuItems);
         etSearch = findViewById(R.id.etSearch);
-        
+
         // Cập nhật title Header
         LinearLayout headerLayout = findViewById(R.id.headerLayout);
         if (headerLayout != null && headerLayout.getChildCount() > 1) {
@@ -101,58 +102,20 @@ public class LapOrderActivity extends AppCompatActivity {
         }
     }
 
+    private Map<Integer, CartItem> cartMap = new HashMap<>();
+
     private void setupRecyclerView() {
-        adapter = new MenuItemLapOrderAdapter(this, new ArrayList<>(), item -> {
-            addItemToOrder(item);
+        adapter = new MenuItemLapOrderAdapter(this, new ArrayList<>(), cartMap, updatedCart -> {
+            cartMap = updatedCart;
         });
         rvMenuItems.setLayoutManager(new LinearLayoutManager(this));
         rvMenuItems.setAdapter(adapter);
     }
 
-    /**
-     * Bước 1: Gọi API POST /api/orders/open để tạo hóa đơn mới.
-     * Backend sẽ: tạo dòng trong Orders + đặt Tables.is_occupied = TRUE
-     */
-    private void openTable() {
-        if (tableId == -1) return;
-
-        ZappyApiService api = RetrofitClient.getApiService();
-        Map<String, Integer> data = new HashMap<>();
-        data.put("tableId", tableId);
-        
-        android.content.SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
-        int userId = prefs.getInt("USER_ID", -1);
-        if (userId != -1) {
-            data.put("userId", userId);
-        }
-
-        api.openTable(data).enqueue(new Callback<Map>() {
-            @Override
-            public void onResponse(Call<Map> call, Response<Map> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Object id = response.body().get("orderId");
-                    if (id != null) {
-                        orderId = ((Double) id).intValue();
-                    }
-                } else {
-                    Toast.makeText(LapOrderActivity.this,
-                            "Không thể mở bàn, thử lại!", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Map> call, Throwable t) {
-                Toast.makeText(LapOrderActivity.this,
-                        "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        });
-    }
-
     private void loadCategories() {
-        if (resId == -1) return;
-        
+        if (resId == -1)
+            return;
+
         apiService.getCategories(resId).enqueue(new Callback<List<Category>>() {
             @Override
             public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
@@ -171,10 +134,10 @@ public class LapOrderActivity extends AppCompatActivity {
 
     private void setupTabs() {
         tabLayoutCategories.removeAllTabs();
-        
+
         // Tab "Tất cả"
         tabLayoutCategories.addTab(tabLayoutCategories.newTab().setText("Tất cả"));
-        
+
         for (Category cat : categoryList) {
             tabLayoutCategories.addTab(tabLayoutCategories.newTab().setText(cat.getCatName()));
         }
@@ -192,10 +155,12 @@ public class LapOrderActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {}
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
         });
 
         // Tải danh sách món cho "Tất cả" mặc định ban đầu
@@ -203,7 +168,8 @@ public class LapOrderActivity extends AppCompatActivity {
     }
 
     private void loadMenuItems(String keyword) {
-        if (resId == -1) return;
+        if (resId == -1)
+            return;
 
         Call<List<MenuItem>> call;
         if (currentSelectedCatId == null) {
@@ -231,68 +197,162 @@ public class LapOrderActivity extends AppCompatActivity {
         });
     }
 
-    private void addItemToOrder(MenuItem item) {
-        if (orderId == -1) {
-            Toast.makeText(this, "Chưa tạo được hóa đơn!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("menuItemId", item.getId());
-        data.put("quantity", 1);
-        data.put("price", item.getPrice());
-
-        apiService.addItem(orderId, data).enqueue(new Callback<com.example.apporderfood.model.OrderDetail>() {
-            @Override
-            public void onResponse(Call<com.example.apporderfood.model.OrderDetail> call, Response<com.example.apporderfood.model.OrderDetail> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(LapOrderActivity.this, "Đã thêm " + item.getItemName(), Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(LapOrderActivity.this, "Lỗi khi thêm món", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<com.example.apporderfood.model.OrderDetail> call, Throwable t) {
-                Toast.makeText(LapOrderActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     private void setupSearch() {
+        android.os.Handler searchHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+        Runnable[] searchRunnable = {null};
+
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                loadMenuItems(s.toString());
+                if (searchRunnable[0] != null) {
+                    searchHandler.removeCallbacks(searchRunnable[0]);
+                }
+                String keyword = s.toString();
+                searchRunnable[0] = () -> loadMenuItems(keyword);
+                searchHandler.postDelayed(searchRunnable[0], 400);
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
     }
 
     private void setupClickListeners() {
 
-        // Nút HỦY BỎ -> quay lại sơ đồ bàn
+        // Nút HỦY BỎ -> quay lại sơ đồ bàn (bàn vẫn trống vì chưa tạo order)
         btnHuyBo.setOnClickListener(v -> finish());
 
-        // Nút ĐỒNG Ý -> Chuyển sang màn hình xác nhận / chi tiết order
+        // Nút ĐỒNG Ý: Kiểm tra giỏ hàng -> Tạo order -> Thêm món -> Sang XacNhanOrderActivity
         btnDongY.setOnClickListener(v -> {
-            if (orderId == -1) {
-                Toast.makeText(this, "Đang tạo đơn, vui lòng thử lại!", Toast.LENGTH_SHORT).show();
+            if (cartMap.isEmpty()) {
+                Toast.makeText(this, "Vui lòng chọn ít nhất 1 món!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Intent intent = new Intent(this, XacNhanOrderActivity.class);
-            intent.putExtra("ORDER_ID", orderId);
-            intent.putExtra("TABLE_NAME", tableName);
-            intent.putExtra("TABLE_ID", tableId);
-            startActivity(intent);
-            finish();
+            // Vô hiệu hóa nút để tránh bấm nhiều lần
+            btnDongY.setEnabled(false);
+            // Bước 1: Tạo order (mở bàn) -> sau đó mới thêm món
+            createOrderThenAddItems();
         });
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+    }
+
+    private void createOrderThenAddItems() {
+        if (tableId == -1) {
+            btnDongY.setEnabled(true);
+            return;
+        }
+
+        ZappyApiService api = RetrofitClient.getApiService();
+        Map<String, Integer> data = new HashMap<>();
+        data.put("tableId", tableId);
+
+        android.content.SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
+        int userId = prefs.getInt("USER_ID", -1);
+        if (userId != -1) {
+            data.put("userId", userId);
+        }
+
+        Toast.makeText(this, "Đang tạo đơn...", Toast.LENGTH_SHORT).show();
+
+        api.openTable(data).enqueue(new Callback<Map>() {
+            @Override
+            public void onResponse(Call<Map> call, Response<Map> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Object id = response.body().get("id");
+                    if (id == null) id = response.body().get("orderId");
+                    if (id != null) {
+                        orderId = ((Double) id).intValue();
+                        addItemsToOrder();
+                    } else {
+                        Toast.makeText(LapOrderActivity.this, "Lỗi: Không nhận được mã đơn!", Toast.LENGTH_SHORT).show();
+                        btnDongY.setEnabled(true);
+                    }
+                } else if (response.code() == 400) {
+                    fetchActiveOrderThenAddItems();
+                } else {
+                    String errMsg = "Lỗi " + response.code();
+                    try {
+                        if (response.errorBody() != null) errMsg += ": " + response.errorBody().string();
+                    } catch (Exception ignored) {}
+                    Toast.makeText(LapOrderActivity.this, errMsg, Toast.LENGTH_LONG).show();
+                    btnDongY.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Map> call, Throwable t) {
+                Toast.makeText(LapOrderActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                btnDongY.setEnabled(true);
+            }
+        });
+    }
+
+    private void fetchActiveOrderThenAddItems() {
+        RetrofitClient.getApiService().getActiveOrder(tableId).enqueue(new Callback<Map>() {
+            @Override
+            public void onResponse(Call<Map> call, Response<Map> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Object id = response.body().get("id");
+                    if (id == null) id = response.body().get("orderId");
+                    if (id != null) {
+                        orderId = ((Double) id).intValue();
+                        addItemsToOrder();
+                    } else {
+                        Toast.makeText(LapOrderActivity.this, "Không lấy được đơn hiện tại!", Toast.LENGTH_SHORT).show();
+                        btnDongY.setEnabled(true);
+                    }
+                } else {
+                    Toast.makeText(LapOrderActivity.this, "Bàn đang có khách nhưng không tìm được đơn!", Toast.LENGTH_LONG).show();
+                    btnDongY.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Map> call, Throwable t) {
+                Toast.makeText(LapOrderActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                btnDongY.setEnabled(true);
+            }
+        });
+    }
+
+    private void addItemsToOrder() {
+        List<Map<String, Object>> batchData = new ArrayList<>();
+        for (CartItem ci : cartMap.values()) {
+            Map<String, Object> item = new HashMap<>();
+            item.put("itemId", ci.getMenuItem().getId());
+            item.put("quantity", ci.getQuantity());
+            item.put("note", ci.getNote() != null ? ci.getNote() : "");
+            batchData.add(item);
+        }
+
+        apiService.addBatchItems(orderId, batchData).enqueue(new Callback<Map<String, String>>() {
+            @Override
+            public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
+                btnDongY.setEnabled(true);
+                if (response.isSuccessful()) {
+                    // Chuyển sang màn hình XacNhanOrder để xem lại và ấn GỬI BẾP
+                    Intent intent = new Intent(LapOrderActivity.this, XacNhanOrderActivity.class);
+                    intent.putExtra("ORDER_ID", orderId);
+                    intent.putExtra("TABLE_NAME", tableName);
+                    intent.putExtra("TABLE_ID", tableId);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(LapOrderActivity.this, "Lỗi thêm món, thử lại!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Map<String, String>> call, Throwable t) {
+                btnDongY.setEnabled(true);
+                Toast.makeText(LapOrderActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

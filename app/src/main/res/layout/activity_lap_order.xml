@@ -167,7 +167,7 @@
                     android:textColorHint="@color/text_hint"
                     android:textColor="@color/text_primary"
                     android:textSize="14sp"
-                    android:inputType="text"
+                    android:inputType="textVisiblePassword"
                     android:imeOptions="actionSearch"
                     android:singleLine="true" />
 

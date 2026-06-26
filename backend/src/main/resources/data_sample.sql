@@ -21,21 +21,21 @@ INSERT INTO restaurants (res_name, res_domain, address) VALUES
 -- ============================================================
 
 -- Chi nhánh 1: Mỳ Cay Seoul Thủ Đức (res_id = 1)
-INSERT INTO users (res_id, username, password, role) VALUES
-(1, 'admin',   '123456', 1),   -- Quản lý
-(1, 'nhanvien01', '123456', 0), -- Nhân viên 1
-(1, 'nhanvien02', '123456', 0); -- Nhân viên 2
+INSERT INTO users (res_id, username, password, role, email, fullname) VALUES
+(1, 'admin',   '123456', 1, 'admin1@gmail.com', 'Admin'),   -- Quản lý
+(1, 'nhanvien01', '123456', 0, 'nv1@gmail.com', 'Nhân viên 1'), -- Nhân viên 1
+(1, 'nhanvien02', '123456', 0, 'nv2@gmail.com', 'Nhân viên 2'); -- Nhân viên 2
 
 -- Chi nhánh 2: Mỳ Cay Seoul Bình Thạnh (res_id = 2)
-INSERT INTO users (res_id, username, password, role) VALUES
-(2, 'admin',   '123456', 1),
-(2, 'nv_binhthanh01', '123456', 0),
-(2, 'nv_binhthanh02', '123456', 0);
+INSERT INTO users (res_id, username, password, role, email, fullname) VALUES
+(2, 'admin2',   '123456', 1, 'admin2@gmail.com', 'Admin BT'),
+(2, 'nv_binhthanh01', '123456', 0, 'nv3@gmail.com', 'Nhân viên 3'),
+(2, 'nv_binhthanh02', '123456', 0, 'nv4@gmail.com', 'Nhân viên 4');
 
 -- Chi nhánh 3: Phở Hà Nội 1975 (res_id = 3)
-INSERT INTO users (res_id, username, password, role) VALUES
-(3, 'admin',   '123456', 1),
-(3, 'nv_pho01', '123456', 0);
+INSERT INTO users (res_id, username, password, role, email, fullname) VALUES
+(3, 'admin3',   '123456', 1, 'admin3@gmail.com', 'Admin HN'),
+(3, 'nv_pho01', '123456', 0, 'nv5@gmail.com', 'Nhân viên 5');
 
 -- ============================================================
 -- 3. AREAS - Khu vực phục vụ cho từng nhà hàng
@@ -201,109 +201,109 @@ INSERT INTO categories (res_id, cat_name) VALUES
 -- ============================================================
 
 -- Mỳ Cay Seoul Thủ Đức - Danh mục MỲ CAY (cat_id=1)
-INSERT INTO menu_items (cat_id, unit_id, item_name, price) VALUES
-(1, 1, 'Mỳ Cay Bò Mỹ Cấp Độ 1',  55000),
-(1, 1, 'Mỳ Cay Bò Mỹ Cấp Độ 3',  58000),
-(1, 1, 'Mỳ Cay Bò Mỹ Cấp Độ 5',  60000),
-(1, 1, 'Mỳ Cay Hải Sản Cấp Độ 1', 65000),
-(1, 1, 'Mỳ Cay Hải Sản Cấp Độ 3', 68000),
-(1, 1, 'Mỳ Cay Hải Sản Cấp Độ 5', 70000),
-(1, 1, 'Mỳ Cay Gà Cấp Độ 1',      52000),
-(1, 1, 'Mỳ Cay Gà Cấp Độ 3',      55000),
-(1, 1, 'Mỳ Cay Nấm Đặc Biệt',     50000),
-(1, 1, 'Mỳ Kim Chi Cay Truyền Thống', 48000),
-(1, 1, 'Mỳ Cay Tôm Đặc Biệt',     62000),
-(1, 8, 'Set Đôi Mỳ Cay + Lẩu Mini', 120000);
+INSERT INTO menu_items (cat_id, unit_id, item_name, price, image_url) VALUES
+(1, 1, 'Mỳ Cay Bò Mỹ Cấp Độ 1',  55000, ''),
+(1, 1, 'Mỳ Cay Bò Mỹ Cấp Độ 3',  58000, ''),
+(1, 1, 'Mỳ Cay Bò Mỹ Cấp Độ 5',  60000, ''),
+(1, 1, 'Mỳ Cay Hải Sản Cấp Độ 1', 65000, ''),
+(1, 1, 'Mỳ Cay Hải Sản Cấp Độ 3', 68000, ''),
+(1, 1, 'Mỳ Cay Hải Sản Cấp Độ 5', 70000, ''),
+(1, 1, 'Mỳ Cay Gà Cấp Độ 1',      52000, ''),
+(1, 1, 'Mỳ Cay Gà Cấp Độ 3',      55000, ''),
+(1, 1, 'Mỳ Cay Nấm Đặc Biệt',     50000, ''),
+(1, 1, 'Mỳ Kim Chi Cay Truyền Thống', 48000, ''),
+(1, 1, 'Mỳ Cay Tôm Đặc Biệt',     62000, ''),
+(1, 8, 'Set Đôi Mỳ Cay + Lẩu Mini', 120000, '');
 
 -- Danh mục LẨU (cat_id=2)
-INSERT INTO menu_items (cat_id, unit_id, item_name, price) VALUES
-(2, 8, 'Lẩu Hải Sản Cay',       250000),
-(2, 8, 'Lẩu Bò Mỹ Cay',        220000),
-(2, 8, 'Lẩu Gà Lá Chanh',      200000),
-(2, 8, 'Lẩu Thái Chua Cay',    230000),
-(2, 8, 'Lẩu Nấm Chay',         180000),
-(2, 2, 'Thêm Mì Tươi',          20000),
-(2, 2, 'Thêm Rau Lẩu',          25000),
-(2, 2, 'Thêm Bò Thái Lát',      55000),
-(2, 2, 'Thêm Hải Sản Hỗn Hợp',  60000);
+INSERT INTO menu_items (cat_id, unit_id, item_name, price, image_url) VALUES
+(2, 8, 'Lẩu Hải Sản Cay',       250000, ''),
+(2, 8, 'Lẩu Bò Mỹ Cay',        220000, ''),
+(2, 8, 'Lẩu Gà Lá Chanh',      200000, ''),
+(2, 8, 'Lẩu Thái Chua Cay',    230000, ''),
+(2, 8, 'Lẩu Nấm Chay',         180000, ''),
+(2, 2, 'Thêm Mì Tươi',          20000, ''),
+(2, 2, 'Thêm Rau Lẩu',          25000, ''),
+(2, 2, 'Thêm Bò Thái Lát',      55000, ''),
+(2, 2, 'Thêm Hải Sản Hỗn Hợp',  60000, '');
 
 -- Danh mục ĐỒ NƯỚNG (cat_id=3)
-INSERT INTO menu_items (cat_id, unit_id, item_name, price) VALUES
-(3, 2, 'Thịt Bò Nướng Bulgogi',   75000),
-(3, 2, 'Gà Nướng Sốt Cay Hàn',   65000),
-(3, 2, 'Tôm Nướng Muối Ớt',      80000),
-(3, 2, 'Mực Nướng Sa Tế',        70000),
-(3, 7, 'Đĩa Rau Nướng Hàn Quốc', 35000),
-(3, 6, 'Phomai Que Chiên',        30000);
+INSERT INTO menu_items (cat_id, unit_id, item_name, price, image_url) VALUES
+(3, 2, 'Thịt Bò Nướng Bulgogi',   75000, ''),
+(3, 2, 'Gà Nướng Sốt Cay Hàn',   65000, ''),
+(3, 2, 'Tôm Nướng Muối Ớt',      80000, ''),
+(3, 2, 'Mực Nướng Sa Tế',        70000, ''),
+(3, 7, 'Đĩa Rau Nướng Hàn Quốc', 35000, ''),
+(3, 6, 'Phomai Que Chiên',        30000, '');
 
 -- Danh mục ĐỒ UỐNG (cat_id=4)
-INSERT INTO menu_items (cat_id, unit_id, item_name, price) VALUES
-(4, 3, 'Trà Chanh Sả',         20000),
-(4, 3, 'Trà Đào Cam Sả',       25000),
-(4, 3, 'Trà Sữa Trân Châu',    35000),
-(4, 3, 'Nước Ép Dâu Tây',      30000),
-(4, 3, 'Nước Ép Dứa Bạc Hà',   28000),
-(4, 3, 'Sinh Tố Bơ',           35000),
-(4, 3, 'Nước Cam Tươi',        25000),
-(4, 4, 'Bia Tiger Chai 330ml', 25000),
-(4, 5, 'Bia Heineken Lon',     22000),
-(4, 5, 'Coca Cola Lon',        15000),
-(4, 5, 'Nước Suối Lavie',      10000),
-(4, 3, 'Soju Hàn Quốc Chá',    55000);
+INSERT INTO menu_items (cat_id, unit_id, item_name, price, image_url) VALUES
+(4, 3, 'Trà Chanh Sả',         20000, ''),
+(4, 3, 'Trà Đào Cam Sả',       25000, ''),
+(4, 3, 'Trà Sữa Trân Châu',    35000, ''),
+(4, 3, 'Nước Ép Dâu Tây',      30000, ''),
+(4, 3, 'Nước Ép Dứa Bạc Hà',   28000, ''),
+(4, 3, 'Sinh Tố Bơ',           35000, ''),
+(4, 3, 'Nước Cam Tươi',        25000, ''),
+(4, 4, 'Bia Tiger Chai 330ml', 25000, ''),
+(4, 5, 'Bia Heineken Lon',     22000, ''),
+(4, 5, 'Coca Cola Lon',        15000, ''),
+(4, 5, 'Nước Suối Lavie',      10000, ''),
+(4, 3, 'Soju Hàn Quốc Chá',    55000, '');
 
 -- Danh mục ĂN VẶT (cat_id=5)
-INSERT INTO menu_items (cat_id, unit_id, item_name, price) VALUES
-(5, 2, 'Khăn Lạnh',                  2000),
-(5, 2, 'Salad Ức Gà Hàn Quốc',      45000),
-(5, 7, 'Kim Chi Cải Thảo Truyền Thống', 25000),
-(5, 7, 'Khoai Tây Chiên Phô Mai',   35000),
-(5, 2, 'Bánh Mì Bơ Tỏi Nướng',     20000),
-(5, 6, 'Mandu Chiên (5 cái)',        40000),
-(5, 6, 'Tokbokki Sốt Gochujang',    45000),
-(5, 7, 'Đĩa Rau Sống',              15000);
+INSERT INTO menu_items (cat_id, unit_id, item_name, price, image_url) VALUES
+(5, 2, 'Khăn Lạnh',                  2000, ''),
+(5, 2, 'Salad Ức Gà Hàn Quốc',      45000, ''),
+(5, 7, 'Kim Chi Cải Thảo Truyền Thống', 25000, ''),
+(5, 7, 'Khoai Tây Chiên Phô Mai',   35000, ''),
+(5, 2, 'Bánh Mì Bơ Tỏi Nướng',     20000, ''),
+(5, 6, 'Mandu Chiên (5 cái)',        40000, ''),
+(5, 6, 'Tokbokki Sốt Gochujang',    45000, ''),
+(5, 7, 'Đĩa Rau Sống',              15000, '');
 
 -- Danh mục TRÁNG MIỆNG (cat_id=6)
-INSERT INTO menu_items (cat_id, unit_id, item_name, price) VALUES
-(6, 2, 'Kem Dâu Tây Hàn Quốc',    45000),
-(6, 2, 'Bánh Hotteok Nhân Quế',   30000),
-(6, 3, 'Chè Thái Đặc Biệt',      35000),
-(6, 2, 'Bingsu Đào Sữa',         55000);
+INSERT INTO menu_items (cat_id, unit_id, item_name, price, image_url) VALUES
+(6, 2, 'Kem Dâu Tây Hàn Quốc',    45000, ''),
+(6, 2, 'Bánh Hotteok Nhân Quế',   30000, ''),
+(6, 3, 'Chè Thái Đặc Biệt',      35000, ''),
+(6, 2, 'Bingsu Đào Sữa',         55000, '');
 
 -- Phở Hà Nội 1975 (cat_id=14=Phở, 15=Bún, 16=Cơm, 17=Uống, 18=ĂnVặt)
 -- units: 18=Tô(pho), 19=Phần, 20=Ly, 21=Đĩa, 22=Cái
-INSERT INTO menu_items (cat_id, unit_id, item_name, price) VALUES
-(14, 18, 'Phở Bò Tái Chín',       55000),
-(14, 18, 'Phở Bò Gầu Gân',       60000),
-(14, 18, 'Phở Bò Đặc Biệt',      70000),
-(14, 18, 'Phở Gà Truyền Thống',  50000),
-(15, 18, 'Bún Bò Huế',           52000),
-(15, 18, 'Bún Chả Hà Nội',       55000),
-(15, 18, 'Bún Riêu Cua Đồng',    50000),
-(16, 19, 'Cơm Tấm Sườn Bì Chả', 45000),
-(16, 19, 'Cơm Chiên Dương Châu', 40000),
-(17, 20, 'Trà Đá',                5000),
-(17, 20, 'Nước Ép Cam',          25000),
-(18, 21, 'Đĩa Quẩy Rán',        10000),
-(18, 22, 'Chả Lụa',             20000);
+INSERT INTO menu_items (cat_id, unit_id, item_name, price, image_url) VALUES
+(14, 18, 'Phở Bò Tái Chín',       55000, ''),
+(14, 18, 'Phở Bò Gầu Gân',       60000, ''),
+(14, 18, 'Phở Bò Đặc Biệt',      70000, ''),
+(14, 18, 'Phở Gà Truyền Thống',  50000, ''),
+(15, 18, 'Bún Bò Huế',           52000, ''),
+(15, 18, 'Bún Chả Hà Nội',       55000, ''),
+(15, 18, 'Bún Riêu Cua Đồng',    50000, ''),
+(16, 19, 'Cơm Tấm Sườn Bì Chả', 45000, ''),
+(16, 19, 'Cơm Chiên Dương Châu', 40000, ''),
+(17, 20, 'Trà Đá',                5000, ''),
+(17, 20, 'Nước Ép Cam',          25000, ''),
+(18, 21, 'Đĩa Quẩy Rán',        10000, ''),
+(18, 22, 'Chả Lụa',             20000, '');
 
 -- ============================================================
 -- 8. ORDERS - Hóa đơn (một số đang phục vụ, một số đã xong)
 -- Bàn đang có khách: 2,4,6 (Tầng Trệt), 9,11,14 (Lầu 1)...
 -- table_id tương ứng: Bàn02=2, Bàn04=4, Bàn06=6, BànA01=9
 -- ============================================================
-INSERT INTO orders (table_id, status, total_amount) VALUES
-(2,  0, 0),       -- Bàn 02 Tầng Trệt - ĐANG PHỤC VỤ
-(4,  0, 0),       -- Bàn 04 Tầng Trệt - ĐANG PHỤC VỤ
-(6,  0, 0),       -- Bàn 06 Tầng Trệt - ĐANG PHỤC VỤ
-(9,  0, 0),       -- Bàn A01 Lầu 1    - ĐANG PHỤC VỤ
-(11, 0, 0),       -- Bàn A03 Lầu 1    - ĐANG PHỤC VỤ
-(14, 0, 0),       -- Bàn A06 Lầu 1    - ĐANG PHỤC VỤ
-(15, 0, 0),       -- VIP 02           - ĐANG PHỤC VỤ
+INSERT INTO orders (table_id, status, total_amount, user_id) VALUES
+(2,  0, 0, 1),       -- Bàn 02 Tầng Trệt - ĐANG PHỤC VỤ
+(4,  0, 0, 1),       -- Bàn 04 Tầng Trệt - ĐANG PHỤC VỤ
+(6,  0, 0, 1),       -- Bàn 06 Tầng Trệt - ĐANG PHỤC VỤ
+(9,  0, 0, 1),       -- Bàn A01 Lầu 1    - ĐANG PHỤC VỤ
+(11, 0, 0, 1),       -- Bàn A03 Lầu 1    - ĐANG PHỤC VỤ
+(14, 0, 0, 1),       -- Bàn A06 Lầu 1    - ĐANG PHỤC VỤ
+(15, 0, 0, 1),       -- VIP 02           - ĐANG PHỤC VỤ
 -- Hóa đơn đã thanh toán (để có lịch sử)
-(1,  1, 178000),  -- ĐÃ THANH TOÁN
-(3,  1, 125000),
-(5,  1, 310000),
-(7,  1, 250000);
+(1,  1, 178000, 1),  -- ĐÃ THANH TOÁN
+(3,  1, 125000, 1),
+(5,  1, 310000, 1),
+(7,  1, 250000, 1);
 
 -- ============================================================
 -- 9. ORDER_DETAILS - Chi tiết gọi món

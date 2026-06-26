@@ -1,138 +1,193 @@
 package com.example.apporderfood.Activity;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.apporderfood.R;
 import com.example.apporderfood.adapter.CategoryManageAdapter;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.example.apporderfood.api.RetrofitClient;
+import com.example.apporderfood.api.ZappyApiService;
+import com.example.apporderfood.model.Category;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import java.util.ArrayList;
-import java.util.List;
 
-public class CategoryManageActivity extends AppCompatActivity {
+import java.util.List;
+import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class CategoryManageActivity extends AppCompatActivity implements CategoryManageAdapter.OnCategoryItemClickListener {
 
     private RecyclerView rvCategoryList;
     private CategoryManageAdapter adapter;
     private FloatingActionButton fabAddCategory;
+    private ProgressBar pbLoading;
+    private TextView tvEmptyState;
+    private TextView tvTotalCategories, tvActiveCategories, tvHiddenCategories;
+
+    private int resId = -1;
+
+    private final ActivityResultLauncher<Intent> addCategoryLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    loadCategories();
+                }
+            }
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quan_ly_danh_muc);
 
-        rvCategoryList = findViewById(R.id.rvCategoryList);
-        fabAddCategory = findViewById(R.id.fab_add_category);
-        
-        rvCategoryList.setLayoutManager(new LinearLayoutManager(this));
+        // Lấy resId của nhà hàng hiện tại từ session đăng nhập
+        SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
+        resId = prefs.getInt("RES_ID", -1);
 
-        List<CategoryManageAdapter.CategoryItem> categoryList = new ArrayList<>();
-        categoryList.add(new CategoryManageAdapter.CategoryItem("Burger", "HOẠT ĐỘNG", 45, "Các loại burger bò, gà..."));
-        categoryList.add(new CategoryManageAdapter.CategoryItem("Pizza", "HOẠT ĐỘNG", 32, "Pizza truyền thống Ý"));
-        categoryList.add(new CategoryManageAdapter.CategoryItem("Đồ uống", "HOẠT ĐỘNG", 58, "Nước ngọt, cà phê, trà"));
-        categoryList.add(new CategoryManageAdapter.CategoryItem("Tráng miệng", "TẠM ẨN", 12, "Kem, bánh ngọt, chè"));
-        categoryList.add(new CategoryManageAdapter.CategoryItem("Combo", "HOẠT ĐỘNG", 8, "Tiết kiệm cho nhóm"));
-        categoryList.add(new CategoryManageAdapter.CategoryItem("Món ăn nhanh", "TẠM ẨN", 24, "Khoai tây chiên, snack"));
-        categoryList.add(new CategoryManageAdapter.CategoryItem("Mì cay", "HOẠT ĐỘNG", 15, "Mì cay 7 cấp độ"));
-        categoryList.add(new CategoryManageAdapter.CategoryItem("Lẩu", "HOẠT ĐỘNG", 10, "Lẩu Thái, lẩu hải sản"));
-
-        adapter = new CategoryManageAdapter(categoryList);
-        rvCategoryList.setAdapter(adapter);
-
-        findViewById(R.id.btn_back).setOnClickListener(v -> finish());
-        
-        fabAddCategory.setOnClickListener(v -> showAddCategoryBottomSheet());
-
+        initViews();
+        setupRecyclerView();
+        loadCategories();
+        setupListeners();
         setupBottomNav();
     }
 
-    private void showAddCategoryBottomSheet() {
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this, R.style.BottomSheetDialogTheme);
-        View view = getLayoutInflater().inflate(R.layout.activity_them_danh_muc, null);
-        bottomSheetDialog.setContentView(view);
-
-        // Fix the jumping issue
-        com.google.android.material.bottomsheet.BottomSheetBehavior<View> behavior = com.google.android.material.bottomsheet.BottomSheetBehavior.from((View) view.getParent());
-        behavior.setState(com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED);
-        behavior.setSkipCollapsed(true);
-        behavior.setHideable(false); // Initially false to prevent light flings
+    private void initViews() {
+        rvCategoryList = findViewById(R.id.rvCategoryList);
+        fabAddCategory = findViewById(R.id.fab_add_category);
+        pbLoading = findViewById(R.id.pbCategoryLoading);
+        tvEmptyState = findViewById(R.id.tvCategoryEmptyState);
         
-        behavior.addBottomSheetCallback(new com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(View bottomSheet, int newState) {
-                if (newState == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED) {
-                    behavior.setHideable(false);
-                }
-            }
+        tvTotalCategories = findViewById(R.id.tvTotalCategories);
+        tvActiveCategories = findViewById(R.id.tvActiveCategories);
+        tvHiddenCategories = findViewById(R.id.tvHiddenCategories);
+    }
 
+    private void setupRecyclerView() {
+        if (rvCategoryList != null) {
+            rvCategoryList.setLayoutManager(new LinearLayoutManager(this));
+        }
+    }
+
+    private void loadCategories() {
+        if (resId == -1) {
+            Toast.makeText(this, "Không tìm thấy thông tin nhà hàng!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (pbLoading != null) pbLoading.setVisibility(View.VISIBLE);
+        if (rvCategoryList != null) rvCategoryList.setVisibility(View.GONE);
+        if (tvEmptyState != null) tvEmptyState.setVisibility(View.GONE);
+
+        ZappyApiService api = RetrofitClient.getApiService();
+        api.getCategories(resId).enqueue(new Callback<List<Category>>() {
             @Override
-            public void onSlide(View bottomSheet, float slideOffset) {
-                // Khi kéo xuống dưới một nửa (slideOffset < 0.5), mới cho phép ẩn
-                if (slideOffset < 0.5f) {
-                    behavior.setHideable(true);
+            public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
+                if (pbLoading != null) pbLoading.setVisibility(View.GONE);
+                
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Category> categoryList = response.body();
+                    if (categoryList.isEmpty()) {
+                        if (tvEmptyState != null) tvEmptyState.setVisibility(View.VISIBLE);
+                    } else {
+                        if (tvEmptyState != null) tvEmptyState.setVisibility(View.GONE);
+                        adapter = new CategoryManageAdapter(categoryList, CategoryManageActivity.this);
+                        if (rvCategoryList != null) {
+                            rvCategoryList.setVisibility(View.VISIBLE);
+                            rvCategoryList.setAdapter(adapter);
+                        }
+                        updateStats(categoryList);
+                    }
                 } else {
-                    behavior.setHideable(false);
-                }
-            }
-        });
-
-        EditText edtName = view.findViewById(R.id.edt_category_name);
-        TextView tvPreviewName = view.findViewById(R.id.tv_preview_name);
-
-        // Real-time preview feature
-        edtName.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() > 0) {
-                    tvPreviewName.setText(s.toString());
-                } else {
-                    tvPreviewName.setText("Tên danh mục");
+                    Toast.makeText(CategoryManageActivity.this, "Lỗi tải danh mục", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void onFailure(Call<List<Category>> call, Throwable t) {
+                if (pbLoading != null) pbLoading.setVisibility(View.GONE);
+                Toast.makeText(CategoryManageActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         });
+    }
 
-        view.findViewById(R.id.btn_close).setOnClickListener(v -> bottomSheetDialog.dismiss());
-        view.findViewById(R.id.btn_cancel).setOnClickListener(v -> bottomSheetDialog.dismiss());
-        view.findViewById(R.id.btn_save).setOnClickListener(v -> {
-            // Save logic here
-            bottomSheetDialog.dismiss();
-        });
+    private void updateStats(List<Category> list) {
+        int total = list.size();
+        int active = 0;
+        int hidden = 0;
+        for (Category item : list) {
+            if (item.getStatus() != null && item.getStatus() == 1) active++;
+            else hidden++;
+        }
+        if (tvTotalCategories != null) tvTotalCategories.setText(String.valueOf(total));
+        if (tvActiveCategories != null) tvActiveCategories.setText(String.valueOf(active));
+        if (tvHiddenCategories != null) tvHiddenCategories.setText(String.format(Locale.getDefault(), "%02d", hidden));
+    }
 
-        bottomSheetDialog.show();
+    private void setupListeners() {
+        View btnBack = findViewById(R.id.btn_back);
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> finish());
+        }
+        
+        if (fabAddCategory != null) {
+            fabAddCategory.setOnClickListener(v -> {
+                Intent intent = new Intent(this, ThemDanhMucActivity.class);
+                addCategoryLauncher.launch(intent);
+            });
+        }
+    }
+
+    @Override
+    public void onEditClick(Category item) {
+        Intent intent = new Intent(this, ThemDanhMucActivity.class);
+        intent.putExtra("CATEGORY_DATA", item);
+        addCategoryLauncher.launch(intent);
+    }
+
+    @Override
+    public void onMoreClick(Category item, View view) {
+        Toast.makeText(this, "Tùy chọn cho: " + item.getCatName(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onItemClick(Category item) {
+        Toast.makeText(this, "Chi tiết: " + item.getCatName(), Toast.LENGTH_SHORT).show();
     }
 
     private void setupBottomNav() {
-        android.view.View navOrder = findViewById(R.id.navOrder);
-        android.view.View navSoDo = findViewById(R.id.navSoDo);
-        android.view.View navTienIch = findViewById(R.id.navTienIch);
+        View navOrder = findViewById(R.id.navOrder);
+        View navSoDo = findViewById(R.id.navSoDo);
+        View navTienIch = findViewById(R.id.navTienIch);
 
         if (navOrder != null) {
             navOrder.setOnClickListener(v -> {
-                startActivity(new android.content.Intent(this, DanhSachOrderActivity.class));
+                startActivity(new Intent(this, DanhSachOrderActivity.class));
                 overridePendingTransition(0, 0);
             });
         }
         if (navSoDo != null) {
             navSoDo.setOnClickListener(v -> {
-                startActivity(new android.content.Intent(this, SoDobanActivity.class));
+                startActivity(new Intent(this, SoDobanActivity.class));
                 overridePendingTransition(0, 0);
             });
         }
         if (navTienIch != null) {
             navTienIch.setOnClickListener(v -> {
-                startActivity(new android.content.Intent(this, TienIchActivity.class));
+                startActivity(new Intent(this, TienIchActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
             });

@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
+    android:fitsSystemWindows="true"
     tools:ignore="HardcodedText">
 
     <!-- ==================== TOP APP BAR ==================== -->
@@ -32,30 +33,23 @@
             app:iiv_icon="faw-arrow-left"
             app:iiv_size="20dp" />
 
-        <!-- Title (centered) -->
+        <!-- Title -->
         <TextView
+            android:id="@+id/tvTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="sans-serif-medium"
             android:gravity="center"
-            android:text="Bàn A01 • Đang phục vụ"
+            android:text="Xác nhận order"
             android:textColor="@color/text_primary"
             android:textSize="16sp"
             android:textStyle="bold" />
 
-        <!-- 3-dot menu -->
-        <com.mikepenz.iconics.view.IconicsImageView
-            android:id="@+id/btnMore"
+        <!-- Spacer -->
+        <View
             android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="10dp"
-            app:iiv_color="@color/text_primary"
-            app:iiv_icon="faw-ellipsis-v"
-            app:iiv_size="20dp" />
+            android:layout_height="40dp" />
 
     </LinearLayout>
 
@@ -105,10 +99,11 @@
                     android:letterSpacing="0.05" />
 
                 <TextView
+                    android:id="@+id/tvItemCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="3 món • phí phục vụ 8%"
+                    android:text="0 món"
                     android:textColor="@color/text_hint"
                     android:textSize="11sp" />
 
@@ -128,7 +123,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
-                    android:text="125.000"
+                    android:text="0"
                     android:textColor="@color/text_primary"
                     android:textSize="26sp"
                     android:textStyle="bold" />
@@ -146,7 +141,7 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <!-- GỬI button (full width, dark navy) -->
+        <!-- GỬI BẾP button -->
         <LinearLayout
             android:id="@+id/btnGui"
             android:layout_width="match_parent"
@@ -170,7 +165,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
                 android:letterSpacing="0.08"
-                android:text="GỬI"
+                android:text="GỬI BẾP"
                 android:textColor="@color/surface"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -226,6 +221,7 @@
                             android:textSize="12sp" />
 
                         <TextView
+                            android:id="@+id/tvBadgeCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
@@ -233,7 +229,7 @@
                             android:background="@drawable/bg_badge_dark"
                             android:paddingHorizontal="12dp"
                             android:paddingVertical="4dp"
-                            android:text="3 MÓN"
+                            android:text="0 MÓN"
                             android:textColor="@color/surface"
                             android:textSize="12sp"
                             android:textStyle="bold" />
@@ -245,184 +241,23 @@
                         android:layout_height="1dp"
                         android:background="@color/divider" />
 
-                    <!-- Item 1: Mì Kim Chi Bò Mỹ -->
-                    <RelativeLayout
+                    <!-- Loading indicator -->
+                    <ProgressBar
+                        android:id="@+id/progressBar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="24dp"
+                        android:layout_marginBottom="24dp"
+                        android:visibility="visible" />
+
+                    <!-- RecyclerView danh sách món -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvOrderDetails"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16dp">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
-                            android:layout_toStartOf="@+id/tvPrice1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="sans-serif-medium"
-                                android:text="Mì Kim Chi Bò Mỹ"
-                                android:textColor="@color/text_primary"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="3dp"
-                                android:text="1 phần • 55.000đ"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="12sp" />
-
-                            <!-- Note pill -->
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:background="@drawable/bg_note_pill"
-                                android:gravity="center_vertical"
-                                android:paddingHorizontal="8dp"
-                                android:paddingVertical="4dp">
-
-                                <com.mikepenz.iconics.view.IconicsImageView
-                                    android:layout_width="12dp"
-                                    android:layout_height="12dp"
-                                    android:layout_marginEnd="5dp"
-                                    app:iiv_color="@color/text_secondary"
-                                    app:iiv_icon="faw-align-left"
-                                    app:iiv_size="10dp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Ghi chú: Không hành ngò"
-                                    android:textColor="@color/text_secondary"
-                                    android:textSize="11sp" />
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:id="@+id/tvPrice1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:fontFamily="sans-serif-medium"
-                            android:text="55.000"
-                            android:textColor="@color/text_primary"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                    </RelativeLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:background="@color/divider" />
-
-                    <!-- Item 2: Trà Chanh Sả -->
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="16dp">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
-                            android:layout_toStartOf="@+id/tvPrice2"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="sans-serif-medium"
-                                android:text="Trà Chanh Sả"
-                                android:textColor="@color/text_primary"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="3dp"
-                                android:text="1 ly • 25.000đ"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="12sp" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:id="@+id/tvPrice2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:fontFamily="sans-serif-medium"
-                            android:text="25.000"
-                            android:textColor="@color/text_primary"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                    </RelativeLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:background="@color/divider" />
-
-                    <!-- Item 3: Salad Ức Gà -->
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="16dp">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
-                            android:layout_toStartOf="@+id/tvPrice3"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="sans-serif-medium"
-                                android:text="Salad Ức Gà"
-                                android:textColor="@color/text_primary"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="3dp"
-                                android:text="1 phần • 45.000đ"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="12sp" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:id="@+id/tvPrice3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:fontFamily="sans-serif-medium"
-                            android:text="45.000"
-                            android:textColor="@color/text_primary"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                    </RelativeLayout>
+                        android:nestedScrollingEnabled="false"
+                        android:visibility="gone" />
 
                     <!-- Thêm món dashed button -->
                     <LinearLayout

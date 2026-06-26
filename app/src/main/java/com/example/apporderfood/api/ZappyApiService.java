@@ -78,8 +78,13 @@ public interface ZappyApiService {
     Call<TableModel> updateTableStatus(@Path("id") Integer tableId,
             @Body Map<String, Boolean> data);
 
+    // Thêm bàn (Gửi đi một cục Map)
     @POST("api/tables")
-    Call<TableModel> createTable(@Body Map<String, Object> data);
+    Call<TableModel> createTable(@Body Map<String, Object> bodyData);
+
+    // Cập nhật tên bàn
+    @PUT("api/tables/{id}")
+    Call<TableModel> updateTable(@Path("id") Integer tableId, @Body Map<String, Object> bodyData);
 
     // ==========================================
     // CATEGORIES & UNITS
@@ -87,8 +92,9 @@ public interface ZappyApiService {
     @GET("api/categories/restaurant/{resId}")
     Call<List<Category>> getCategories(@Path("resId") Integer resId);
 
+    // Thêm danh mục
     @POST("api/categories")
-    Call<Category> createCategory(@Body Map<String, Object> data);
+    Call<Category> createCategory(@Body Map<String, Object> bodyData);
 
     @GET("api/units/restaurant/{resId}")
     Call<List<Unit>> getUnits(@Path("resId") Integer resId);
@@ -132,9 +138,18 @@ public interface ZappyApiService {
     Call<OrderDetail> addItem(@Path("orderId") Integer orderId,
             @Body Map<String, Object> data);
 
+    /** Nhan vien gui nhieu mon vao gio (batch) */
+    @POST("api/orders/{orderId}/items/batch")
+    Call<Map<String, String>> addBatchItems(@Path("orderId") Integer orderId,
+            @Body java.util.List<Map<String, Object>> itemsData);
+
     /** Lay chi tiet mon cua 1 hoa don */
     @GET("api/orders/{orderId}/details")
     Call<List<OrderDetail>> getOrderDetails(@Path("orderId") Integer orderId);
+
+    /** Lay danh sach tat ca hoa don dang phuc vu cua nha hang */
+    @GET("api/orders/restaurant/{resId}/active")
+    Call<List<Map<String, Object>>> getActiveOrdersByRestaurant(@Path("resId") Integer resId);
 
     /** Nhan vien gui mon -> status=1 (KHOA, nhan vien khong sua/xoa duoc) */
     @PUT("api/orders/{orderId}/send")
@@ -148,4 +163,13 @@ public interface ZappyApiService {
     /** Thanh toan: tinh tong, dong hoa don, ban -> trong */
     @POST("api/orders/{orderId}/checkout")
     Call<Map> checkout(@Path("orderId") Integer orderId);
+    /** Quen mat khau: gui ma otp*/
+    @POST("api/auth/forgot-password/send-otp")
+    Call<Map<String, String>> sendOtp(@Body Map<String, String> data);
+    /** Quen mat khau: Kiem tra ma otp */
+    @POST("api/auth/forgot-password/verify-otp")
+    Call<Map<String, String>> verifyOtp(@Body Map<String, String> data);
+    /** Quen mat khau: Reset password, tao password moi*/
+    @POST("api/auth/forgot-password/reset-password")
+    Call<Map<String, String>> resetPassword(@Body Map<String, String> data);
 }

@@ -4,6 +4,10 @@
 
     <!-- Quyen ket noi Internet de goi API Spring Boot backend -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
         android:name=".ZappyApp"
@@ -18,11 +22,17 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".Activity.CategoryManageActivity"
-            android:exported="false" />
+            android:name=".Activity.ThemDanhMucActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".Activity.ThemBanMoiActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".Activity.CategoryManageActivity"
             android:exported="false" />
 
         <activity
@@ -40,10 +50,21 @@
         <activity
             android:name=".Activity.DangKyActivity"
             android:exported="true" />
+        <activity
+            android:name=".Activity.QuenMatKhauActivity"
+            android:exported="true" />
+        <activity
+            android:name=".Activity.DatLaiMatKhauActivity"
+            android:exported="true" />
+        <activity
+            android:name=".Activity.OTPActivity"
+            android:exported="true" />
+
 
         <activity
             android:name=".Activity.DangNhapActivity"
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -53,7 +74,7 @@
         <activity
             android:name=".Activity.ChangePasswordActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- ===== Màn hình Sơ đồ bàn ===== -->
         <activity
@@ -68,8 +89,7 @@
         <!-- ===== Lập order (bàn trống) ===== -->
         <activity
             android:name=".Activity.LapOrderActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:exported="false" />
 
         <!-- ===== Xác nhận order / Gửi đơn bếp ===== -->
         <activity
@@ -97,5 +117,6 @@
             android:exported="false" />
 
         </application>
+
 
 </manifest>
