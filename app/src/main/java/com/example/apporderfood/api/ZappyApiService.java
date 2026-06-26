@@ -78,8 +78,13 @@ public interface ZappyApiService {
     Call<TableModel> updateTableStatus(@Path("id") Integer tableId,
             @Body Map<String, Boolean> data);
 
+    // Thêm bàn (Gửi đi một cục Map)
     @POST("api/tables")
-    Call<TableModel> createTable(@Body Map<String, Object> data);
+    Call<TableModel> createTable(@Body Map<String, Object> bodyData);
+
+    // Cập nhật tên bàn
+    @PUT("api/tables/{id}")
+    Call<TableModel> updateTable(@Path("id") Integer tableId, @Body Map<String, Object> bodyData);
 
     // ==========================================
     // CATEGORIES & UNITS
@@ -87,8 +92,9 @@ public interface ZappyApiService {
     @GET("api/categories/restaurant/{resId}")
     Call<List<Category>> getCategories(@Path("resId") Integer resId);
 
+    // Thêm danh mục
     @POST("api/categories")
-    Call<Category> createCategory(@Body Map<String, Object> data);
+    Call<Category> createCategory(@Body Map<String, Object> bodyData);
 
     @GET("api/units/restaurant/{resId}")
     Call<List<Unit>> getUnits(@Path("resId") Integer resId);
@@ -153,4 +159,13 @@ public interface ZappyApiService {
     /** Thanh toan: tinh tong, dong hoa don, ban -> trong */
     @POST("api/orders/{orderId}/checkout")
     Call<Map> checkout(@Path("orderId") Integer orderId);
+    /** Quen mat khau: gui ma otp*/
+    @POST("api/auth/forgot-password/send-otp")
+    Call<Map<String, String>> sendOtp(@Body Map<String, String> data);
+    /** Quen mat khau: Kiem tra ma otp */
+    @POST("api/auth/forgot-password/verify-otp")
+    Call<Map<String, String>> verifyOtp(@Body Map<String, String> data);
+    /** Quen mat khau: Reset password, tao password moi*/
+    @POST("api/auth/forgot-password/reset-password")
+    Call<Map<String, String>> resetPassword(@Body Map<String, String> data);
 }

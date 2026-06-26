@@ -44,9 +44,9 @@ public class DangNhapActivity extends AppCompatActivity {
             finish();
         });
 
-        tvForgotPassword.setOnClickListener(v -> {
-            Toast.makeText(this, "Tính năng quên mật khẩu đang được phát triển!", Toast.LENGTH_SHORT).show();
-        });
+        tvForgotPassword.setOnClickListener(v ->
+                startActivity(new Intent(DangNhapActivity.this, QuenMatKhauActivity.class))
+        );
 
         btnLogin.setOnClickListener(v -> handleLogin());
         btnTogglePassword.setOnClickListener(new View.OnClickListener() {
