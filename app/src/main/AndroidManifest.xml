@@ -116,6 +116,11 @@
             android:name=".Activity.InvoiceManageActivity"
             android:exported="false" />
 
+        <!-- ===== Quản lý ca làm ===== -->
+        <activity
+            android:name=".Activity.ShiftManageActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>
