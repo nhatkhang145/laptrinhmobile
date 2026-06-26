@@ -94,7 +94,7 @@ public class OTPActivity extends AppCompatActivity {
         }
         setResendEnabled(false);
         tvCountdown.setText("");
-        tvResend.setText("Đang gửi...");
+        tvResend.setText("Đang gửi lại mã...");
         Map<String, String> data = new HashMap<>();
         data.put("email", email);
         RetrofitClient.getApiService().sendOtp(data).enqueue(new Callback<Map<String, String>>() {
