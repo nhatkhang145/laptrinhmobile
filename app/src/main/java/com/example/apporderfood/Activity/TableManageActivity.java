@@ -15,10 +15,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.apporderfood.R;
 import com.example.apporderfood.adapter.TableManageAdapter;
+import com.example.apporderfood.model.Area;
+import com.example.apporderfood.model.TableModel;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class TableManageActivity extends AppCompatActivity implements TableManageAdapter.OnTableItemClickListener {
 
@@ -67,25 +70,25 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
     }
 
     private void loadTables() {
-        pbLoading.setVisibility(View.VISIBLE);
+        if (pbLoading != null) pbLoading.setVisibility(View.VISIBLE);
         rvTableList.setVisibility(View.GONE);
 
         // Giả lập tải dữ liệu từ API
         new android.os.Handler().postDelayed(() -> {
-            List<TableManageAdapter.TableItem> tableList = new ArrayList<>();
-            tableList.add(new TableManageAdapter.TableItem("B01", "HOẠT ĐỘNG", "Tầng 1", 4, "12/10/2023"));
-            tableList.add(new TableManageAdapter.TableItem("VIP01", "ĐANG KHÓA", "Phòng VIP", 10, "15/10/2023"));
-            tableList.add(new TableManageAdapter.TableItem("B05", "BẢO TRÌ", "Sân vườn", 2, "20/10/2023"));
-            tableList.add(new TableManageAdapter.TableItem("B02", "HOẠT ĐỘNG", "Tầng 1", 4, "12/10/2023"));
-            tableList.add(new TableManageAdapter.TableItem("B03", "HOẠT ĐỘNG", "Tầng 2", 6, "14/10/2023"));
+            List<TableModel> tableList = new ArrayList<>();
+            tableList.add(createMockTable(1, "B01", "HOẠT ĐỘNG", "Tầng 1", 4));
+            tableList.add(createMockTable(2, "VIP01", "ĐANG KHÓA", "Phòng VIP", 10));
+            tableList.add(createMockTable(3, "B05", "BẢO TRÌ", "Sân vườn", 2));
+            tableList.add(createMockTable(4, "B02", "HOẠT ĐỘNG", "Tầng 1", 4));
+            tableList.add(createMockTable(5, "B03", "HOẠT ĐỘNG", "Tầng 2", 6));
 
-            pbLoading.setVisibility(View.GONE);
+            if (pbLoading != null) pbLoading.setVisibility(View.GONE);
             
             if (tableList.isEmpty()) {
-                tvEmptyState.setVisibility(View.VISIBLE);
+                if (tvEmptyState != null) tvEmptyState.setVisibility(View.VISIBLE);
                 rvTableList.setVisibility(View.GONE);
             } else {
-                tvEmptyState.setVisibility(View.GONE);
+                if (tvEmptyState != null) tvEmptyState.setVisibility(View.GONE);
                 rvTableList.setVisibility(View.VISIBLE);
                 adapter = new TableManageAdapter(tableList, this);
                 rvTableList.setAdapter(adapter);
@@ -94,46 +97,62 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
         }, 800);
     }
 
-    private void updateStats(List<TableManageAdapter.TableItem> list) {
+    private TableModel createMockTable(int id, String name, String status, String areaName, int seats) {
+        TableModel table = new TableModel();
+        table.setId(id);
+        table.setTableName(name);
+        table.setStatus(status);
+        table.setArea(new Area(null, areaName));
+        table.setSeats(seats);
+        table.setOccupied("ĐANG KHÓA".equals(status));
+        return table;
+    }
+
+    private void updateStats(List<TableModel> list) {
         int total = list.size();
         int active = 0;
         int locked = 0;
-        for (TableManageAdapter.TableItem item : list) {
-            if ("HOẠT ĐỘNG".equals(item.getStatus())) active++;
-            if ("ĐANG KHÓA".equals(item.getStatus()) || "BẢO TRÌ".equals(item.getStatus())) locked++;
+        for (TableModel item : list) {
+            String status = item.getStatus() != null ? item.getStatus() : "HOẠT ĐỘNG";
+            if ("HOẠT ĐỘNG".equals(status)) active++;
+            if ("ĐANG KHÓA".equals(status) || "BẢO TRÌ".equals(status)) locked++;
         }
-        tvTotalTables.setText(String.valueOf(total));
-        tvActiveTables.setText(String.valueOf(active));
-        tvLockedTables.setText(String.format("%02d", locked));
+        if (tvTotalTables != null) tvTotalTables.setText(String.valueOf(total));
+        if (tvActiveTables != null) tvActiveTables.setText(String.valueOf(active));
+        if (tvLockedTables != null) tvLockedTables.setText(String.format(Locale.getDefault(), "%02d", locked));
     }
 
     private void setupListeners() {
         findViewById(R.id.btn_back).setOnClickListener(v -> finish());
 
-        btnAddTable.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ThemBanMoiActivity.class);
-            addTableLauncher.launch(intent);
-        });
+        if (btnAddTable != null) {
+            btnAddTable.setOnClickListener(v -> {
+                Intent intent = new Intent(this, ThemBanMoiActivity.class);
+                addTableLauncher.launch(intent);
+            });
+        }
     }
 
     @Override
-    public void onEditClick(TableManageAdapter.TableItem item) {
+    public void onEditClick(TableModel item) {
         Intent intent = new Intent(this, ThemBanMoiActivity.class);
         intent.putExtra("IS_EDIT", true);
-        intent.putExtra("TABLE_ID", item.getTableId());
-        intent.putExtra("TABLE_AREA", item.getArea());
-        intent.putExtra("TABLE_SEATS", item.getSeats());
+        intent.putExtra("TABLE_ID", item.getTableName());
+        if (item.getArea() != null) {
+            intent.putExtra("TABLE_AREA", item.getArea().getAreaName());
+        }
+        intent.putExtra("TABLE_SEATS", item.getSeats() != null ? item.getSeats() : 4);
         addTableLauncher.launch(intent);
     }
 
     @Override
-    public void onMoreClick(TableManageAdapter.TableItem item, View view) {
-        Toast.makeText(this, "Tùy chọn: " + item.getTableId(), Toast.LENGTH_SHORT).show();
+    public void onMoreClick(TableModel item, View view) {
+        Toast.makeText(this, "Tùy chọn: " + item.getTableName(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onItemClick(TableManageAdapter.TableItem item) {
-        Toast.makeText(this, "Chi tiết: " + item.getTableId(), Toast.LENGTH_SHORT).show();
+    public void onItemClick(TableModel item) {
+        Toast.makeText(this, "Chi tiết: " + item.getTableName(), Toast.LENGTH_SHORT).show();
     }
 
     private void setupBottomNav() {
