@@ -111,6 +111,16 @@
             android:name=".Activity.HoaDonActivity"
             android:exported="false" />
 
+        <!-- ===== Quản lý nhân viên ===== -->
+        <activity
+            android:name=".Activity.QuanLyNhanVienActivity"
+            android:exported="false" />
+        <!-- ===== Thêm nhân viên ===== -->
+        <activity
+            android:name=".Activity.ThemNhanVienActivity"
+            android:exported="false" />
+
+
         <!-- ===== Quản lý hóa đơn ===== -->
         <activity
             android:name=".Activity.InvoiceManageActivity"

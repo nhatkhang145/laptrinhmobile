@@ -1,10 +1,9 @@
 package com.example.apporderfood.model;
 
 import com.google.gson.annotations.SerializedName;
-import java.io.Serializable;
 
 /** Model User dung cho dang nhap va hien thi thong tin */
-public class User implements Serializable {
+public class User {
 
     @SerializedName("id")
     private Integer id;
@@ -27,9 +26,12 @@ public class User implements Serializable {
     @SerializedName("fullname")
     private String fullname;
 
+    @SerializedName("email")
+    private String email;
+
     public User() {}
 
-    public User(Integer id, String username, Integer role, Integer resId, String resName, String resDomain, String fullname) {
+    public User(Integer id, String username, Integer role, Integer resId, String resName, String resDomain, String fullname,String email) {
         this.id = id;
         this.username = username;
         this.role = role;
@@ -37,9 +39,13 @@ public class User implements Serializable {
         this.resName = resName;
         this.resDomain = resDomain;
         this.fullname = fullname;
+        this.email = email;
     }
 
     // Getters and Setters
+
+
+    // Getters
     public Integer getId()      { return id; }
     public void setId(Integer id) { this.id = id; }
 
@@ -60,6 +66,8 @@ public class User implements Serializable {
 
     public String getFullname() { return fullname; }
     public void setFullname(String fullname) { this.fullname = fullname; }
+
+    public String getEmail()    { return email; } // Bổ sung Getter
 
     /** Kiem tra co phai Quan ly khong */
     public boolean isManager()  { return role != null && role == 1; }
