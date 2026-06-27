@@ -127,6 +127,7 @@ public class UserController {
         userRepo.deleteById(id);
         return ResponseEntity.ok(Map.of("message", "Da xoa tai khoan!"));
     }
+    //Cap nhat thong tin nhan vien
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody Map<String, Object> data) {
         // 1. Tìm user trong DB

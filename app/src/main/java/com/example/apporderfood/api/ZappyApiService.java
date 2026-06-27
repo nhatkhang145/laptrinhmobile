@@ -190,7 +190,7 @@ public interface ZappyApiService {
     // USER (NHÂN VIÊN)
     // ==========================================
     @GET("api/users/restaurant/{resId}")
-    Call<List<Map<String, Object>>> getUsersByRestaurant(@Path("resId") int resId);
+    Call<List<Map<String, Object>>> getUsersByRestaurant1(@Path("resId") int resId);
 
     // ==========================================
     // SHIFT (CA LÀM VIỆC)
@@ -210,4 +210,12 @@ public interface ZappyApiService {
 
     @PUT("api/shifts/{id}/close")
     Call<Map<String, Object>> closeShift(@Path("id") int shiftId, @Body Map<String, Object> shiftData);
+    // ==========================================
+    // THỐNG KÊ (STATS)
+    // ==========================================
+    @GET("api/orders/stats/restaurant/{resId}")
+    Call<Map<String, Object>> getDashboardStats(
+            @Path("resId") int resId,
+            @retrofit2.http.Query("period") String period
+    );
 }
