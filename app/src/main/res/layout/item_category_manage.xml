@@ -17,20 +17,9 @@
         android:orientation="horizontal"
         android:padding="12dp">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/ivCategoryIcon"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:background="@drawable/bg_ic_circle_gray"
-            android:padding="14dp"
-            android:src="@drawable/ic_store"
-            app:shapeAppearanceOverlay="@style/RoundedSquare"
-            app:tint="@color/text_primary" />
-
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -56,13 +45,16 @@
                     android:layout_marginStart="8dp"
                     android:background="@drawable/bg_status_available"
                     android:fontFamily="sans-serif-black"
-                    android:paddingStart="8dp"
-                    android:paddingTop="2dp"
-                    android:paddingEnd="8dp"
-                    android:paddingBottom="2dp"
+                    android:paddingStart="10dp"
+                    android:paddingTop="3dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="3dp"
                     android:text="HOẠT ĐỘNG"
                     android:textColor="#10B981"
-                    android:textSize="10sp" />
+                    android:textSize="10sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless" />
             </LinearLayout>
 
             <TextView
@@ -86,18 +78,18 @@
                 android:id="@+id/ivCategoryEdit"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="14dp"
                 android:src="@android:drawable/ic_menu_edit"
                 app:tint="@color/text_secondary"
                 android:contentDescription="Sửa" />
 
             <ImageView
-                android:id="@+id/ivCategoryMore"
+                android:id="@+id/ivCategoryDelete"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@android:drawable/ic_menu_more"
-                app:tint="@color/text_secondary"
-                android:contentDescription="Thêm" />
+                android:src="@android:drawable/ic_menu_delete"
+                app:tint="#EF4444"
+                android:contentDescription="Xóa" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

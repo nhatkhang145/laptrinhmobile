@@ -138,10 +138,10 @@ public class TienIchActivity extends AppCompatActivity {
 
         navTienIch.setOnClickListener(v -> { });
 
-        menuQuanLyNhanVien.setOnClickListener(v -> {
-            animatePress(v);
-            startActivity(new Intent(this, QuanLyNhanVienActivity.class));
-        });
+//        menuQuanLyNhanVien.setOnClickListener(v -> {
+//            animatePress(v);
+//            startActivity(new Intent(this, QuanLyNhanVienActivity.class));
+//        });
     }
 
     private void animateEntrance() {
