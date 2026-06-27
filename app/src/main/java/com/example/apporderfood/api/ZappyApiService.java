@@ -175,6 +175,12 @@ public interface ZappyApiService {
     /** Quen mat khau: Reset password, tao password moi*/
     @POST("api/auth/forgot-password/reset-password")
     Call<Map<String, String>> resetPassword(@Body Map<String, String> data);
+    /** Dang ky tai khoan: Gui ma otp xac nhan gmail */
+    @POST("api/auth/register/send-otp")
+    Call<Map<String, String>> sendRegisterOtp(@Body Map<String, String> body);
+    /** Dang ky tai khoan: Xac nhan otp vua gui */
+    @POST("api/auth/register/verify-otp")
+    Call<Map<String, String>> verifyRegisterOtp(@Body Map<String, String> body);
 
     // ==========================================
     // USER (NHÂN VIÊN)
