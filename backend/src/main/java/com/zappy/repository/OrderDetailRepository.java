@@ -18,9 +18,9 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Intege
 	// Lay mon theo trang thai trong 1 hoa don
 	List<OrderDetail> findByOrderIdAndStatus(Integer orderId, Integer status);
 
-	// Tinh tong tien thuc thu: chi cong mon co status = 1 (da gui bep)
+	// Tinh tong tien thuc thu: khong cong mon da huy (status = 2)
 	@Query("SELECT COALESCE(SUM(od.quantity * od.priceAtSale), 0) "
-			+ "FROM OrderDetail od WHERE od.order.id = :orderId AND od.status = 1")
+			+ "FROM OrderDetail od WHERE od.order.id = :orderId AND od.status != 2")
 	BigDecimal calculateTotalAmount(@Param("orderId") Integer orderId);
 
 	@Query("""
