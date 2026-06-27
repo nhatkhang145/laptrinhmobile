@@ -36,7 +36,6 @@ public class ThemNhanVienActivity extends AppCompatActivity {
 
     private ZappyApiService apiService;
 
-    // Giữ mặc định resId = 1 để test, role mặc định là 0 (Nhân viên)
     private int currentResId ;
     private int selectedRoleId = 0;
 
@@ -49,7 +48,7 @@ public class ThemNhanVienActivity extends AppCompatActivity {
         if (currentResId == -1) {
             Toast.makeText(this, "Không tìm thấy thông tin nhà hàng. Vui lòng đăng nhập lại!", Toast.LENGTH_SHORT).show();
 
-            // Thoát ra màn hình đăng nhập cho an toàn
+            // Thoát ra màn hình đăng nhập
             Intent intent = new Intent(this, DangNhapActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -138,6 +137,7 @@ public class ThemNhanVienActivity extends AppCompatActivity {
                 btnConfirm.setEnabled(true);
                 if (response.isSuccessful() && response.body() != null) {
                     Toast.makeText(ThemNhanVienActivity.this, "Thêm nhân viên thành công!", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK); // Báo cho QuanLyNhanVienActivity biết để load lại
                     finish(); // Đóng màn hình, quay về danh sách
                 } else {
                     Toast.makeText(ThemNhanVienActivity.this, "Tài khoản đã tồn tại hoặc lỗi Server!", Toast.LENGTH_SHORT).show();

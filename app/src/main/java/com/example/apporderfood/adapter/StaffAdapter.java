@@ -108,6 +108,25 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
             holder.tvRoleTag.setText("NHÂN VIÊN");
             holder.tvRoleTag.setBackgroundColor(Color.parseColor("#F59E0B"));
         }
+        Boolean isActive = user.getIsActive();
+        Boolean isOnline = user.getIsOnline();
+        if (isActive != null && !isActive) {
+            holder.tvStatusDetail.setText("Bị khóa");
+            holder.tvStatusDetail.setTextColor(Color.parseColor("#EF4444")); // Đỏ nguy hiểm
+            holder.viewStatusDot.setBackgroundResource(R.drawable.bg_icon_red); // Chấm đỏ
+        }
+        else {
+            if (isOnline != null && isOnline) {
+                holder.tvStatusDetail.setText("Trực tuyến");
+                holder.tvStatusDetail.setTextColor(Color.parseColor("#10B981")); // Xanh lá
+                holder.viewStatusDot.setBackgroundResource(R.drawable.bg_online_dot);
+            } else {
+                holder.tvStatusDetail.setText("Ngoại tuyến");
+                holder.tvStatusDetail.setTextColor(Color.parseColor("#9CA3AF")); // Xám
+                // Đảm bảo bạn đã tạo file bg_offline_dot.xml màu xám nhé!
+                holder.viewStatusDot.setBackgroundResource(R.drawable.bg_offline_dot);
+            }
+        }
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, ChiTietNhanVienActivity.class);
             // Truyền toàn bộ object user sang màn hình Chi tiết
@@ -123,13 +142,14 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
 
     public static class StaffViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvContact, tvRoleTag, tvStatusDetail;
-
+        View viewStatusDot;
         public StaffViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvName);
             tvContact = itemView.findViewById(R.id.tvContact);
             tvRoleTag = itemView.findViewById(R.id.tvRoleTag);
             tvStatusDetail = itemView.findViewById(R.id.tvStatusDetail);
+            viewStatusDot = itemView.findViewById(R.id.viewStatusDot);
         }
     }
 }

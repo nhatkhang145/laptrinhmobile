@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.apporderfood.R;
 import com.example.apporderfood.adapter.StaffAdapter;
@@ -36,6 +37,7 @@ public class QuanLyNhanVienActivity extends AppCompatActivity {
     private TextView tvTotalStaff,tvOnlineStaff, tvOfflineStaff;;
     private MaterialButton btnAddStaff;
     private RecyclerView rvStaff;
+    private SwipeRefreshLayout swipeRefresh;
     private TextView tabAll, tabManager, tabCashier,tabStaff;
     private TextView currentSelectedTab;
 
@@ -45,6 +47,10 @@ public class QuanLyNhanVienActivity extends AppCompatActivity {
     private LinearLayout navOrder;
     private LinearLayout navSoDo;
     private LinearLayout navTienIch;
+
+    // Dùng để tránh gọi loadStaffData() 2 lần khi Activity vừa mới mở
+    // (vì onCreate() đã gọi 1 lần, onResume() cũng sẽ gọi theo sau)
+    private boolean isFirstLoad = true;
 
 
     // Giả sử lấy resId từ SharedPreferences sau khi Login, tạm fix = 1 để test
@@ -77,12 +83,28 @@ public class QuanLyNhanVienActivity extends AppCompatActivity {
         loadStaffData();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Bỏ qua lần đầu vì onCreate() đã load rồi, tránh gọi API trùng 2 lần
+        if (isFirstLoad) {
+            isFirstLoad = false;
+            return;
+        }
+
+        // Mỗi khi Activity hiện lại (ví dụ quay về từ màn hình Thêm nhân viên)
+        // sẽ tự động tải lại danh sách mới nhất
+        loadStaffData();
+    }
+
     private void initViews() {
         btnBack = findViewById(R.id.btnBack);
         etSearch = findViewById(R.id.etSearch);
 
         // Tạm thời bỏ qua ánh xạ cứng các số liệu online/offline vì Backend chưa hỗ trợ trường này
         rvStaff = findViewById(R.id.rvStaff);
+        swipeRefresh = findViewById(R.id.swipeRefresh);
         btnAddStaff = findViewById(R.id.btnAddStaff);
 
         etSearch = findViewById(R.id.etSearch);
@@ -115,6 +137,9 @@ public class QuanLyNhanVienActivity extends AppCompatActivity {
 
     private void setupListeners() {
         btnBack.setOnClickListener(v -> finish());
+
+        // Kéo từ trên xuống để tải lại danh sách (Swipe to Refresh)
+        swipeRefresh.setOnRefreshListener(this::loadStaffData);
 
         if(etSearch != null) {
             etSearch.addTextChangedListener(new TextWatcher() {
@@ -167,24 +192,48 @@ public class QuanLyNhanVienActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     List<User> users = response.body();
                     staffAdapter.updateData(users);
-
-                    int total = users.size();
-                    tvTotalStaff.setText(String.valueOf(total));
-                    // Giả lập UI: Tạm thời cho tất cả đều đang Online (Do DB chưa có trường status)
-                    tvOnlineStaff.setText(String.valueOf(total));
-                    tvOfflineStaff.setText("0");
-                    // Hiện tại Backend không lưu trữ trạng thái Online/Offline
+                    calculateStats(users);
 
                 } else {
                     Toast.makeText(QuanLyNhanVienActivity.this, "Lỗi lấy danh sách", Toast.LENGTH_SHORT).show();
+                }
+
+                if (swipeRefresh.isRefreshing()) {
+                    swipeRefresh.setRefreshing(false);
                 }
             }
 
             @Override
             public void onFailure(Call<List<User>> call, Throwable t) {
                 Toast.makeText(QuanLyNhanVienActivity.this, "Mất kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+
+                if (swipeRefresh.isRefreshing()) {
+                    swipeRefresh.setRefreshing(false);
+                }
             }
         });
+    }
+    private void calculateStats(List<User> users) {
+        int total = 0;
+        int online = 0;
+        int offline = 0;
+
+        for (User user : users) {
+            // Chỉ thống kê nhân viên còn hoạt động
+            if (!Boolean.TRUE.equals(user.getIsActive())) {
+                continue;
+            }
+            total++;
+            if (Boolean.TRUE.equals(user.getIsOnline())) {
+                online++;
+            } else {
+                offline++;
+            }
+        }
+
+        tvTotalStaff.setText(String.valueOf(total));
+        tvOnlineStaff.setText(String.valueOf(online));
+        tvOfflineStaff.setText(String.valueOf(offline));
     }
     private void selectTab(TextView selectedTab, Integer roleId) {
         if (currentSelectedTab == selectedTab) return;

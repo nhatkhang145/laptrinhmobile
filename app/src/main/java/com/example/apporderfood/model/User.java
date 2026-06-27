@@ -29,6 +29,12 @@ public class User implements Serializable {
     @SerializedName("email")
     private String email;
 
+    @SerializedName("isOnline")
+    private Boolean isOnline;
+
+    @SerializedName("isActive")
+    private Boolean isActive;
+
     public User() {}
 
     public User(Integer id, String username, Integer role, Integer resId, String resName, String resDomain, String fullname,String email) {
@@ -67,7 +73,14 @@ public class User implements Serializable {
     public String getFullname() { return fullname; }
     public void setFullname(String fullname) { this.fullname = fullname; }
 
-    public String getEmail()    { return email; } // Bổ sung Getter
+    public String getEmail()    { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public Boolean getIsOnline() { return isOnline; }
+    public void setIsOnline(Boolean isOnline) { this.isOnline = isOnline; }
+
+    public Boolean getIsActive() { return isActive; }
+    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
 
     /** Kiem tra co phai Quan ly khong */
     public boolean isManager()  { return role != null && role == 1; }

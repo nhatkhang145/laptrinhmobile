@@ -55,7 +55,9 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Sai username hoac mat khau!"));
         }
-
+        //set trạng thái là online khi đăng nhập
+        user.setIsOnline(true);
+        userRepo.save(user);
         // B3: Dang nhap thanh cong - tra ve thong tin user
         return ResponseEntity.ok(Map.of(
                 "id",         user.getId(),
@@ -160,5 +162,14 @@ public class UserController {
         // 4. Lưu lại vào DB
         User updatedUser = userRepo.save(user);
         return ResponseEntity.ok(updatedUser);
+    }
+    // Dang xuat (Cap nhat trang thai Offline)
+    @PutMapping("/{id}/logout")
+    public ResponseEntity<?> logout(@PathVariable Integer id) {
+        return userRepo.findById(id).map(user -> {
+            user.setIsOnline(false); // Chuyển cờ hoạt động về false
+            userRepo.save(user);
+            return ResponseEntity.ok(Map.of("message", "Đăng xuất thành công!"));
+        }).orElse(ResponseEntity.notFound().build());
     }
 }

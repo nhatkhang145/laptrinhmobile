@@ -52,290 +52,296 @@
             app:shapeAppearanceOverlay="@style/CircleImage" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/bottomNav"
         app:layout_constraintTop_toBottomOf="@id/headerLayout">
 
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_height="match_parent">
 
-            <!-- Search Bar -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@drawable/bg_input_selector"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingHorizontal="12dp">
-
-                <com.mikepenz.iconics.view.IconicsImageView
-                    android:id="@+id/ivSearchIcon"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    app:iiv_color="@color/text_hint"
-                    app:iiv_icon="faw_search"
-                    android:contentDescription="@string/hint_tim_nhan_vien" />
-
-                <EditText
-                    android:id="@+id/etSearch"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@null"
-                    android:hint="@string/hint_tim_nhan_vien"
-                    android:imeOptions="actionSearch"
-                    android:inputType="text"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:textSize="14sp"
-                    android:importantForAutofill="no" />
-            </LinearLayout>
-
-            <!-- Filter Tabs -->
-            <HorizontalScrollView
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:scrollbars="none">
+                android:orientation="vertical"
+                android:padding="16dp">
 
+                <!-- Search Bar -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_input_selector"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="12dp">
 
+                    <com.mikepenz.iconics.view.IconicsImageView
+                        android:id="@+id/ivSearchIcon"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        app:iiv_color="@color/text_hint"
+                        app:iiv_icon="faw_search"
+                        android:contentDescription="@string/hint_tim_nhan_vien" />
 
-                    <TextView
-                        android:id="@+id/tabAll"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_tab_selected_dark"
-                        android:paddingHorizontal="20dp"
-                        android:paddingVertical="8dp"
-                        android:text="@string/tab_tat_ca"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-<!--                    <TextView-->
-<!--                        android:id="@+id/tabAdmin"-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:layout_marginStart="8dp"-->
-<!--                        android:background="@drawable/bg_input_selector"-->
-<!--                        android:paddingHorizontal="20dp"-->
-<!--                        android:paddingVertical="8dp"-->
-<!--                        android:text="@string/tab_admin"-->
-<!--                        android:textColor="@color/text_secondary" />-->
-
-                    <TextView
-                        android:id="@+id/tabManager"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_input_selector"
-                        android:paddingHorizontal="20dp"
-                        android:paddingVertical="8dp"
-                        android:text="@string/tab_quan_ly"
-                        android:textColor="@color/text_secondary" />
-
-                    <TextView
-                        android:id="@+id/tabCashier"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_input_selector"
-                        android:paddingHorizontal="20dp"
-                        android:paddingVertical="8dp"
-                        android:text="@string/tab_thu_ngan"
-                        android:textColor="@color/text_secondary" />
-
-                    <TextView
-                        android:id="@+id/tabStaff"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_input_selector"
-                        android:paddingHorizontal="20dp"
-                        android:paddingVertical="8dp"
-                        android:text="Nhân viên"
-                        android:textColor="@color/text_secondary" />
-
-
+                    <EditText
+                        android:id="@+id/etSearch"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:hint="@string/hint_tim_nhan_vien"
+                        android:imeOptions="actionSearch"
+                        android:inputType="text"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:textSize="14sp"
+                        android:importantForAutofill="no" />
                 </LinearLayout>
-            </HorizontalScrollView>
 
-            <!-- Stats Cards -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:baselineAligned="false"
-                android:orientation="horizontal"
-                android:weightSum="3">
-
-                <!-- Total -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
+                <!-- Filter Tabs -->
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp"
-                    android:layout_weight="1"
-                    app:cardBackgroundColor="@color/white"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="2dp"
-                    app:strokeWidth="0dp">
+                    android:layout_marginTop="16dp"
+                    android:scrollbars="none">
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="12dp">
+                        android:orientation="horizontal">
 
-                        <com.mikepenz.iconics.view.IconicsImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            app:iiv_color="@color/text_primary"
-                            app:iiv_icon="faw_users"
-                            android:contentDescription="@string/label_tong_so" />
 
                         <TextView
-                            android:id="@+id/tvTotalStaff"
+                            android:id="@+id/tabAll"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="0"
-                            android:textColor="@color/text_primary"
-                            android:textSize="22sp"
+                            android:background="@drawable/bg_tab_selected_dark"
+                            android:paddingHorizontal="20dp"
+                            android:paddingVertical="8dp"
+                            android:text="@string/tab_tat_ca"
+                            android:textColor="@color/white"
                             android:textStyle="bold" />
 
+                        <!--                    <TextView-->
+                        <!--                        android:id="@+id/tabAdmin"-->
+                        <!--                        android:layout_width="wrap_content"-->
+                        <!--                        android:layout_height="wrap_content"-->
+                        <!--                        android:layout_marginStart="8dp"-->
+                        <!--                        android:background="@drawable/bg_input_selector"-->
+                        <!--                        android:paddingHorizontal="20dp"-->
+                        <!--                        android:paddingVertical="8dp"-->
+                        <!--                        android:text="@string/tab_admin"-->
+                        <!--                        android:textColor="@color/text_secondary" />-->
+
                         <TextView
+                            android:id="@+id/tabManager"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/label_tong_so"
-                            android:textAllCaps="true"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="11sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_input_selector"
+                            android:paddingHorizontal="20dp"
+                            android:paddingVertical="8dp"
+                            android:text="@string/tab_quan_ly"
+                            android:textColor="@color/text_secondary" />
 
-                <!-- Online -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
+                        <TextView
+                            android:id="@+id/tabCashier"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_input_selector"
+                            android:paddingHorizontal="20dp"
+                            android:paddingVertical="8dp"
+                            android:text="@string/tab_thu_ngan"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:id="@+id/tabStaff"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_input_selector"
+                            android:paddingHorizontal="20dp"
+                            android:paddingVertical="8dp"
+                            android:text="Nhân viên"
+                            android:textColor="@color/text_secondary" />
+
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <!-- Stats Cards -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="4dp"
-                    android:layout_weight="1"
-                    app:cardBackgroundColor="@color/white"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="2dp"
-                    app:strokeWidth="0dp">
+                    android:layout_marginTop="16dp"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <!-- Total -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="12dp">
+                        android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="0dp">
 
-                        <com.mikepenz.iconics.view.IconicsImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            app:iiv_color="@color/status_online"
-                            app:iiv_icon="faw_check_circle"
-                            android:contentDescription="@string/label_online" />
-
-                        <TextView
-                            android:id="@+id/tvOnlineStaff"
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="0"
-                            android:textColor="@color/text_primary"
-                            android:textSize="22sp"
-                            android:textStyle="bold" />
+                            android:orientation="vertical"
+                            android:padding="12dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                            <com.mikepenz.iconics.view.IconicsImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                app:iiv_color="@color/text_primary"
+                                app:iiv_icon="faw_users"
+                                android:contentDescription="@string/label_tong_so" />
+
+                            <TextView
+                                android:id="@+id/tvTotalStaff"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="0"
+                                android:textColor="@color/text_primary"
+                                android:textSize="22sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/label_tong_so"
+                                android:textAllCaps="true"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Online -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/label_online"
-                            android:textAllCaps="true"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="11sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                            android:orientation="vertical"
+                            android:padding="12dp">
 
-                <!-- Offline -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
+                            <com.mikepenz.iconics.view.IconicsImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                app:iiv_color="@color/status_online"
+                                app:iiv_icon="faw_check_circle"
+                                android:contentDescription="@string/label_online" />
+
+                            <TextView
+                                android:id="@+id/tvOnlineStaff"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="0"
+                                android:textColor="@color/text_primary"
+                                android:textSize="22sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/label_online"
+                                android:textAllCaps="true"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Offline -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <com.mikepenz.iconics.view.IconicsImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                app:iiv_color="@color/text_hint"
+                                app:iiv_icon="faw_stopwatch"
+                                android:contentDescription="@string/label_offline" />
+
+                            <TextView
+                                android:id="@+id/tvOfflineStaff"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="0"
+                                android:textColor="@color/text_primary"
+                                android:textSize="22sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/label_offline"
+                                android:textAllCaps="true"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="11sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+                <!-- Add Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddStaff"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="@color/primary"
+                    android:text="@string/label_them_nhan_vien"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    app:cornerRadius="12dp"
+
+                    app:iconGravity="textStart"
+                    app:iconPadding="12dp" />
+
+                <!-- Staff List -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvStaff"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:layout_weight="1"
-                    app:cardBackgroundColor="@color/white"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="2dp"
-                    app:strokeWidth="0dp">
+                    android:layout_marginTop="16dp"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_nhan_vien" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="12dp">
-
-                        <com.mikepenz.iconics.view.IconicsImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            app:iiv_color="@color/text_hint"
-                            app:iiv_icon="faw_stopwatch"
-                            android:contentDescription="@string/label_offline" />
-
-                        <TextView
-                            android:id="@+id/tvOfflineStaff"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="0"
-                            android:textColor="@color/text_primary"
-                            android:textSize="22sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/label_offline"
-                            android:textAllCaps="true"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="11sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
-
-            <!-- Add Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAddStaff"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="16dp"
-                android:backgroundTint="@color/primary"
-                android:text="@string/label_them_nhan_vien"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                app:cornerRadius="12dp"
-
-                app:iconGravity="textStart"
-                app:iconPadding="12dp" />
-
-            <!-- Staff List -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvStaff"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:nestedScrollingEnabled="false"
-                tools:listitem="@layout/item_nhan_vien" />
-
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <include
         android:id="@+id/bottomNav"
