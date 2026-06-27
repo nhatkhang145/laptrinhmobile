@@ -190,7 +190,7 @@ public interface ZappyApiService {
     // USER (NHÂN VIÊN)
     // ==========================================
     @GET("api/users/restaurant/{resId}")
-    Call<List<Map<String, Object>>> getUsersByRestaurant(@Path("resId") int resId);
+    Call<List<com.example.apporderfood.model.User>> getUsersByRestaurant(@Path("resId") int resId);
 
     // ==========================================
     // SHIFT (CA LÀM VIỆC)
