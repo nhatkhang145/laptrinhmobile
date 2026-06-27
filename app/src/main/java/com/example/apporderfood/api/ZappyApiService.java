@@ -179,4 +179,35 @@ public interface ZappyApiService {
     /**Chỉnh sửa thông tin nhân viên**/
     @PUT("api/users/{id}")
     Call<User> updateUser(@Path("id") Integer id, @Body Map<String, Object> data);
+    /** Dang ky tai khoan: Gui ma otp xac nhan gmail */
+    @POST("api/auth/register/send-otp")
+    Call<Map<String, String>> sendRegisterOtp(@Body Map<String, String> body);
+    /** Dang ky tai khoan: Xac nhan otp vua gui */
+    @POST("api/auth/register/verify-otp")
+    Call<Map<String, String>> verifyRegisterOtp(@Body Map<String, String> body);
+
+    // ==========================================
+    // USER (NHÂN VIÊN)
+    // ==========================================
+    @GET("api/users/restaurant/{resId}")
+    Call<List<Map<String, Object>>> getUsersByRestaurant(@Path("resId") int resId);
+
+    // ==========================================
+    // SHIFT (CA LÀM VIỆC)
+    // ==========================================
+
+    @GET("api/shifts/restaurant/{resId}")
+    Call<List<Map<String, Object>>> getShiftHistory(@Path("resId") int resId);
+
+    @GET("api/shifts/restaurant/{resId}/active")
+    Call<Map<String, Object>> getActiveShift(@Path("resId") int resId);
+
+    @POST("api/shifts/open")
+    Call<Map<String, Object>> openShift(@Body Map<String, Object> shiftData);
+
+    @PUT("api/shifts/{id}/employees")
+    Call<Map<String, Object>> updateShiftEmployees(@Path("id") int shiftId, @Body Map<String, Object> shiftData);
+
+    @PUT("api/shifts/{id}/close")
+    Call<Map<String, Object>> closeShift(@Path("id") int shiftId, @Body Map<String, Object> shiftData);
 }

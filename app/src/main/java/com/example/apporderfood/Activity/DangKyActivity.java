@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,7 +34,8 @@ public class DangKyActivity extends AppCompatActivity {
     private ImageButton btnTogglePassword, btnTogglePasswordAgain;
     private boolean isPasswordVisible = false;
     private boolean isPasswordAgainVisible = false;
-
+    private TextView tvSignUpText;
+    private ImageView ivSignUpArrow;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +85,8 @@ public class DangKyActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+        ivSignUpArrow = findViewById(R.id.ivSignUpArrow);
+        tvSignUpText = findViewById(R.id.tvSignUpText);
         etRestaurantName = findViewById(R.id.etRestaurantName);
         etRestaurantUsername = findViewById(R.id.etRestaurantUsername);
         etManagerName = findViewById(R.id.etManagerName);
@@ -105,8 +109,10 @@ public class DangKyActivity extends AppCompatActivity {
         String username = etAdminUsername.getText().toString().trim();
         String pass = etPassword.getText().toString().trim();
         String passAgain = etPasswordAgain.getText().toString().trim();
-
-        if (resName.isEmpty() || resDomain.isEmpty() || username.isEmpty() || pass.isEmpty()|| email.isEmpty()) {
+        String managerName = etManagerName.getText().toString().trim();
+        if (resName.isEmpty() || resDomain.isEmpty() || managerName.isEmpty()
+                || address.isEmpty() || email.isEmpty() || username.isEmpty()
+                || pass.isEmpty() || passAgain.isEmpty()) {
             Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -117,36 +123,42 @@ public class DangKyActivity extends AppCompatActivity {
         }
 
         ZappyApiService api = RetrofitClient.getApiService();
-
-        // 1. Tao Nha hang truoc
-        Map<String, String> resData = new HashMap<>();
-        resData.put("resName", resName);
-        resData.put("resDomain", resDomain);
-        resData.put("address", address);
-
-        btnSignUp.setEnabled(false); // disable chong click nhieu lan
-        api.createRestaurant(resData).enqueue(new Callback<Restaurant>() {
+        Map<String, String> data = new HashMap<>();
+        data.put("email", email);
+        setLoading(true);
+        api.sendRegisterOtp(data).enqueue(new Callback<Map<String, String>>() {
             @Override
-            public void onResponse(Call<Restaurant> call, Response<Restaurant> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Integer resId = response.body().getId();
-                    // 2. Tao Admin User sau khi co ID nha hang
-                    createAdminUser(resId, username, pass,email);
+            public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
+                setLoading(false);
+                if (response.isSuccessful()) {
+                    Intent intent = new Intent(DangKyActivity.this, OTPActivity.class);
+                    intent.putExtra("mode", "register");
+                    intent.putExtra("email", email);
+                    intent.putExtra("resName", resName);
+                    intent.putExtra("resDomain", resDomain);
+                    intent.putExtra("address", address);
+                    intent.putExtra("username", username);
+                    intent.putExtra("password", pass);
+                    intent.putExtra("managerName", managerName);
+                    Toast.makeText(DangKyActivity.this, "Đã gửi mã OTP", Toast.LENGTH_SHORT).show();
+                    startActivity(intent);
                 } else {
-                    btnSignUp.setEnabled(true);
-                    Toast.makeText(DangKyActivity.this, "Domain đã tồn tại hoặc lỗi server!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(
+                            DangKyActivity.this,
+                            "Lỗi HTTP: " + response.code(),
+                            Toast.LENGTH_LONG
+                    ).show();
                 }
             }
-
             @Override
-            public void onFailure(Call<Restaurant> call, Throwable t) {
-                btnSignUp.setEnabled(true);
-                Toast.makeText(DangKyActivity.this, "Lỗi kết nối mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onFailure(Call<Map<String, String>> call, Throwable t) {
+                setLoading(false);
+                Toast.makeText(DangKyActivity.this, "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void createAdminUser(Integer resId, String username, String password, String email) {
+    private void createAdminUser(Integer resId, String username, String password, String email, String managerName) {
         ZappyApiService api = RetrofitClient.getApiService();
         Map<String, Object> userData = new HashMap<>();
         userData.put("resId", resId);
@@ -154,11 +166,11 @@ public class DangKyActivity extends AppCompatActivity {
         userData.put("password", password);
         userData.put("role", 1); // 1 = Quan ly
         userData.put("email", email);
-
+        userData.put("fullname", managerName);
         api.createUser(userData).enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
-                btnSignUp.setEnabled(true);
+                setLoading(false);
                 if (response.isSuccessful()) {
                     Toast.makeText(DangKyActivity.this, "Đăng ký thành công, vui lòng đăng nhập vào nhà hàng", Toast.LENGTH_LONG).show();
                     startActivity(new Intent(DangKyActivity.this, DangNhapActivity.class));
@@ -170,9 +182,34 @@ public class DangKyActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
-                btnSignUp.setEnabled(true);
+                setLoading(false);
                 Toast.makeText(DangKyActivity.this, "Lỗi mạng tạo tài khoản: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+    private void setLoading(boolean loading) {
+        btnSignUp.setEnabled(!loading);
+        btnSignUp.setAlpha(loading ? 0.5f : 1f);
+        tvSignUpText.setText(loading
+                ? "Đang gửi mã xác nhận email..."
+                : getString(R.string.signup_label));
+        View[] inputs = {
+                etRestaurantName,
+                etRestaurantUsername,
+                etManagerName,
+                etEmail,
+                etAdminUsername,
+                etAddress,
+                etPassword,
+                etPasswordAgain,
+                btnTogglePassword,
+                btnTogglePasswordAgain,
+                tvLogin
+        };
+        ivSignUpArrow.setVisibility(loading ? View.GONE : View.VISIBLE);
+        for (View v : inputs) {
+            v.setEnabled(!loading);
+            v.setAlpha(loading ? 0.5f : 1f);
+        }
     }
 }

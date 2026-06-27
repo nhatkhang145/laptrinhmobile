@@ -15,6 +15,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.apporderfood.R;
 import com.example.apporderfood.api.RetrofitClient;
+import com.example.apporderfood.model.Restaurant;
+import com.example.apporderfood.model.User;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +32,7 @@ public class OTPActivity extends AppCompatActivity {
     private String email;
     private TextView tvCountdown, tvResend;
     private CountDownTimer countDownTimer;
+    private String mode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +43,7 @@ public class OTPActivity extends AppCompatActivity {
         startCountdown();
         setResendEnabled(false);
         email = getIntent().getStringExtra("email");
-
+        mode = getIntent().getStringExtra("mode");
         otp1 = findViewById(R.id.otp1);
         otp2 = findViewById(R.id.otp2);
         otp3 = findViewById(R.id.otp3);
@@ -66,14 +69,26 @@ public class OTPActivity extends AppCompatActivity {
                     Map<String, String> data = new HashMap<>();
                     data.put("email", email);
                     data.put("otp", otp);
-                    RetrofitClient.getApiService().verifyOtp(data).enqueue(new Callback<Map<String, String>>() {
+                    Call<Map<String, String>> call;
+
+                    if ("register".equals(mode)) {
+                        call = RetrofitClient.getApiService().verifyRegisterOtp(data);
+                    } else {
+                        call = RetrofitClient.getApiService().verifyOtp(data);
+                    }
+
+                    call.enqueue(new Callback<Map<String, String>>() {
                         @Override
                         public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
                             if (response.isSuccessful()) {
-                                Intent intent = new Intent(OTPActivity.this, DatLaiMatKhauActivity.class);
-                                intent.putExtra("email", email);
-                                startActivity(intent);
-                                finish();
+                                if ("register".equals(mode)) {
+                                    createRestaurantThenAdmin();
+                                } else {
+                                    Intent intent = new Intent(OTPActivity.this, DatLaiMatKhauActivity.class);
+                                    intent.putExtra("email", email);
+                                    startActivity(intent);
+                                    finish();
+                                }
                             } else {
                                 Toast.makeText(OTPActivity.this, "OTP không đúng hoặc đã hết hạn", Toast.LENGTH_SHORT).show();
                             }
@@ -88,6 +103,62 @@ public class OTPActivity extends AppCompatActivity {
         );
     }
 
+    private void createRestaurantThenAdmin() {
+        String resName = getIntent().getStringExtra("resName");
+        String resDomain = getIntent().getStringExtra("resDomain");
+        String address = getIntent().getStringExtra("address");
+        String username = getIntent().getStringExtra("username");
+        String password = getIntent().getStringExtra("password");
+        String managerName = getIntent().getStringExtra("managerName");
+
+        Map<String, String> resData = new HashMap<>();
+        resData.put("resName", resName);
+        resData.put("resDomain", resDomain);
+        resData.put("address", address);
+
+        RetrofitClient.getApiService().createRestaurant(resData).enqueue(new Callback<Restaurant>() {
+            @Override
+            public void onResponse(Call<Restaurant> call, Response<Restaurant> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Integer resId = response.body().getId();
+
+                    Map<String, Object> userData = new HashMap<>();
+                    userData.put("resId", resId);
+                    userData.put("username", username);
+                    userData.put("password", password);
+                    userData.put("role", 1);
+                    userData.put("email", email);
+                    userData.put("fullname", managerName);
+
+                    RetrofitClient.getApiService().createUser(userData).enqueue(new Callback<User>() {
+                        @Override
+                        public void onResponse(Call<User> call, Response<User> response) {
+                            if (response.isSuccessful()) {
+                                Toast.makeText(OTPActivity.this, "Đăng ký thành công", Toast.LENGTH_LONG).show();
+                                startActivity(new Intent(OTPActivity.this, DangNhapActivity.class));
+                                finish();
+                            } else {
+                                Toast.makeText(OTPActivity.this, "Lỗi tạo tài khoản quản lý", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<User> call, Throwable t) {
+                            Toast.makeText(OTPActivity.this, "Lỗi mạng tạo tài khoản: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    Toast.makeText(OTPActivity.this, "Domain đã tồn tại hoặc lỗi server", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Restaurant> call, Throwable t) {
+                Toast.makeText(OTPActivity.this, "Lỗi mạng tạo nhà hàng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void resendOtp() {
         if (countDownTimer != null) {
             countDownTimer.cancel();
@@ -97,7 +168,13 @@ public class OTPActivity extends AppCompatActivity {
         tvResend.setText("Đang gửi lại mã...");
         Map<String, String> data = new HashMap<>();
         data.put("email", email);
-        RetrofitClient.getApiService().sendOtp(data).enqueue(new Callback<Map<String, String>>() {
+        Call<Map<String, String>> call;
+        if ("register".equals(mode)) {
+            call = RetrofitClient.getApiService().sendRegisterOtp(data);
+        } else {
+            call = RetrofitClient.getApiService().sendOtp(data);
+        }
+        call.enqueue(new Callback<Map<String, String>>() {
             @Override
             public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
                 if (response.isSuccessful()) {
