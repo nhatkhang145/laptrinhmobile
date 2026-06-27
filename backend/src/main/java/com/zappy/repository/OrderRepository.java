@@ -19,7 +19,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     List<Order> findByRestaurantIdAndStatus(@org.springframework.data.repository.query.Param("resId") Integer resId, @org.springframework.data.repository.query.Param("status") Integer status);
 
     @org.springframework.data.jpa.repository.Query("SELECT o FROM Order o WHERE o.table.area.restaurant.id = :resId AND o.status = :status " +
-            "AND (:fromDate IS NULL OR o.checkoutAt >= :fromDate) AND (:toDate IS NULL OR o.checkoutAt <= :toDate)")
+            "AND (:fromDate IS NULL OR COALESCE(o.checkoutAt, o.createdAt) >= :fromDate) AND (:toDate IS NULL OR COALESCE(o.checkoutAt, o.createdAt) <= :toDate)")
     List<Order> findPaidOrdersWithFilter(@org.springframework.data.repository.query.Param("resId") Integer resId, 
                                          @org.springframework.data.repository.query.Param("status") Integer status, 
                                          @org.springframework.data.repository.query.Param("fromDate") java.time.LocalDateTime fromDate, 
