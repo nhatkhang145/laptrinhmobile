@@ -55,21 +55,25 @@ public class InvoiceManageAdapter extends RecyclerView.Adapter<InvoiceManageAdap
             holder.tvOrderId.setText("#" + ((Number) invoice.get("id")).intValue());
         }
 
-        Object createdAtObj = invoice.get("createdAt");
-        if (createdAtObj != null) {
-            if (createdAtObj instanceof String) {
-                String createdAt = (String) createdAtObj;
+        Object timeObj = invoice.get("checkoutAt");
+        if (timeObj == null) {
+            timeObj = invoice.get("createdAt");
+        }
+        
+        if (timeObj != null) {
+            if (timeObj instanceof String) {
+                String timeStr = (String) timeObj;
                 try {
                     SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
-                    java.util.Date date = parser.parse(createdAt);
+                    java.util.Date date = parser.parse(timeStr);
                     SimpleDateFormat printer = new SimpleDateFormat("dd/MM/yyyy - HH:mm", Locale.getDefault());
                     holder.tvOrderTime.setText(printer.format(date));
                 } catch (Exception e) {
-                    holder.tvOrderTime.setText(createdAt);
+                    holder.tvOrderTime.setText(timeStr);
                 }
-            } else if (createdAtObj instanceof List) {
+            } else if (timeObj instanceof List) {
                 try {
-                    List<Number> list = (List<Number>) createdAtObj;
+                    List<Number> list = (List<Number>) timeObj;
                     if (list.size() >= 5) {
                         String formatted = String.format(Locale.getDefault(), "%02d/%02d/%04d - %02d:%02d",
                                 list.get(2).intValue(), list.get(1).intValue(), list.get(0).intValue(),
@@ -80,6 +84,8 @@ public class InvoiceManageAdapter extends RecyclerView.Adapter<InvoiceManageAdap
                     holder.tvOrderTime.setText("Lỗi ngày giờ");
                 }
             }
+        } else {
+            holder.tvOrderTime.setText("Chưa rõ ngày");
         }
 
         if (invoice.get("table") != null) {

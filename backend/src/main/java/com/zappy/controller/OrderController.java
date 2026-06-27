@@ -98,11 +98,27 @@ public class OrderController {
 
     /** Lay danh sach tat ca hoa don da thanh toan cua nha hang */
     @GetMapping("/restaurant/{resId}/paid")
-    public ResponseEntity<?> getPaidOrdersByRestaurant(@PathVariable Integer resId) {
-        List<Order> paidOrders = orderRepo.findByRestaurantIdAndStatus(resId, 1);
+    public ResponseEntity<?> getPaidOrdersByRestaurant(
+            @PathVariable Integer resId,
+            @RequestParam(required = false) String fromDate,
+            @RequestParam(required = false) String toDate) {
+
+        java.time.LocalDateTime from = null;
+        java.time.LocalDateTime to = null;
+        try {
+            if (fromDate != null && !fromDate.isEmpty()) from = java.time.LocalDateTime.parse(fromDate);
+            if (toDate != null && !toDate.isEmpty()) to = java.time.LocalDateTime.parse(toDate);
+        } catch (Exception e) {
+            // ignore parse errors
+        }
+
+        List<Order> paidOrders = orderRepo.findPaidOrdersWithFilter(resId, 1, from, to);
         
-        // Sap xep moi nhat len tren
+        // Sap xep moi nhat len tren theo checkoutAt
         paidOrders.sort((o1, o2) -> {
+            if (o1.getCheckoutAt() != null && o2.getCheckoutAt() != null) {
+                return o2.getCheckoutAt().compareTo(o1.getCheckoutAt());
+            }
             if (o1.getCreatedAt() != null && o2.getCreatedAt() != null) {
                 return o2.getCreatedAt().compareTo(o1.getCreatedAt());
             }
@@ -240,6 +256,7 @@ public class OrderController {
         // Dong hoa don
         order.setTotalAmount(total);
         order.setStatus(1); // Da thanh toan
+        order.setCheckoutAt(java.time.LocalDateTime.now());
         orderRepo.save(order);
 
         // Giai phong ban -> trang thai trong

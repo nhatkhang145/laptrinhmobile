@@ -163,7 +163,11 @@ public interface ZappyApiService {
     Call<List<Map<String, Object>>> getActiveOrdersByRestaurant(@Path("resId") int resId);
 
     @GET("api/orders/restaurant/{resId}/paid")
-    Call<List<Map<String, Object>>> getPaidOrdersByRestaurant(@Path("resId") int resId);
+    Call<List<Map<String, Object>>> getPaidOrdersByRestaurant(
+            @Path("resId") int resId,
+            @Query("fromDate") String fromDate,
+            @Query("toDate") String toDate
+    );
 
     /** Nhan vien gui mon -> status=1 (KHOA, nhan vien khong sua/xoa duoc) */
     @PUT("api/orders/{orderId}/send")
