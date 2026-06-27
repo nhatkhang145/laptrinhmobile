@@ -175,4 +175,8 @@ public interface ZappyApiService {
     /** Quen mat khau: Reset password, tao password moi*/
     @POST("api/auth/forgot-password/reset-password")
     Call<Map<String, String>> resetPassword(@Body Map<String, String> data);
+
+    /**Chỉnh sửa thông tin nhân viên**/
+    @PUT("api/users/{id}")
+    Call<User> updateUser(@Path("id") Integer id, @Body Map<String, Object> data);
 }
