@@ -6,6 +6,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -38,11 +41,13 @@ public class DanhSachOrderActivity extends AppCompatActivity {
     private TextView tabTatCa, tabDangPhucVu, tvEmpty;
     private RecyclerView rvOrderList;
     private ProgressBar progressBar;
+    private EditText etSearch;
     
     private OrderListAdapter adapter;
     private int resId = -1;
     private int currentUserId = -1;
     private int currentTab = 0; // 0 = Tất cả, 1 = Đang phục vụ
+    private String currentSearchText = "";
     private List<java.util.Map<String, Object>> allOrders = new ArrayList<>();
     private ZappyApiService apiService;
 
@@ -80,6 +85,7 @@ public class DanhSachOrderActivity extends AppCompatActivity {
         tvEmpty = findViewById(R.id.tvEmpty);
         rvOrderList = findViewById(R.id.rvOrderList);
         progressBar = findViewById(R.id.progressBar);
+        etSearch = findViewById(R.id.etSearch);
     }
     
     private void setupRecyclerView() {
@@ -139,8 +145,25 @@ public class DanhSachOrderActivity extends AppCompatActivity {
             tabTatCa.setBackgroundResource(R.drawable.bg_tab_inactive);
             tabTatCa.setTextColor(getResources().getColor(R.color.text_primary));
             
+            
             filterList();
         });
+
+        if (etSearch != null) {
+            etSearch.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    currentSearchText = s.toString().trim().toLowerCase();
+                    filterList();
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {}
+            });
+        }
     }
     
     private void loadTables() {
@@ -192,13 +215,28 @@ public class DanhSachOrderActivity extends AppCompatActivity {
     private void filterList() {
         List<java.util.Map<String, Object>> filtered = new ArrayList<>();
         for (java.util.Map<String, Object> order : allOrders) {
+            boolean matchesTab = false;
             if (currentTab == 0) {
-                filtered.add(order);
+                matchesTab = true;
             } else if (currentTab == 1) {
                 if (order.get("user") != null) {
                     java.util.Map<String, Object> user = (java.util.Map<String, Object>) order.get("user");
                     if (user.get("id") != null && ((Number) user.get("id")).intValue() == currentUserId) {
-                        filtered.add(order);
+                        matchesTab = true;
+                    }
+                }
+            }
+            
+            if (matchesTab) {
+                if (currentSearchText.isEmpty()) {
+                    filtered.add(order);
+                } else {
+                    java.util.Map<String, Object> table = (java.util.Map<String, Object>) order.get("table");
+                    if (table != null && table.get("tableName") != null) {
+                        String tblName = table.get("tableName").toString().toLowerCase();
+                        if (tblName.contains(currentSearchText)) {
+                            filtered.add(order);
+                        }
                     }
                 }
             }
