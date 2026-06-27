@@ -69,14 +69,19 @@ public class TienIchActivity extends AppCompatActivity {
     private void loadUserInfo() {
         SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
         String fullname = prefs.getString("FULLNAME", "");
-        String username = prefs.getString("USERNAME", "");
+        int role = prefs.getInt("ROLE", 0);
         
-        if (!fullname.isEmpty()) {
+        if (fullname != null && !fullname.trim().isEmpty()) {
             tvUserName.setText(fullname);
-        } else if (!username.isEmpty()) {
-            tvUserName.setText(username);
         } else {
-            tvUserName.setText("Chưa xác định");
+            tvUserName.setText("Chưa cập nhật tên");
+        }
+        
+        if (role == 0) { // Nhan vien
+            View tvAdminSectionTitle = findViewById(R.id.tvAdminSectionTitle);
+            View adminMenuCard = findViewById(R.id.adminMenuCard);
+            if (tvAdminSectionTitle != null) tvAdminSectionTitle.setVisibility(View.GONE);
+            if (adminMenuCard != null) adminMenuCard.setVisibility(View.GONE);
         }
     }
 
