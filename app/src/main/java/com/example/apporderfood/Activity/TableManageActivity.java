@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,8 +23,10 @@ import com.example.apporderfood.api.ZappyApiService;
 import com.example.apporderfood.model.TableModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -126,13 +129,21 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
         int active = 0;
         int locked = 0;
         for (TableModel item : list) {
-            String status = item.getStatus() != null ? item.getStatus() : "HOẠT ĐỘNG";
-            if ("HOẠT ĐỘNG".equals(status)) active++;
-            else locked++;
+            String status = item.getStatus();
+            // Bàn được coi là "hoạt động" nếu status null (default) hoặc bằng "HOẠT ĐỘNG"
+            if (status == null || "HOẠT ĐỘNG".equals(status)) active++;
+            else locked++; // ĐANG KHÓA, BẢO TRÌ, hoặc bất kỳ trạng thái khác
         }
         if (tvTotalTables != null) tvTotalTables.setText(String.valueOf(total));
         if (tvActiveTables != null) tvActiveTables.setText(String.valueOf(active));
         if (tvLockedTables != null) tvLockedTables.setText(String.format(Locale.getDefault(), "%02d", locked));
+    }
+
+    /** Cập nhật stats sau khi toggle status mà không cần reload API ngay lập tức */
+    private void updateStatsFromAdapter() {
+        if (adapter != null && adapter.getTableList() != null) {
+            updateStats(adapter.getTableList());
+        }
     }
 
     private void setupListeners() {
@@ -158,8 +169,86 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
     }
 
     @Override
-    public void onMoreClick(TableModel item, View view) {
-        Toast.makeText(this, "Lựa chọn khác cho bàn: " + item.getTableName(), Toast.LENGTH_SHORT).show();
+    public void onStatusToggleClick(TableModel item, int position) {
+        if (item.getId() == null) return;
+
+        boolean currentlyActive = item.getStatus() == null || "HOẠT ĐỘNG".equals(item.getStatus());
+        String newStatus = currentlyActive ? "ĐANG KHÓA" : "HOẠT ĐỘNG";
+
+        ZappyApiService api = RetrofitClient.getApiService();
+        Map<String, Object> body = new HashMap<>();
+        body.put("tableName", item.getTableName());
+        body.put("status", newStatus);
+
+        api.updateTable(item.getId(), body).enqueue(new Callback<TableModel>() {
+            @Override
+            public void onResponse(Call<TableModel> call, Response<TableModel> response) {
+                if (response.isSuccessful()) {
+                    // Update local list
+                    item.setStatus(newStatus);
+                    if (adapter != null) adapter.updateItemStatus(position, newStatus);
+                    updateStatsFromAdapter();
+                    Toast.makeText(TableManageActivity.this,
+                            "Bàn \"" + item.getTableName() + "\" → " + newStatus,
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(TableManageActivity.this,
+                            "Cập nhật thất bại (lỗi " + response.code() + ")",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TableModel> call, Throwable t) {
+                Toast.makeText(TableManageActivity.this,
+                        "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onDeleteClick(TableModel item) {
+        if (item.getId() == null) return;
+
+        new AlertDialog.Builder(this)
+                .setTitle("Xóa bàn")
+                .setMessage("Bạn có chắc chắn muốn xóa bàn \"" + item.getTableName() + "\" không?")
+                .setPositiveButton("Xóa", (dialog, which) -> performDelete(item))
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    private void performDelete(TableModel item) {
+        ZappyApiService api = RetrofitClient.getApiService();
+        api.deleteTable(item.getId()).enqueue(new Callback<Map>() {
+            @Override
+            public void onResponse(Call<Map> call, Response<Map> response) {
+                if (response.isSuccessful()) {
+                    if (adapter != null) {
+                        adapter.removeItem(item);
+                        updateStatsFromAdapter();
+                        
+                        if (adapter.getTableList().isEmpty() && tvEmptyState != null) {
+                            tvEmptyState.setVisibility(View.VISIBLE);
+                            if (rvTableList != null) rvTableList.setVisibility(View.GONE);
+                        }
+                    }
+                    Toast.makeText(TableManageActivity.this, "Đã xóa bàn", Toast.LENGTH_SHORT).show();
+                } else if (response.code() == 409 || response.code() == 400) {
+                    Toast.makeText(TableManageActivity.this,
+                            "Không thể xóa bàn đã có hóa đơn/khách", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(TableManageActivity.this,
+                            "Xóa thất bại (lỗi " + response.code() + ")", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Map> call, Throwable t) {
+                Toast.makeText(TableManageActivity.this,
+                        "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

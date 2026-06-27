@@ -56,13 +56,16 @@
                     android:layout_marginStart="8dp"
                     android:background="@drawable/bg_status_available"
                     android:fontFamily="sans-serif-black"
-                    android:paddingStart="8dp"
-                    android:paddingTop="2dp"
-                    android:paddingEnd="8dp"
-                    android:paddingBottom="2dp"
+                    android:paddingStart="10dp"
+                    android:paddingTop="3dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="3dp"
                     android:text="HOẠT ĐỘNG"
                     android:textColor="#10B981"
-                    android:textSize="10sp" />
+                    android:textSize="10sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless" />
             </LinearLayout>
 
             <TextView
@@ -98,12 +101,12 @@
                 android:contentDescription="Sửa" />
 
             <ImageView
-                android:id="@+id/ivTableMore"
+                android:id="@+id/ivTableDelete"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@android:drawable/ic_menu_more"
-                app:tint="@color/text_secondary"
-                android:contentDescription="Thêm" />
+                android:src="@android:drawable/ic_menu_delete"
+                app:tint="#EF4444"
+                android:contentDescription="Xóa" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

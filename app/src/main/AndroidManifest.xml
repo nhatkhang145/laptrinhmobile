@@ -36,6 +36,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".Activity.ChiTietDanhMucActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".Activity.TableManageActivity"
             android:exported="true" />
 

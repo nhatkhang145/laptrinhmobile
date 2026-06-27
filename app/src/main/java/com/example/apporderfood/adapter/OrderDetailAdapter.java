@@ -109,11 +109,20 @@ public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.
             holder.tvQtyBadge.setTextColor(context.getResources().getColor(R.color.surface));
             holder.tvSubTotal.setPaintFlags(holder.tvSubTotal.getPaintFlags() & (~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG));
 
-            if (isAdmin && detail.getStatus() != null && detail.getStatus() == 1) {
-                holder.btnCancel.setVisibility(View.VISIBLE);
-                holder.btnCancel.setOnClickListener(v -> {
-                    if (cancelListener != null) cancelListener.onCancelItem(detail);
-                });
+            if (detail.getStatus() != null && detail.getStatus() != 2) {
+                if (detail.getStatus() == 0 || isAdmin) {
+                    holder.btnCancel.setVisibility(View.VISIBLE);
+                    if (detail.getStatus() == 0) {
+                        holder.btnCancel.setText("Xóa món");
+                    } else {
+                        holder.btnCancel.setText("Hủy món");
+                    }
+                    holder.btnCancel.setOnClickListener(v -> {
+                        if (cancelListener != null) cancelListener.onCancelItem(detail);
+                    });
+                } else {
+                    holder.btnCancel.setVisibility(View.GONE);
+                }
             } else {
                 holder.btnCancel.setVisibility(View.GONE);
             }

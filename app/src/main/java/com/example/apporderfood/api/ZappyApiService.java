@@ -19,6 +19,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * ZappyApiService - Dinh nghia tat ca API endpoint cua Zappy Backend
@@ -86,6 +87,9 @@ public interface ZappyApiService {
     @PUT("api/tables/{id}")
     Call<TableModel> updateTable(@Path("id") Integer tableId, @Body Map<String, Object> bodyData);
 
+    @DELETE("api/tables/{id}")
+    Call<Map> deleteTable(@Path("id") Integer id);
+
     // ==========================================
     // CATEGORIES & UNITS
     // ==========================================
@@ -95,6 +99,14 @@ public interface ZappyApiService {
     // Thêm danh mục
     @POST("api/categories")
     Call<Category> createCategory(@Body Map<String, Object> bodyData);
+
+    // Cập nhật danh mục
+    @PUT("api/categories/{id}")
+    Call<Category> updateCategory(@Path("id") Integer id, @Body Map<String, Object> bodyData);
+
+    // Xóa danh mục
+    @DELETE("api/categories/{id}")
+    Call<Map> deleteCategory(@Path("id") Integer id);
 
     @GET("api/units/restaurant/{resId}")
     Call<List<Unit>> getUnits(@Path("resId") Integer resId);
@@ -152,7 +164,11 @@ public interface ZappyApiService {
     Call<List<Map<String, Object>>> getActiveOrdersByRestaurant(@Path("resId") int resId);
 
     @GET("api/orders/restaurant/{resId}/paid")
-    Call<List<Map<String, Object>>> getPaidOrdersByRestaurant(@Path("resId") int resId);
+    Call<List<Map<String, Object>>> getPaidOrdersByRestaurant(
+            @Path("resId") int resId,
+            @Query("fromDate") String fromDate,
+            @Query("toDate") String toDate
+    );
 
     /** Nhan vien gui mon -> status=1 (KHOA, nhan vien khong sua/xoa duoc) */
     @PUT("api/orders/{orderId}/send")
@@ -190,7 +206,7 @@ public interface ZappyApiService {
     // USER (NHÂN VIÊN)
     // ==========================================
     @GET("api/users/restaurant/{resId}")
-    Call<List<Map<String, Object>>> getUsersByRestaurant1(@Path("resId") int resId);
+    Call<List<com.example.apporderfood.model.User>> getUsersByRestaurant(@Path("resId") int resId);
 
     // ==========================================
     // SHIFT (CA LÀM VIỆC)

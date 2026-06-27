@@ -48,6 +48,9 @@ public class Order {
     @Column(name = "created_at")
     private java.time.LocalDateTime createdAt;
 
+    @Column(name = "checkout_at")
+    private java.time.LocalDateTime checkoutAt;
+
     @PrePersist
     protected void onCreate() {
         createdAt = java.time.LocalDateTime.now();

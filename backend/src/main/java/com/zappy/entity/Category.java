@@ -29,4 +29,10 @@ public class Category {
 
     @Column(name = "cat_name", nullable = false)
     private String catName;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "status")
+    private Integer status = 1; // 1 = Hoạt động, 0 = Tạm ẩn
 }
