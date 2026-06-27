@@ -103,8 +103,11 @@ public class OrderController {
         
         // Sap xep moi nhat len tren
         paidOrders.sort((o1, o2) -> {
-            if (o1.getCreatedAt() == null || o2.getCreatedAt() == null) return 0;
-            return o2.getCreatedAt().compareTo(o1.getCreatedAt());
+            if (o1.getCreatedAt() != null && o2.getCreatedAt() != null) {
+                return o2.getCreatedAt().compareTo(o1.getCreatedAt());
+            }
+            // Fallback: don't have createdAt, sort by id desc
+            return Integer.compare(o2.getId(), o1.getId());
         });
         
         return ResponseEntity.ok(paidOrders);
