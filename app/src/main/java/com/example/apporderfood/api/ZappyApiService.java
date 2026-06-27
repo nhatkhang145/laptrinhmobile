@@ -175,6 +175,10 @@ public interface ZappyApiService {
     /** Quen mat khau: Reset password, tao password moi*/
     @POST("api/auth/forgot-password/reset-password")
     Call<Map<String, String>> resetPassword(@Body Map<String, String> data);
+
+    /**Chỉnh sửa thông tin nhân viên**/
+    @PUT("api/users/{id}")
+    Call<User> updateUser(@Path("id") Integer id, @Body Map<String, Object> data);
     /** Dang ky tai khoan: Gui ma otp xac nhan gmail */
     @POST("api/auth/register/send-otp")
     Call<Map<String, String>> sendRegisterOtp(@Body Map<String, String> body);
@@ -186,12 +190,12 @@ public interface ZappyApiService {
     // USER (NHÂN VIÊN)
     // ==========================================
     @GET("api/users/restaurant/{resId}")
-    Call<List<Map<String, Object>>> getUsersByRestaurant(@Path("resId") int resId);
+    Call<List<com.example.apporderfood.model.User>> getUsersByRestaurant(@Path("resId") int resId);
 
     // ==========================================
     // SHIFT (CA LÀM VIỆC)
     // ==========================================
-    
+
     @GET("api/shifts/restaurant/{resId}")
     Call<List<Map<String, Object>>> getShiftHistory(@Path("resId") int resId);
 
