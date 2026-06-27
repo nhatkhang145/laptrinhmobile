@@ -234,4 +234,9 @@ public interface ZappyApiService {
             @Path("resId") int resId,
             @retrofit2.http.Query("period") String period
     );
+    //=======================
+    // LogOut
+    //=========================
+    @PUT("api/users/{id}/logout")
+    Call<Map<String, String>> logoutUser(@Path("id") Integer id);
 }
