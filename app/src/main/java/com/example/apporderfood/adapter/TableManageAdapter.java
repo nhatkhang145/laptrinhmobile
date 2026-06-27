@@ -18,13 +18,33 @@ public class TableManageAdapter extends RecyclerView.Adapter<TableManageAdapter.
 
     public interface OnTableItemClickListener {
         void onEditClick(TableModel item);
-        void onMoreClick(TableModel item, View view);
+        void onDeleteClick(TableModel item);
+        void onStatusToggleClick(TableModel item, int position);
         void onItemClick(TableModel item);
     }
 
     public TableManageAdapter(List<TableModel> tableList, OnTableItemClickListener listener) {
         this.tableList = tableList;
         this.listener = listener;
+    }
+
+    public List<TableModel> getTableList() {
+        return tableList;
+    }
+
+    public void removeItem(TableModel item) {
+        int pos = tableList.indexOf(item);
+        if (pos >= 0) {
+            tableList.remove(pos);
+            notifyItemRemoved(pos);
+        }
+    }
+
+    public void updateItemStatus(int position, String newStatus) {
+        if (position >= 0 && position < tableList.size()) {
+            tableList.get(position).setStatus(newStatus);
+            notifyItemChanged(position);
+        }
     }
 
     @NonNull
@@ -51,15 +71,18 @@ public class TableManageAdapter extends RecyclerView.Adapter<TableManageAdapter.
 
         // Update status UI
         if ("HOẠT ĐỘNG".equals(status)) {
+            holder.tvTableStatus.setText("● HOẠT ĐỘNG");
             holder.tvTableStatus.setBackgroundResource(R.drawable.bg_status_available);
             holder.tvTableStatus.setTextColor(holder.itemView.getContext().getColor(android.R.color.holo_green_dark));
-        } else if ("ĐANG KHÓA".equals(status)) {
-            holder.tvTableStatus.setBackgroundResource(R.drawable.bg_status_unavailable);
-            holder.tvTableStatus.setTextColor(holder.itemView.getContext().getColor(android.R.color.holo_red_dark));
         } else {
+            holder.tvTableStatus.setText("○ ĐANG KHÓA");
             holder.tvTableStatus.setBackgroundResource(R.drawable.bg_status_paused);
             holder.tvTableStatus.setTextColor(holder.itemView.getContext().getColor(android.R.color.holo_orange_dark));
         }
+
+        holder.tvTableStatus.setOnClickListener(v -> {
+            if (listener != null) listener.onStatusToggleClick(item, holder.getAdapterPosition());
+        });
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onItemClick(item);
@@ -69,8 +92,8 @@ public class TableManageAdapter extends RecyclerView.Adapter<TableManageAdapter.
             if (listener != null) listener.onEditClick(item);
         });
 
-        holder.ivTableMore.setOnClickListener(v -> {
-            if (listener != null) listener.onMoreClick(item, v);
+        holder.ivTableDelete.setOnClickListener(v -> {
+            if (listener != null) listener.onDeleteClick(item);
         });
     }
 
@@ -81,7 +104,7 @@ public class TableManageAdapter extends RecyclerView.Adapter<TableManageAdapter.
 
     public static class TableViewHolder extends RecyclerView.ViewHolder {
         TextView tvTableId, tvTableStatus, tvTableInfo, tvDateCreated;
-        ImageView ivTableEdit, ivTableMore;
+        ImageView ivTableEdit, ivTableDelete;
 
         public TableViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -90,7 +113,7 @@ public class TableManageAdapter extends RecyclerView.Adapter<TableManageAdapter.
             tvTableInfo = itemView.findViewById(R.id.tvTableInfo);
             tvDateCreated = itemView.findViewById(R.id.tvDateCreated);
             ivTableEdit = itemView.findViewById(R.id.ivTableEdit);
-            ivTableMore = itemView.findViewById(R.id.ivTableMore);
+            ivTableDelete = itemView.findViewById(R.id.ivTableDelete);
         }
     }
 }

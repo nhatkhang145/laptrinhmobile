@@ -19,7 +19,7 @@ import com.example.apporderfood.api.ZappyApiService;
 import com.example.apporderfood.model.Area;
 import com.example.apporderfood.model.TableModel;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.switchmaterial.SwitchMaterial;
+import androidx.core.content.ContextCompat;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +36,8 @@ public class ThemBanMoiActivity extends AppCompatActivity {
     private EditText edtTableName, edtTableSeats;
     private TextView tvTitle, tvSelectedArea;
     private TextView chipTang1, chipTang2, chipSanVuon;
-    private SwitchMaterial switchStatus;
+    private TextView tvStatusToggle;
+    private boolean isToggleOn = true; // mặc định: bật (màu)
 
     private String selectedAreaName = "";
     private Integer selectedAreaId = null;  // ID thực của khu vực
@@ -83,7 +84,7 @@ public class ThemBanMoiActivity extends AppCompatActivity {
         chipTang1 = findViewById(R.id.chip_tang1);
         chipTang2 = findViewById(R.id.chip_tang2);
         chipSanVuon = findViewById(R.id.chip_san_vuon);
-        switchStatus = findViewById(R.id.switch_status);
+        tvStatusToggle = findViewById(R.id.tvStatusToggle);
     }
 
     /**
@@ -164,6 +165,11 @@ public class ThemBanMoiActivity extends AppCompatActivity {
                     tvSelectedArea.setText(selectedAreaName);
                     tvSelectedArea.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
                 }
+                // Pre-fill toggle theo trạng thái bàn hiện tại
+                if (editingTable.getStatus() != null) {
+                    isToggleOn = !"ĐANG KHÓA".equals(editingTable.getStatus());
+                    updateToggleUI();
+                }
             }
         }
     }
@@ -182,6 +188,14 @@ public class ThemBanMoiActivity extends AppCompatActivity {
         chipTang1.setOnClickListener(areaClickListener);
         chipTang2.setOnClickListener(areaClickListener);
         chipSanVuon.setOnClickListener(areaClickListener);
+
+        // Toggle visual: bật = màu primary, tắt = trắng có viền
+        if (tvStatusToggle != null) {
+            tvStatusToggle.setOnClickListener(v -> {
+                isToggleOn = !isToggleOn;
+                updateToggleUI();
+            });
+        }
 
         btnConfirm.setOnClickListener(v -> validateAndSave());
     }
@@ -239,10 +253,26 @@ public class ThemBanMoiActivity extends AppCompatActivity {
         }
     }
 
+    private void updateToggleUI() {
+        if (tvStatusToggle == null) return;
+        if (isToggleOn) {
+            // Bật = HOẠT ĐỘNG: nền màu primary, chữ trắng
+            tvStatusToggle.setBackgroundResource(R.drawable.bg_tab_active_dark);
+            tvStatusToggle.setTextColor(ContextCompat.getColor(this, R.color.white));
+            tvStatusToggle.setText("● HOẠT ĐỘNG");
+        } else {
+            // Tắt = ĐANG KHÓA: nền trắng, viền xám, chữ mờ
+            tvStatusToggle.setBackgroundResource(R.drawable.bg_tab_inactive);
+            tvStatusToggle.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+            tvStatusToggle.setText("○ ĐANG KHÓA");
+        }
+    }
+
     private void createTable(int areaId, String tableName) {
         Map<String, Object> body = new HashMap<>();
         body.put("areaId", areaId);
         body.put("tableName", tableName);
+        body.put("status", isToggleOn ? "HOẠT ĐỘNG" : "ĐANG KHÓA");
 
         ZappyApiService api = RetrofitClient.getApiService();
         api.createTable(body).enqueue(new Callback<TableModel>() {
@@ -275,6 +305,7 @@ public class ThemBanMoiActivity extends AppCompatActivity {
     private void updateTable(int tableId, String tableName) {
         Map<String, Object> body = new HashMap<>();
         body.put("tableName", tableName);
+        body.put("status", isToggleOn ? "HOẠT ĐỘNG" : "ĐANG KHÓA");
 
         ZappyApiService api = RetrofitClient.getApiService();
         api.updateTable(tableId, body).enqueue(new Callback<TableModel>() {

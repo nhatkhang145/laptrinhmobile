@@ -86,6 +86,9 @@ public interface ZappyApiService {
     @PUT("api/tables/{id}")
     Call<TableModel> updateTable(@Path("id") Integer tableId, @Body Map<String, Object> bodyData);
 
+    @DELETE("api/tables/{id}")
+    Call<Map> deleteTable(@Path("id") Integer id);
+
     // ==========================================
     // CATEGORIES & UNITS
     // ==========================================
@@ -95,6 +98,14 @@ public interface ZappyApiService {
     // Thêm danh mục
     @POST("api/categories")
     Call<Category> createCategory(@Body Map<String, Object> bodyData);
+
+    // Cập nhật danh mục
+    @PUT("api/categories/{id}")
+    Call<Category> updateCategory(@Path("id") Integer id, @Body Map<String, Object> bodyData);
+
+    // Xóa danh mục
+    @DELETE("api/categories/{id}")
+    Call<Map> deleteCategory(@Path("id") Integer id);
 
     @GET("api/units/restaurant/{resId}")
     Call<List<Unit>> getUnits(@Path("resId") Integer resId);
@@ -176,16 +187,26 @@ public interface ZappyApiService {
     @POST("api/auth/forgot-password/reset-password")
     Call<Map<String, String>> resetPassword(@Body Map<String, String> data);
 
+    /**Chỉnh sửa thông tin nhân viên**/
+    @PUT("api/users/{id}")
+    Call<User> updateUser(@Path("id") Integer id, @Body Map<String, Object> data);
+    /** Dang ky tai khoan: Gui ma otp xac nhan gmail */
+    @POST("api/auth/register/send-otp")
+    Call<Map<String, String>> sendRegisterOtp(@Body Map<String, String> body);
+    /** Dang ky tai khoan: Xac nhan otp vua gui */
+    @POST("api/auth/register/verify-otp")
+    Call<Map<String, String>> verifyRegisterOtp(@Body Map<String, String> body);
+
     // ==========================================
     // USER (NHÂN VIÊN)
     // ==========================================
     @GET("api/users/restaurant/{resId}")
-    Call<List<Map<String, Object>>> getUsersByRestaurant(@Path("resId") int resId);
+    Call<List<com.example.apporderfood.model.User>> getUsersByRestaurant(@Path("resId") int resId);
 
     // ==========================================
     // SHIFT (CA LÀM VIỆC)
     // ==========================================
-    
+
     @GET("api/shifts/restaurant/{resId}")
     Call<List<Map<String, Object>>> getShiftHistory(@Path("resId") int resId);
 

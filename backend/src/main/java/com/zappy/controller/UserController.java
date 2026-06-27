@@ -127,4 +127,35 @@ public class UserController {
         userRepo.deleteById(id);
         return ResponseEntity.ok(Map.of("message", "Da xoa tai khoan!"));
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody Map<String, Object> data) {
+        // 1. Tìm user trong DB
+        User user = userRepo.findById(id).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Không tìm thấy nhân viên!"));
+        }
+
+        // 2. Cập nhật các trường thông tin nếu có truyền lên
+        if (data.containsKey("fullname")) {
+            user.setFullname((String) data.get("fullname"));
+        }
+        if (data.containsKey("email")) {
+            user.setEmail((String) data.get("email"));
+        }
+        if (data.containsKey("role")) {
+            user.setRole((Integer) data.get("role"));
+        }
+        
+        // 3. Xử lý cập nhật mật khẩu (Nếu có check vào nút Đổi MK)
+        if (data.containsKey("password")) {
+            String newPassword = (String) data.get("password");
+            
+            user.setPassword(newPassword);
+        }
+
+        // 4. Lưu lại vào DB
+        User updatedUser = userRepo.save(user);
+        return ResponseEntity.ok(updatedUser);
+    }
 }

@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,14 +23,17 @@ import com.example.apporderfood.api.ZappyApiService;
 import com.example.apporderfood.model.Category;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CategoryManageActivity extends AppCompatActivity implements CategoryManageAdapter.OnCategoryItemClickListener {
+public class CategoryManageActivity extends AppCompatActivity
+        implements CategoryManageAdapter.OnCategoryItemClickListener {
 
     private RecyclerView rvCategoryList;
     private CategoryManageAdapter adapter;
@@ -54,7 +58,6 @@ public class CategoryManageActivity extends AppCompatActivity implements Categor
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quan_ly_danh_muc);
 
-        // Lấy resId của nhà hàng hiện tại từ session đăng nhập
         SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
         resId = prefs.getInt("RES_ID", -1);
 
@@ -66,14 +69,13 @@ public class CategoryManageActivity extends AppCompatActivity implements Categor
     }
 
     private void initViews() {
-        rvCategoryList = findViewById(R.id.rvCategoryList);
-        fabAddCategory = findViewById(R.id.fab_add_category);
-        pbLoading = findViewById(R.id.pbCategoryLoading);
-        tvEmptyState = findViewById(R.id.tvCategoryEmptyState);
-        
-        tvTotalCategories = findViewById(R.id.tvTotalCategories);
-        tvActiveCategories = findViewById(R.id.tvActiveCategories);
-        tvHiddenCategories = findViewById(R.id.tvHiddenCategories);
+        rvCategoryList      = findViewById(R.id.rvCategoryList);
+        fabAddCategory      = findViewById(R.id.fab_add_category);
+        pbLoading           = findViewById(R.id.pbCategoryLoading);
+        tvEmptyState        = findViewById(R.id.tvCategoryEmptyState);
+        tvTotalCategories   = findViewById(R.id.tvTotalCategories);
+        tvActiveCategories  = findViewById(R.id.tvActiveCategories);
+        tvHiddenCategories  = findViewById(R.id.tvHiddenCategories);
     }
 
     private void setupRecyclerView() {
@@ -97,7 +99,7 @@ public class CategoryManageActivity extends AppCompatActivity implements Categor
             @Override
             public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
                 if (pbLoading != null) pbLoading.setVisibility(View.GONE);
-                
+
                 if (response.isSuccessful() && response.body() != null) {
                     List<Category> categoryList = response.body();
                     if (categoryList.isEmpty()) {
@@ -129,7 +131,8 @@ public class CategoryManageActivity extends AppCompatActivity implements Categor
         int active = 0;
         int hidden = 0;
         for (Category item : list) {
-            if (item.getStatus() != null && item.getStatus() == 1) active++;
+            // ✅ Đồng nhất: null hoặc 1 = HOẠT ĐỘNG
+            if (item.getStatus() == null || item.getStatus() == 1) active++;
             else hidden++;
         }
         if (tvTotalCategories != null) tvTotalCategories.setText(String.valueOf(total));
@@ -137,12 +140,18 @@ public class CategoryManageActivity extends AppCompatActivity implements Categor
         if (tvHiddenCategories != null) tvHiddenCategories.setText(String.format(Locale.getDefault(), "%02d", hidden));
     }
 
+    /** Cập nhật stats từ data local hiện tại của adapter (sau khi toggle status) */
+    private void updateStatsFromAdapter() {
+        if (adapter == null) return;
+        // Lấy lại stats bằng cách đọc từ categoryList đang được giữ trong adapter
+        // (adapter đã cập nhật status local rồi)
+        loadCategories(); // Đơn giản nhất: reload lại để stats luôn chính xác
+    }
+
     private void setupListeners() {
         View btnBack = findViewById(R.id.btn_back);
-        if (btnBack != null) {
-            btnBack.setOnClickListener(v -> finish());
-        }
-        
+        if (btnBack != null) btnBack.setOnClickListener(v -> finish());
+
         if (fabAddCategory != null) {
             fabAddCategory.setOnClickListener(v -> {
                 Intent intent = new Intent(this, ThemDanhMucActivity.class);
@@ -151,26 +160,115 @@ public class CategoryManageActivity extends AppCompatActivity implements Categor
         }
     }
 
+    // ── Callbacks từ adapter ────────────────────────────────────────────────
+
     @Override
     public void onEditClick(Category item) {
         Intent intent = new Intent(this, ThemDanhMucActivity.class);
+        intent.putExtra("IS_EDIT", true);
         intent.putExtra("CATEGORY_DATA", item);
         addCategoryLauncher.launch(intent);
     }
 
     @Override
-    public void onMoreClick(Category item, View view) {
-        Toast.makeText(this, "Tùy chọn cho: " + item.getCatName(), Toast.LENGTH_SHORT).show();
+    public void onStatusToggleClick(Category item, int position) {
+        if (item.getId() == null) return;
+
+        // Đảo ngược trạng thái: null/1 → 0 (ẩn), 0 → 1 (hoạt động)
+        boolean currentlyActive = item.getStatus() == null || item.getStatus() == 1;
+        int newStatus = currentlyActive ? 0 : 1;
+        String newStatusLabel = currentlyActive ? "TẠM ẨN" : "HOẠT ĐỘNG";
+
+        ZappyApiService api = RetrofitClient.getApiService();
+        Map<String, Object> body = new HashMap<>();
+        body.put("resId", resId); // THÊM RES ID VÌ API YÊU CẦU
+        body.put("catName", item.getCatName());
+        body.put("status", newStatus);
+        if (item.getDescription() != null) body.put("description", item.getDescription());
+
+        api.updateCategory(item.getId(), body).enqueue(new Callback<Category>() {
+            @Override
+            public void onResponse(Call<Category> call, Response<Category> response) {
+                if (response.isSuccessful()) {
+                    // Cập nhật local ngay, không cần reload toàn bộ
+                    item.setStatus(newStatus);
+                    if (adapter != null) adapter.updateItemStatus(position, newStatus);
+                    updateStatsFromAdapter();
+                    Toast.makeText(CategoryManageActivity.this,
+                            "\"" + item.getCatName() + "\" → " + newStatusLabel,
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(CategoryManageActivity.this,
+                            "Cập nhật thất bại (lỗi " + response.code() + ")",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Category> call, Throwable t) {
+                Toast.makeText(CategoryManageActivity.this,
+                        "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onDeleteClick(Category item) {
+        new AlertDialog.Builder(this)
+                .setTitle("Xóa danh mục")
+                .setMessage("Bạn có chắc muốn xóa danh mục \"" + item.getCatName() + "\"?\n"
+                        + "Các món ăn trong danh mục này sẽ không còn được phân loại.")
+                .setPositiveButton("Xóa", (dialog, which) -> performDelete(item))
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    private void performDelete(Category item) {
+        if (item.getId() == null) return;
+
+        ZappyApiService api = RetrofitClient.getApiService();
+        api.deleteCategory(item.getId()).enqueue(new Callback<Map>() {
+            @Override
+            public void onResponse(Call<Map> call, Response<Map> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(CategoryManageActivity.this,
+                            "Đã xóa danh mục: " + item.getCatName(), Toast.LENGTH_SHORT).show();
+                    // Xóa khỏi list ngay không cần gọi API lại
+                    if (adapter != null) {
+                        adapter.removeItem(item);
+                        // Cập nhật stats từ adapter
+                        loadCategories();
+                    }
+                } else if (response.code() == 409 || response.code() == 400) {
+                    Toast.makeText(CategoryManageActivity.this,
+                            "Không thể xóa: danh mục đang có món ăn hoặc đang được sử dụng",
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(CategoryManageActivity.this,
+                            "Xóa thất bại (lỗi " + response.code() + ")", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Map> call, Throwable t) {
+                Toast.makeText(CategoryManageActivity.this,
+                        "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
     public void onItemClick(Category item) {
-        Toast.makeText(this, "Chi tiết: " + item.getCatName(), Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, ChiTietDanhMucActivity.class);
+        intent.putExtra("CATEGORY_DATA", item);
+        startActivity(intent);
     }
 
+    // ── Bottom navigation ──────────────────────────────────────────────────
+
     private void setupBottomNav() {
-        View navOrder = findViewById(R.id.navOrder);
-        View navSoDo = findViewById(R.id.navSoDo);
+        View navOrder  = findViewById(R.id.navOrder);
+        View navSoDo   = findViewById(R.id.navSoDo);
         View navTienIch = findViewById(R.id.navTienIch);
 
         if (navOrder != null) {

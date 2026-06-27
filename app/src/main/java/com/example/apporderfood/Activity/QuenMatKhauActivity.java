@@ -60,6 +60,7 @@ public class QuenMatKhauActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
                         Toast.makeText(QuenMatKhauActivity.this, "Đã gửi mã OTP", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(QuenMatKhauActivity.this, OTPActivity.class);
+                        intent.putExtra("mode", "forgot_password");
                         intent.putExtra("email", email);
                         startActivity(intent);
                         finish();
