@@ -163,27 +163,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-
-                        <ImageView
-                            android:id="@+id/imgTrend"
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:src="@drawable/ic_arrow_trend_up"
-                            app:tint="#10B981"
-                            android:contentDescription="@null" />
-
-                        <!-- DỮ LIỆU ĐỘNG: Phần trăm tăng trưởng -->
-                        <TextView
-                            android:id="@+id/tvGrowth"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:text="+12.5% so với hôm qua"
-                            android:textColor="#10B981"
-                            android:textSize="13sp" />
-                    </LinearLayout>
+                        android:orientation="horizontal"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
