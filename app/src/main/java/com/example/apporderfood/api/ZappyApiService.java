@@ -86,6 +86,9 @@ public interface ZappyApiService {
     @PUT("api/tables/{id}")
     Call<TableModel> updateTable(@Path("id") Integer tableId, @Body Map<String, Object> bodyData);
 
+    @DELETE("api/tables/{id}")
+    Call<Map> deleteTable(@Path("id") Integer id);
+
     // ==========================================
     // CATEGORIES & UNITS
     // ==========================================
@@ -95,6 +98,14 @@ public interface ZappyApiService {
     // Thêm danh mục
     @POST("api/categories")
     Call<Category> createCategory(@Body Map<String, Object> bodyData);
+
+    // Cập nhật danh mục
+    @PUT("api/categories/{id}")
+    Call<Category> updateCategory(@Path("id") Integer id, @Body Map<String, Object> bodyData);
+
+    // Xóa danh mục
+    @DELETE("api/categories/{id}")
+    Call<Map> deleteCategory(@Path("id") Integer id);
 
     @GET("api/units/restaurant/{resId}")
     Call<List<Unit>> getUnits(@Path("resId") Integer resId);

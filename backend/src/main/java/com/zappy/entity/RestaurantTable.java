@@ -36,6 +36,10 @@ public class RestaurantTable {
     @Column(name = "is_occupied", nullable = false)
     private Boolean isOccupied = false;
     
+    // Trạng thái bàn: HOẠT ĐỘNG, ĐANG KHÓA
+    @Column(name = "status")
+    private String status = "HOẠT ĐỘNG";
+    
     @Transient
     private Integer activeUserId;
 }

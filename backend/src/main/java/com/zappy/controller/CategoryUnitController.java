@@ -58,11 +58,37 @@ public class CategoryUnitController {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryRepo.save(c));
     }
 
+    @PutMapping("/api/categories/{id}")
+    public ResponseEntity<?> updateCategory(@PathVariable Integer id, @RequestBody Map<String, Object> data) {
+        Category c = categoryRepo.findById(id).orElse(null);
+        if (c == null) return ResponseEntity.notFound().build();
+
+        if (data.containsKey("catName")) {
+            String name = data.get("catName").toString().trim();
+            if (!name.isEmpty()) c.setCatName(name);
+        }
+        if (data.containsKey("description")) {
+            c.setDescription(data.get("description") != null ? data.get("description").toString() : null);
+        }
+        if (data.containsKey("status")) {
+            try {
+                c.setStatus(Integer.parseInt(data.get("status").toString()));
+            } catch (Exception ignored) {}
+        }
+        return ResponseEntity.ok(categoryRepo.save(c));
+    }
+
     @DeleteMapping("/api/categories/{id}")
     public ResponseEntity<?> deleteCategory(@PathVariable Integer id) {
         if (!categoryRepo.existsById(id)) return ResponseEntity.notFound().build();
-        categoryRepo.deleteById(id);
-        return ResponseEntity.ok(Map.of("message", "Da xoa danh muc!"));
+        try {
+            categoryRepo.deleteById(id);
+            return ResponseEntity.ok(Map.of("message", "Da xoa danh muc!"));
+        } catch (Exception e) {
+            // Lỗi khóa ngoại (đang chứa món ăn)
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", "Không thể xóa danh mục đang chứa món ăn"));
+        }
     }
 
     // ===== UNITS =====
