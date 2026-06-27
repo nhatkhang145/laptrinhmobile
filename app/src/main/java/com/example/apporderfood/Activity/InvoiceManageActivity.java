@@ -58,7 +58,19 @@ public class InvoiceManageActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        adapter = new InvoiceManageAdapter(this);
+        adapter = new InvoiceManageAdapter(this, invoice -> {
+            android.content.Intent intent = new android.content.Intent(InvoiceManageActivity.this, HoaDonActivity.class);
+            if (invoice.get("id") != null) {
+                intent.putExtra("ORDER_ID", ((Number) invoice.get("id")).intValue());
+            }
+            if (invoice.get("table") != null) {
+                Map<String, Object> table = (Map<String, Object>) invoice.get("table");
+                String areaName = table.get("area") != null ? (String) ((Map<String, Object>) table.get("area")).get("areaName") : "Khu vực";
+                intent.putExtra("TABLE_NAME", areaName + " - " + table.get("tableName"));
+            }
+            intent.putExtra("IS_VIEW_ONLY", true);
+            startActivity(intent);
+        });
         rvInvoices.setLayoutManager(new LinearLayoutManager(this));
         rvInvoices.setAdapter(adapter);
     }

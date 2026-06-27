@@ -84,6 +84,23 @@ public class HoaDonActivity extends AppCompatActivity {
         
         tvTableName.setText(tableName);
         
+        TextView tvInvoiceNumber = findViewById(R.id.tvInvoiceNumber);
+        if (tvInvoiceNumber != null && orderId != -1) {
+            tvInvoiceNumber.setText("Số: #" + orderId);
+        }
+        
+        TextView tvHeaderTitle = findViewById(R.id.tvHeaderTitle);
+        View bottomBarLayout = findViewById(R.id.bottomBarLayout);
+        boolean isViewOnly = getIntent().getBooleanExtra("IS_VIEW_ONLY", false);
+        if (isViewOnly) {
+            if (bottomBarLayout != null) {
+                bottomBarLayout.setVisibility(View.GONE);
+            }
+            if (tvHeaderTitle != null) {
+                tvHeaderTitle.setText("Chi tiết hóa đơn");
+            }
+        }
+        
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy (HH:mm)", new Locale("vi", "VN"));
         tvInvoiceDate.setText(sdf.format(new Date()));
         

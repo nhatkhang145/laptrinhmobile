@@ -23,9 +23,15 @@ public class InvoiceManageAdapter extends RecyclerView.Adapter<InvoiceManageAdap
     private Context context;
     private List<Map<String, Object>> invoices;
     private final DecimalFormat formatter = new DecimalFormat("#,###");
+    private final OnItemClickListener listener;
 
-    public InvoiceManageAdapter(Context context) {
+    public interface OnItemClickListener {
+        void onItemClick(Map<String, Object> invoiceMap);
+    }
+
+    public InvoiceManageAdapter(Context context, OnItemClickListener listener) {
         this.context = context;
+        this.listener = listener;
         this.invoices = new ArrayList<>();
     }
 
@@ -101,6 +107,12 @@ public class InvoiceManageAdapter extends RecyclerView.Adapter<InvoiceManageAdap
         } else {
             holder.tvTotalAmount.setText("0đ");
         }
+        
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(invoice);
+            }
+        });
     }
 
     @Override
