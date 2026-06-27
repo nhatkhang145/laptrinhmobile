@@ -142,7 +142,10 @@
         <activity
             android:name=".Activity.LichSuCaActivity"
             android:exported="false" />
-
+        <!--===== Thống kê ========-->
+        <activity
+            android:name=".Activity.ThongKeActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

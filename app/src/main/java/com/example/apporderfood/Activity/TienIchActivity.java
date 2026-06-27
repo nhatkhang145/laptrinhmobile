@@ -31,7 +31,8 @@ public class TienIchActivity extends AppCompatActivity {
     private LinearLayout navSoDo;
     private LinearLayout navTienIch;
     private TextView tvUserName;
-    private LinearLayout menuQuanLyNhanVien;
+    private LinearLayout menuQuanLyNhanVien,menuThongKe;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +65,7 @@ public class TienIchActivity extends AppCompatActivity {
         navTienIch         = findViewById(R.id.navTienIch);
         tvUserName         = findViewById(R.id.tvUserName);
         menuQuanLyNhanVien = findViewById(R.id.menuQuanLyNhanVien);
+        menuThongKe= findViewById(R.id.menuThongKe);
     }
 
     private void loadUserInfo() {
@@ -76,7 +78,7 @@ public class TienIchActivity extends AppCompatActivity {
         } else {
             tvUserName.setText("Chưa cập nhật tên");
         }
-        
+
         if (role == 0) { // Nhan vien
             View tvAdminSectionTitle = findViewById(R.id.tvAdminSectionTitle);
             View adminMenuCard = findViewById(R.id.adminMenuCard);
@@ -143,10 +145,14 @@ public class TienIchActivity extends AppCompatActivity {
 
         navTienIch.setOnClickListener(v -> { });
 
-//        menuQuanLyNhanVien.setOnClickListener(v -> {
-//            animatePress(v);
-//            startActivity(new Intent(this, QuanLyNhanVienActivity.class));
-//        });
+        menuQuanLyNhanVien.setOnClickListener(v -> {
+            animatePress(v);
+            startActivity(new Intent(this, QuanLyNhanVienActivity.class));
+        });
+        menuThongKe.setOnClickListener(v ->{
+            animatePress(v);
+            startActivity(new Intent(this, ThongKeActivity.class));
+        });
     }
 
     private void animateEntrance() {

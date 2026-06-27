@@ -14,6 +14,13 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import java.time.LocalDateTime;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
  * API Hoa don - Nghiep vu chinh cua app
  *
@@ -269,5 +276,68 @@ public class OrderController {
                 "totalAmount", total,
                 "orderId", orderId
         ));
+    }
+ // ==========================================
+    // THỐNG KÊ (STATS) - THEO THỜI GIAN
+    // ==========================================
+    @GetMapping("/stats/restaurant/{resId}")
+    public ResponseEntity<?> getDashboardStats(
+            @PathVariable Integer resId,
+            @RequestParam(defaultValue = "today") String period) {
+
+        LocalDateTime startDate;
+        LocalDateTime endDate;
+
+        LocalDate today = LocalDate.now();
+
+        switch (period.toLowerCase()) {
+
+            case "week":
+                startDate = today.with(DayOfWeek.MONDAY).atStartOfDay();
+                endDate = startDate.plusWeeks(1);
+                break;
+
+            case "month":
+                startDate = today.withDayOfMonth(1).atStartOfDay();
+                endDate = startDate.plusMonths(1);
+                break;
+
+            case "today":
+            default:
+                startDate = today.atStartOfDay();
+                endDate = startDate.plusDays(1);
+                break;
+        }
+
+        BigDecimal revenue = orderRepo.getRevenue(
+                resId,
+                startDate,
+                endDate
+        );
+
+        Long totalOrders = orderRepo.countOrders(
+                resId,
+                startDate,
+                endDate
+        );
+
+        Long cancelledItems = detailRepo.countCancelledItems(
+                resId,
+                startDate,
+                endDate
+        );
+
+        Long unpaidTables = tableRepo.countOccupiedTables(
+                resId
+        );
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("totalRevenue", revenue);
+        result.put("totalOrders", totalOrders);
+        result.put("cancelledItems", cancelledItems);
+        result.put("unpaidTables", unpaidTables);
+
+        return ResponseEntity.ok(result);
     }
 }
