@@ -1,6 +1,7 @@
 package com.example.apporderfood.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.apporderfood.Activity.ChiTietNhanVienActivity;
 import com.example.apporderfood.R;
 import com.example.apporderfood.model.User;
 
@@ -84,7 +86,11 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
     public void onBindViewHolder(@NonNull StaffViewHolder holder, int position) {
         User user = staffList.get(position);
 
-        holder.tvName.setText(user.getUsername());
+        if (user.getFullname() != null && !user.getFullname().trim().isEmpty()) {
+            holder.tvName.setText(user.getFullname());
+        } else {
+            holder.tvName.setText(user.getUsername());
+        }
         holder.tvContact.setText(user.getEmail());
         if (user.getRole() != null) {
             if (user.getRole() == 1) {
@@ -98,10 +104,16 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
                 holder.tvRoleTag.setBackgroundColor(Color.parseColor("#F59E0B")); // Màu Xanh dương
             }
         } else {
-            // Mặc định an toàn
+            // Mặc định
             holder.tvRoleTag.setText("NHÂN VIÊN");
             holder.tvRoleTag.setBackgroundColor(Color.parseColor("#F59E0B"));
         }
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ChiTietNhanVienActivity.class);
+            // Truyền toàn bộ object user sang màn hình Chi tiết
+            intent.putExtra("USER_DATA", user);
+            context.startActivity(intent);
+        });
     }
 
     @Override

@@ -1,9 +1,9 @@
 package com.example.apporderfood.model;
-
+import java.io.Serializable;
 import com.google.gson.annotations.SerializedName;
 
 /** Model User dung cho dang nhap va hien thi thong tin */
-public class User {
+public class User implements Serializable {
 
     @SerializedName("id")
     private Integer id;
