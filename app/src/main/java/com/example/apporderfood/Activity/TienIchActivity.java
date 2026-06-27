@@ -25,10 +25,13 @@ public class TienIchActivity extends AppCompatActivity {
     private LinearLayout menuQuanLyMonAn;
     private LinearLayout menuQuanLyBan;
     private LinearLayout menuQuanLyDanhMuc;
+    private LinearLayout menuQuanLyHoaDon;
+    private LinearLayout menuQuanLyCaLam;
     private LinearLayout navOrder;
     private LinearLayout navSoDo;
     private LinearLayout navTienIch;
     private TextView tvUserName;
+    private LinearLayout menuQuanLyNhanVien;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,10 +57,13 @@ public class TienIchActivity extends AppCompatActivity {
         menuQuanLyMonAn    = findViewById(R.id.menuQuanLyMonAn);
         menuQuanLyBan      = findViewById(R.id.menuQuanLyBan);
         menuQuanLyDanhMuc  = findViewById(R.id.menuQuanLyDanhMuc);
+        menuQuanLyHoaDon   = findViewById(R.id.menuQuanLyHoaDon);
+        menuQuanLyCaLam    = findViewById(R.id.menuQuanLyCaLam);
         navOrder           = findViewById(R.id.navOrder);
         navSoDo            = findViewById(R.id.navSoDo);
         navTienIch         = findViewById(R.id.navTienIch);
         tvUserName         = findViewById(R.id.tvUserName);
+        menuQuanLyNhanVien = findViewById(R.id.menuQuanLyNhanVien);
     }
 
     private void loadUserInfo() {
@@ -96,6 +102,20 @@ public class TienIchActivity extends AppCompatActivity {
             startActivity(new Intent(this, CategoryManageActivity.class));
         });
 
+        if (menuQuanLyHoaDon != null) {
+            menuQuanLyHoaDon.setOnClickListener(v -> {
+                animatePress(v);
+                startActivity(new Intent(this, InvoiceManageActivity.class));
+            });
+        }
+        
+        if (menuQuanLyCaLam != null) {
+            menuQuanLyCaLam.setOnClickListener(v -> {
+                animatePress(v);
+                startActivity(new Intent(this, QuanLyCaActivity.class));
+            });
+        }
+
         menuChangePassword.setOnClickListener(v -> {
             animatePress(v);
             startActivity(new Intent(this, ChangePasswordActivity.class));
@@ -117,6 +137,11 @@ public class TienIchActivity extends AppCompatActivity {
         });
 
         navTienIch.setOnClickListener(v -> { });
+
+        menuQuanLyNhanVien.setOnClickListener(v -> {
+            animatePress(v);
+            startActivity(new Intent(this, QuanLyNhanVienActivity.class));
+        });
     }
 
     private void animateEntrance() {

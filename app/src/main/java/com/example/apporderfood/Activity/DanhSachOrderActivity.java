@@ -43,7 +43,7 @@ public class DanhSachOrderActivity extends AppCompatActivity {
     private int resId = -1;
     private int currentUserId = -1;
     private int currentTab = 0; // 0 = Tất cả, 1 = Đang phục vụ
-    private List<TableModel> allTables = new ArrayList<>();
+    private List<java.util.Map<String, Object>> allOrders = new ArrayList<>();
     private ZappyApiService apiService;
 
     @Override
@@ -83,14 +83,24 @@ public class DanhSachOrderActivity extends AppCompatActivity {
     }
     
     private void setupRecyclerView() {
-        adapter = new OrderListAdapter(this, table -> {
-            // Chuyen sang man hinh chi tiet ban
-            Intent intent = new Intent(this, ChiTietBanActivity.class);
-            String title = (table.getArea() != null ? table.getArea().getAreaName() : "") + " - " + table.getTableName();
-            intent.putExtra("TABLE_NAME", title);
-            intent.putExtra("TABLE_ID", table.getId());
-            // TODO: Truyen ORDER_ID neu co
-            startActivity(intent);
+        adapter = new OrderListAdapter(this, order -> {
+            java.util.Map<String, Object> table = (java.util.Map<String, Object>) order.get("table");
+            if (table != null) {
+                Intent intent = new Intent(this, ChiTietBanActivity.class);
+                String areaName = "Không rõ";
+                if (table.get("area") != null) {
+                    java.util.Map<String, Object> area = (java.util.Map<String, Object>) table.get("area");
+                    areaName = (String) area.get("areaName");
+                }
+                String title = areaName + " - " + table.get("tableName");
+                intent.putExtra("TABLE_NAME", title);
+                intent.putExtra("TABLE_ID", ((Number) table.get("id")).intValue());
+                
+                if (order.get("id") != null) {
+                    intent.putExtra("ORDER_ID", ((Number) order.get("id")).intValue());
+                }
+                startActivity(intent);
+            }
         });
         rvOrderList.setLayoutManager(new LinearLayoutManager(this));
         rvOrderList.setAdapter(adapter);
@@ -140,21 +150,21 @@ public class DanhSachOrderActivity extends AppCompatActivity {
         tvEmpty.setVisibility(View.GONE);
         rvOrderList.setVisibility(View.GONE);
         
-        apiService.getAllTablesByRestaurant(resId).enqueue(new Callback<List<TableModel>>() {
+        apiService.getActiveOrdersByRestaurant(resId).enqueue(new Callback<List<java.util.Map<String, Object>>>() {
             @Override
-            public void onResponse(Call<List<TableModel>> call, Response<List<TableModel>> response) {
+            public void onResponse(Call<List<java.util.Map<String, Object>>> call, Response<List<java.util.Map<String, Object>>> response) {
                 progressBar.setVisibility(View.GONE);
                 if (response.isSuccessful() && response.body() != null) {
-                    allTables = response.body();
+                    allOrders = response.body();
                     updateTabsCount();
                     filterList();
                 } else {
-                    Toast.makeText(DanhSachOrderActivity.this, "Lỗi lấy danh sách bàn", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DanhSachOrderActivity.this, "Lỗi lấy danh sách đơn", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<List<TableModel>> call, Throwable t) {
+            public void onFailure(Call<List<java.util.Map<String, Object>>> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
                 Toast.makeText(DanhSachOrderActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("DanhSachOrderActivity", "API Call failed", t);
@@ -166,10 +176,11 @@ public class DanhSachOrderActivity extends AppCompatActivity {
         int countTatCa = 0;
         int countDangPhucVu = 0;
         
-        for (TableModel t : allTables) {
-            if (t.isOccupied()) {
-                countTatCa++;
-                if (t.getActiveUserId() != null && t.getActiveUserId() == currentUserId) {
+        for (java.util.Map<String, Object> order : allOrders) {
+            countTatCa++; // Tất cả active orders
+            if (order.get("user") != null) {
+                java.util.Map<String, Object> user = (java.util.Map<String, Object>) order.get("user");
+                if (user.get("id") != null && ((Number) user.get("id")).intValue() == currentUserId) {
                     countDangPhucVu++;
                 }
             }
@@ -179,26 +190,27 @@ public class DanhSachOrderActivity extends AppCompatActivity {
     }
 
     private void filterList() {
-        List<TableModel> filtered = new ArrayList<>();
-        for (TableModel t : allTables) {
-            if (!t.isOccupied()) continue; // Chỉ hiển thị bàn có khách
-            
+        List<java.util.Map<String, Object>> filtered = new ArrayList<>();
+        for (java.util.Map<String, Object> order : allOrders) {
             if (currentTab == 0) {
-                filtered.add(t);
+                filtered.add(order);
             } else if (currentTab == 1) {
-                if (t.getActiveUserId() != null && t.getActiveUserId() == currentUserId) {
-                    filtered.add(t);
+                if (order.get("user") != null) {
+                    java.util.Map<String, Object> user = (java.util.Map<String, Object>) order.get("user");
+                    if (user.get("id") != null && ((Number) user.get("id")).intValue() == currentUserId) {
+                        filtered.add(order);
+                    }
                 }
             }
         }
         
+        adapter.setOrderList(filtered);
         if (filtered.isEmpty()) {
             tvEmpty.setVisibility(View.VISIBLE);
             rvOrderList.setVisibility(View.GONE);
         } else {
             tvEmpty.setVisibility(View.GONE);
             rvOrderList.setVisibility(View.VISIBLE);
-            adapter.setTableList(filtered);
         }
     }
 }

@@ -118,6 +118,7 @@
                         android:textSize="14sp" />
 
                     <TextView
+                        android:id="@+id/tvInvoiceDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -139,6 +140,7 @@
                         android:textSize="14sp" />
 
                     <TextView
+                        android:id="@+id/tvTableName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -160,6 +162,7 @@
                         android:textSize="14sp" />
 
                     <TextView
+                        android:id="@+id/tvStaffName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -224,144 +227,12 @@
                 android:background="@color/divider" />
 
             <!-- Items -->
-            <!-- Item 1 -->
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvInvoiceItems"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Mì Kim Chi Bò Mỹ"
-                    android:textColor="@color/text_primary"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.8"
-                    android:gravity="center"
-                    android:text="1"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.2"
-                    android:gravity="center"
-                    android:text="55.000"
-                    android:textColor="@color/text_hint"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.5"
-                    android:fontFamily="sans-serif-medium"
-                    android:gravity="end"
-                    android:text="55.000"
-                    android:textColor="@color/text_primary"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Item 2 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingBottom="12dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Trà Chanh Sả"
-                    android:textColor="@color/text_primary"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.8"
-                    android:gravity="center"
-                    android:text="1"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.2"
-                    android:gravity="center"
-                    android:text="25.000"
-                    android:textColor="@color/text_hint"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.5"
-                    android:fontFamily="sans-serif-medium"
-                    android:gravity="end"
-                    android:text="25.000"
-                    android:textColor="@color/text_primary"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Item 3 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingBottom="16dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Salad Ức Gà"
-                    android:textColor="@color/text_primary"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.8"
-                    android:gravity="center"
-                    android:text="1"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.2"
-                    android:gravity="center"
-                    android:text="45.000"
-                    android:textColor="@color/text_hint"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.5"
-                    android:fontFamily="sans-serif-medium"
-                    android:gravity="end"
-                    android:text="45.000"
-                    android:textColor="@color/text_primary"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                android:nestedScrollingEnabled="false"
+                android:layout_marginTop="8dp" />
 
             <View
                 android:layout_width="match_parent"
@@ -387,6 +258,7 @@
                     android:textSize="16sp" />
 
                 <TextView
+                    android:id="@+id/tvTotal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
@@ -427,14 +299,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:gravity="center"
-                android:text="Xác nhận thanh toán"
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

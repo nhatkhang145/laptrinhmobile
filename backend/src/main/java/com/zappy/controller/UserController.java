@@ -81,6 +81,7 @@ public class UserController {
         String password  = (String)  data.get("password");
         Integer role     = (Integer) data.get("role");
         String email = (String) data.get("email");
+        String fullname  = (String) data.get("fullname");
         Restaurant restaurant = restaurantRepo.findById(resId)
                 .orElse(null);
         if (restaurant == null) {
@@ -94,6 +95,7 @@ public class UserController {
         user.setPassword(password); // TODO: nen hash bang BCrypt
         user.setRole(role != null ? role : 0);
         user.setEmail(email);
+        user.setFullname(fullname);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(userRepo.save(user));
     }

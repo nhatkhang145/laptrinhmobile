@@ -147,6 +147,13 @@ public interface ZappyApiService {
     @GET("api/orders/{orderId}/details")
     Call<List<OrderDetail>> getOrderDetails(@Path("orderId") Integer orderId);
 
+    /** Lay danh sach tat ca hoa don dang phuc vu cua nha hang */
+    @GET("api/orders/restaurant/{resId}/active")
+    Call<List<Map<String, Object>>> getActiveOrdersByRestaurant(@Path("resId") int resId);
+
+    @GET("api/orders/restaurant/{resId}/paid")
+    Call<List<Map<String, Object>>> getPaidOrdersByRestaurant(@Path("resId") int resId);
+
     /** Nhan vien gui mon -> status=1 (KHOA, nhan vien khong sua/xoa duoc) */
     @PUT("api/orders/{orderId}/send")
     Call<Map> sendOrder(@Path("orderId") Integer orderId);
@@ -168,4 +175,29 @@ public interface ZappyApiService {
     /** Quen mat khau: Reset password, tao password moi*/
     @POST("api/auth/forgot-password/reset-password")
     Call<Map<String, String>> resetPassword(@Body Map<String, String> data);
+
+    // ==========================================
+    // USER (NHÂN VIÊN)
+    // ==========================================
+    @GET("api/users/restaurant/{resId}")
+    Call<List<Map<String, Object>>> getUsersByRestaurant(@Path("resId") int resId);
+
+    // ==========================================
+    // SHIFT (CA LÀM VIỆC)
+    // ==========================================
+    
+    @GET("api/shifts/restaurant/{resId}")
+    Call<List<Map<String, Object>>> getShiftHistory(@Path("resId") int resId);
+
+    @GET("api/shifts/restaurant/{resId}/active")
+    Call<Map<String, Object>> getActiveShift(@Path("resId") int resId);
+
+    @POST("api/shifts/open")
+    Call<Map<String, Object>> openShift(@Body Map<String, Object> shiftData);
+
+    @PUT("api/shifts/{id}/employees")
+    Call<Map<String, Object>> updateShiftEmployees(@Path("id") int shiftId, @Body Map<String, Object> shiftData);
+
+    @PUT("api/shifts/{id}/close")
+    Call<Map<String, Object>> closeShift(@Path("id") int shiftId, @Body Map<String, Object> shiftData);
 }

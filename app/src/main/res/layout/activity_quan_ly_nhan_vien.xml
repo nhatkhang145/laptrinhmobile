@@ -74,6 +74,7 @@
                 android:paddingHorizontal="12dp">
 
                 <com.mikepenz.iconics.view.IconicsImageView
+                    android:id="@+id/ivSearchIcon"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     app:iiv_color="@color/text_hint"
@@ -81,6 +82,7 @@
                     android:contentDescription="@string/hint_tim_nhan_vien" />
 
                 <EditText
+                    android:id="@+id/etSearch"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@null"
@@ -107,6 +109,7 @@
 
 
                     <TextView
+                        android:id="@+id/tabAll"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_tab_selected_dark"
@@ -116,17 +119,19 @@
                         android:textColor="@color/white"
                         android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_input_selector"
-                        android:paddingHorizontal="20dp"
-                        android:paddingVertical="8dp"
-                        android:text="@string/tab_admin"
-                        android:textColor="@color/text_secondary" />
+<!--                    <TextView-->
+<!--                        android:id="@+id/tabAdmin"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginStart="8dp"-->
+<!--                        android:background="@drawable/bg_input_selector"-->
+<!--                        android:paddingHorizontal="20dp"-->
+<!--                        android:paddingVertical="8dp"-->
+<!--                        android:text="@string/tab_admin"-->
+<!--                        android:textColor="@color/text_secondary" />-->
 
                     <TextView
+                        android:id="@+id/tabManager"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
@@ -137,6 +142,7 @@
                         android:textColor="@color/text_secondary" />
 
                     <TextView
+                        android:id="@+id/tabCashier"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
@@ -147,24 +153,17 @@
                         android:textColor="@color/text_secondary" />
 
                     <TextView
+                        android:id="@+id/tabStaff"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:background="@drawable/bg_input_selector"
                         android:paddingHorizontal="20dp"
                         android:paddingVertical="8dp"
-                        android:text="@string/tab_phuc_vu"
+                        android:text="Nhân viên"
                         android:textColor="@color/text_secondary" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_input_selector"
-                        android:paddingHorizontal="20dp"
-                        android:paddingVertical="8dp"
-                        android:text="@string/tab_bep"
-                        android:textColor="@color/text_secondary" />
+
                 </LinearLayout>
             </HorizontalScrollView>
 
@@ -202,14 +201,14 @@
                             android:contentDescription="@string/label_tong_so" />
 
                         <TextView
+                            android:id="@+id/tvTotalStaff"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="24"
+                            android:text="0"
                             android:textColor="@color/text_primary"
                             android:textSize="22sp"
-                            android:textStyle="bold"
-                            tools:ignore="HardcodedText" />
+                            android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -246,14 +245,14 @@
                             android:contentDescription="@string/label_online" />
 
                         <TextView
+                            android:id="@+id/tvOnlineStaff"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="18"
+                            android:text="0"
                             android:textColor="@color/text_primary"
                             android:textSize="22sp"
-                            android:textStyle="bold"
-                            tools:ignore="HardcodedText" />
+                            android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -290,14 +289,14 @@
                             android:contentDescription="@string/label_offline" />
 
                         <TextView
+                            android:id="@+id/tvOfflineStaff"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="06"
+                            android:text="0"
                             android:textColor="@color/text_primary"
                             android:textSize="22sp"
-                            android:textStyle="bold"
-                            tools:ignore="HardcodedText" />
+                            android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
