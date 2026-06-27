@@ -63,7 +63,9 @@ public class UserController {
                 "role",       user.getRole(),
                 "resId",      restaurant.getId(),
                 "resName",    restaurant.getResName(),
-                "resDomain",  restaurant.getResDomain()
+                "resDomain",  restaurant.getResDomain(),
+                "fullname",   user.getFullname() != null ? user.getFullname() : "",
+                "email",      user.getEmail() != null ? user.getEmail() : ""
         ));
     }
 
