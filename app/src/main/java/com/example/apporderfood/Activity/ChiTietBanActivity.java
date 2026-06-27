@@ -44,6 +44,7 @@ public class ChiTietBanActivity extends AppCompatActivity {
     private View btnBack;
     private View btnThemMon;
     private View btnTinhTien;
+    private View btnGuiBep;
     
     private TextView tvTitle;
     private TextView tvBadgeCount;
@@ -81,6 +82,7 @@ public class ChiTietBanActivity extends AppCompatActivity {
         btnBack     = findViewById(R.id.btnBack);
         btnThemMon  = findViewById(R.id.btnAddItem); // changed to btnAddItem based on xml id
         btnTinhTien = findViewById(R.id.btnTinhTien);
+        btnGuiBep = findViewById(R.id.btnGuiBep);
         
         tvTitle = findViewById(R.id.tvTitle);
         tvBadgeCount = findViewById(R.id.tvBadgeCount);
@@ -100,6 +102,10 @@ public class ChiTietBanActivity extends AppCompatActivity {
     private void setupRecyclerView() {
         android.content.SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
         boolean isAdmin = prefs.getInt("ROLE", 0) == 1;
+        
+        if (!isAdmin && btnTinhTien != null) {
+            btnTinhTien.setVisibility(View.GONE);
+        }
 
         adapter = new OrderDetailAdapter(this, new java.util.ArrayList<>(), isAdmin, this::cancelItem);
         rvOrderDetails.setLayoutManager(new LinearLayoutManager(this));
@@ -191,6 +197,31 @@ public class ChiTietBanActivity extends AppCompatActivity {
             intent.putExtra("ORDER_ID", orderId);
             intent.putExtra("TABLE_NAME", tableName);
             startActivity(intent);
+        });
+
+        if (btnGuiBep != null) {
+            btnGuiBep.setOnClickListener(v -> guiBep());
+        }
+    }
+
+    private void guiBep() {
+        if (orderId == -1) return;
+        ZappyApiService api = RetrofitClient.getApiService();
+        api.sendOrder(orderId).enqueue(new Callback<Map>() {
+            @Override
+            public void onResponse(Call<Map> call, Response<Map> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(ChiTietBanActivity.this, "Đã gửi bếp thành công!", Toast.LENGTH_SHORT).show();
+                    loadOrderDetails();
+                } else {
+                    Toast.makeText(ChiTietBanActivity.this, "Lỗi gửi bếp", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Map> call, Throwable t) {
+                Toast.makeText(ChiTietBanActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }
