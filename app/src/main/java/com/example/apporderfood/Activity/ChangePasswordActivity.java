@@ -16,9 +16,18 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.apporderfood.R;
+import com.example.apporderfood.api.RetrofitClient;
+import com.example.apporderfood.api.ZappyApiService;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome;
 import com.mikepenz.iconics.view.IconicsImageView;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ChangePasswordActivity extends AppCompatActivity {
 
@@ -33,12 +42,15 @@ public class ChangePasswordActivity extends AppCompatActivity {
     private boolean currentVisible = false;
     private boolean newVisible     = false;
     private boolean confirmVisible = false;
+    private int currentUserId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_doimatkhau);
+        
+        currentUserId = getSharedPreferences("ZappySession", MODE_PRIVATE).getInt("USER_ID", -1);
 
         ViewCompat.setOnApplyWindowInsetsListener(
                 findViewById(R.id.changePasswordRoot), (v, insets) -> {
@@ -142,9 +154,33 @@ public class ChangePasswordActivity extends AppCompatActivity {
             etConfirmPassword.requestFocus();
             return;
         }
+        
+        if (currentUserId == -1) {
+            Toast.makeText(this, "Không tìm thấy thông tin tài khoản", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        ZappyApiService apiService = RetrofitClient.getApiService();
+        Map<String, String> request = new HashMap<>();
+        request.put("oldPassword", current);
+        request.put("newPassword", newPass);
+        
+        apiService.changePassword(currentUserId, request).enqueue(new Callback<Map>() {
+            @Override
+            public void onResponse(Call<Map> call, Response<Map> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(ChangePasswordActivity.this, "Cập nhật mật khẩu thành công!", Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    Toast.makeText(ChangePasswordActivity.this, "Mật khẩu hiện tại không đúng", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-        Toast.makeText(this, "Cập nhật mật khẩu thành công!", Toast.LENGTH_SHORT).show();
-        finish();
+            @Override
+            public void onFailure(Call<Map> call, Throwable t) {
+                Toast.makeText(ChangePasswordActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void animateEntrance() {

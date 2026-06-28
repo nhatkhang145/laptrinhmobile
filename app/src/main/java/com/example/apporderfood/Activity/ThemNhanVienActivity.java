@@ -11,6 +11,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.apporderfood.R;
 import com.example.apporderfood.api.RetrofitClient;
@@ -42,7 +46,13 @@ public class ThemNhanVienActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_them_nhan_vien);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
         SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
         currentResId = prefs.getInt("RES_ID", -1);
         if (currentResId == -1) {
@@ -105,13 +115,13 @@ public class ThemNhanVienActivity extends AppCompatActivity {
 
     private void handleAddStaff() {
         String fullName = etFullName.getText().toString().trim();
-        String phone = etPhone.getText().toString().trim();
+        String email = etPhone.getText().toString().trim();
         String username = etUsername.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
         // Validate cơ bản
-        if (username.isEmpty() || password.isEmpty() || phone.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập đầy đủ Username, Password và SĐT!", Toast.LENGTH_SHORT).show();
+        if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
+            Toast.makeText(this, "Vui lòng nhập đầy đủ Username, Password và Email!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -121,11 +131,7 @@ public class ThemNhanVienActivity extends AppCompatActivity {
         data.put("username", username);
         data.put("password", password);
         data.put("role", selectedRoleId);
-
-        // Vì Backend hiện tại bắt buộc phải có email, ta dùng tạm SĐT để truyền vào
-        data.put("email", phone);
-
-        // Truyền thêm fullname, Backend có thể lưu nếu sau này cập nhật
+        data.put("email", email);
         data.put("fullname", fullName);
 
         // Khóa nút để tránh bấm 2 lần

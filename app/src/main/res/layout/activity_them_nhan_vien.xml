@@ -2,6 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
@@ -55,39 +56,7 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- Upload Photo Area -->
-            <LinearLayout
-                android:id="@+id/layoutUpload"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:paddingBottom="24dp">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    app:cardBackgroundColor="#F3F4F6"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
-
-                    <com.mikepenz.iconics.view.IconicsImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="center"
-                        app:iiv_color="@color/text_secondary"
-                        app:iiv_icon="faw_camera" />
-                </com.google.android.material.card.MaterialCardView>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/label_tai_anh_len"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp" />
-            </LinearLayout>
 
             <!-- Full Name -->
             <TextView
@@ -125,7 +94,7 @@
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/bg_input_gray_filled"
                 android:hint="@string/hint_so_dien_thoai"
-                android:inputType="phone"
+                android:inputType="textEmailAddress"
                 android:paddingHorizontal="16dp"
                 android:textSize="15sp" />
 
