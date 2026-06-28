@@ -55,6 +55,11 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Sai username hoac mat khau!"));
         }
+        // Kiem tra tai khoan bi khoa
+        if (Boolean.FALSE.equals(user.getIsActive())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "Tai khoan nay da bi khoa!"));
+        }
         //set trạng thái là online khi đăng nhập
         user.setIsOnline(true);
         userRepo.save(user);
