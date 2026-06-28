@@ -51,6 +51,16 @@
                     android:textSize="16sp" />
 
                 <TextView
+                    android:id="@+id/tvTableInfo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Khu vực - Bàn"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
                     android:id="@+id/tvCancelTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

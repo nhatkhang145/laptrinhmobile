@@ -61,8 +61,46 @@ public class CancelManageAdapter extends RecyclerView.Adapter<CancelManageAdapte
         }
         holder.tvCancelTime.setText(time);
 
+        String tableInfoStr = "Chưa rõ bàn";
+        if (item.containsKey("order")) {
+            Object orderObj = item.get("order");
+            if (orderObj instanceof Map) {
+                Map<String, Object> orderMap = (Map<String, Object>) orderObj;
+                if (orderMap.containsKey("table")) {
+                    Object tableObj = orderMap.get("table");
+                    if (tableObj instanceof Map) {
+                        Map<String, Object> tableMap = (Map<String, Object>) tableObj;
+                        String tableName = "";
+                        if (tableMap.containsKey("tableName") && tableMap.get("tableName") != null) {
+                            tableName = String.valueOf(tableMap.get("tableName"));
+                        }
+                        String areaName = "";
+                        if (tableMap.containsKey("area")) {
+                            Object areaObj = tableMap.get("area");
+                            if (areaObj instanceof Map) {
+                                Map<String, Object> areaMap = (Map<String, Object>) areaObj;
+                                if (areaMap.containsKey("areaName") && areaMap.get("areaName") != null) {
+                                    areaName = String.valueOf(areaMap.get("areaName"));
+                                }
+                            }
+                        }
+                        if (!areaName.isEmpty() && !tableName.isEmpty()) {
+                            tableInfoStr = areaName + " - " + tableName;
+                        } else if (!tableName.isEmpty()) {
+                            tableInfoStr = tableName;
+                        }
+                    }
+                }
+            }
+        }
+        holder.tvTableInfo.setText(tableInfoStr);
+
         double price = 0;
-        if (item.containsKey("price") && item.get("price") != null) {
+        if (item.containsKey("priceAtSale") && item.get("priceAtSale") != null) {
+            try {
+                price = Double.parseDouble(String.valueOf(item.get("priceAtSale")));
+            } catch (Exception e) {}
+        } else if (item.containsKey("price") && item.get("price") != null) {
             try {
                 price = Double.parseDouble(String.valueOf(item.get("price")));
             } catch (Exception e) {
@@ -95,7 +133,7 @@ public class CancelManageAdapter extends RecyclerView.Adapter<CancelManageAdapte
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvItemName, tvCancelTime, tvPrice, tvCancelReason;
+        TextView tvItemName, tvCancelTime, tvPrice, tvCancelReason, tvTableInfo;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -103,6 +141,7 @@ public class CancelManageAdapter extends RecyclerView.Adapter<CancelManageAdapte
             tvCancelTime = itemView.findViewById(R.id.tvCancelTime);
             tvPrice = itemView.findViewById(R.id.tvPrice);
             tvCancelReason = itemView.findViewById(R.id.tvCancelReason);
+            tvTableInfo = itemView.findViewById(R.id.tvTableInfo);
         }
     }
 }
