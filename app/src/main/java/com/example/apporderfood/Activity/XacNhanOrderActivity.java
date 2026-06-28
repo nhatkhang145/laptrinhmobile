@@ -20,6 +20,9 @@ import com.example.apporderfood.adapter.OrderDetailAdapter;
 import com.example.apporderfood.api.RetrofitClient;
 import com.example.apporderfood.api.ZappyApiService;
 import com.example.apporderfood.model.OrderDetail;
+import com.example.apporderfood.model.CartItem;
+import com.example.apporderfood.model.MenuItem;
+import com.example.apporderfood.Activity.LapOrderActivity;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -120,8 +123,8 @@ public class XacNhanOrderActivity extends AppCompatActivity {
 
     private void cancelItem(OrderDetail detail) {
         if (detail.getId() == null) {
-            if (detail.getMenuItem() != null && com.example.apporderfood.Activity.LapOrderActivity.cartMap.containsKey(detail.getMenuItem().getId())) {
-                com.example.apporderfood.Activity.LapOrderActivity.cartMap.remove(detail.getMenuItem().getId());
+            if (detail.getMenuItem() != null && LapOrderActivity.cartMap.containsKey(detail.getMenuItem().getId())) {
+                LapOrderActivity.cartMap.remove(detail.getMenuItem().getId());
                 Toast.makeText(XacNhanOrderActivity.this, "Đã xóa món khỏi giỏ!", Toast.LENGTH_SHORT).show();
                 loadOrderDetails();
             }
@@ -178,13 +181,13 @@ public class XacNhanOrderActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     List<OrderDetail> details = response.body();
                     
-                    for (com.example.apporderfood.model.CartItem ci : com.example.apporderfood.Activity.LapOrderActivity.cartMap.values()) {
+                    for (CartItem ci : LapOrderActivity.cartMap.values()) {
                         OrderDetail localItem = new OrderDetail();
                         localItem.setId(null);
                         localItem.setMenuItem(ci.getMenuItem());
                         localItem.setQuantity(ci.getQuantity());
                         localItem.setNote(ci.getNote());
-                        BigDecimal price = new BigDecimal(ci.getMenuItem().getPrice());
+                        BigDecimal price = ci.getMenuItem().getPrice();
                         localItem.setPriceAtSale(price); 
                         localItem.setStatus(0);
                         
@@ -286,18 +289,18 @@ public class XacNhanOrderActivity extends AppCompatActivity {
         btnGui.setAlpha(0.45f);
         ZappyApiService api = RetrofitClient.getApiService();
 
-        if (!com.example.apporderfood.Activity.LapOrderActivity.cartMap.isEmpty()) {
-            java.util.List<java.util.Map<String, Object>> batchData = new java.util.ArrayList<>();
-            for (com.example.apporderfood.model.CartItem ci : com.example.apporderfood.Activity.LapOrderActivity.cartMap.values()) {
-                java.util.Map<String, Object> item = new java.util.HashMap<>();
+        if (!LapOrderActivity.cartMap.isEmpty()) {
+            List<Map<String, Object>> batchData = new ArrayList<>();
+            for (CartItem ci : LapOrderActivity.cartMap.values()) {
+                Map<String, Object> item = new java.util.HashMap<>();
                 item.put("itemId", ci.getMenuItem().getId());
                 item.put("quantity", ci.getQuantity());
                 item.put("note", ci.getNote() != null ? ci.getNote() : "");
                 batchData.add(item);
             }
-            api.addBatchItems(orderId, batchData).enqueue(new Callback<java.util.Map<String, String>>() {
+            api.addBatchItems(orderId, batchData).enqueue(new Callback<Map<String, String>>() {
                 @Override
-                public void onResponse(Call<java.util.Map<String, String>> call, Response<java.util.Map<String, String>> response) {
+                public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
                     if (response.isSuccessful()) {
                         executeSendOrderAPI(api);
                     } else {
@@ -307,7 +310,7 @@ public class XacNhanOrderActivity extends AppCompatActivity {
                     }
                 }
                 @Override
-                public void onFailure(Call<java.util.Map<String, String>> call, Throwable t) {
+                public void onFailure(Call<Map<String, String>> call, Throwable t) {
                     btnGui.setEnabled(true);
                     btnGui.setAlpha(1.0f);
                     Toast.makeText(XacNhanOrderActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
@@ -323,9 +326,9 @@ public class XacNhanOrderActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<java.util.Map> call, Response<java.util.Map> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(XacNhanOrderActivity.this,
-                            "Đã gửi lên bếp thành công!", Toast.LENGTH_SHORT).show();
-                    com.example.apporderfood.Activity.LapOrderActivity.cartMap.clear();
+                        Toast.makeText(XacNhanOrderActivity.this,
+                                "Đã gửi lên bếp thành công!", Toast.LENGTH_SHORT).show();
+                        LapOrderActivity.cartMap.clear();
 
                     Intent intent = new Intent(XacNhanOrderActivity.this, ChiTietBanActivity.class);
                     intent.putExtra("ORDER_ID", orderId);
