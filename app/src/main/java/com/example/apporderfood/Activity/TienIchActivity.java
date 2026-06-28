@@ -31,6 +31,7 @@ public class TienIchActivity extends AppCompatActivity {
     private LinearLayout menuLogout;
     private LinearLayout menuQuanLyMonAn;
     private LinearLayout menuQuanLyBan;
+    private LinearLayout menuQuanLyKhuVuc;
     private LinearLayout menuQuanLyDanhMuc;
     private LinearLayout menuQuanLyHoaDon;
     private LinearLayout menuQuanLyHuyMon;
@@ -65,6 +66,7 @@ public class TienIchActivity extends AppCompatActivity {
         menuLogout         = findViewById(R.id.menuLogout);
         menuQuanLyMonAn    = findViewById(R.id.menuQuanLyMonAn);
         menuQuanLyBan      = findViewById(R.id.menuQuanLyBan);
+        menuQuanLyKhuVuc   = findViewById(R.id.menuQuanLyKhuVuc);
         menuQuanLyDanhMuc  = findViewById(R.id.menuQuanLyDanhMuc);
         menuQuanLyHoaDon   = findViewById(R.id.menuQuanLyHoaDon);
         menuQuanLyHuyMon   = findViewById(R.id.menuQuanLyHuyMon);
@@ -112,6 +114,13 @@ public class TienIchActivity extends AppCompatActivity {
             animatePress(v);
             startActivity(new Intent(this, TableManageActivity.class));
         });
+
+        if (menuQuanLyKhuVuc != null) {
+            menuQuanLyKhuVuc.setOnClickListener(v -> {
+                animatePress(v);
+                startActivity(new Intent(this, AreaManageActivity.class));
+            });
+        }
 
         menuQuanLyDanhMuc.setOnClickListener(v -> {
             animatePress(v);

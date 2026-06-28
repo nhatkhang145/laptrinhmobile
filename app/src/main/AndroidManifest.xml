@@ -56,6 +56,13 @@
             android:exported="true" />
 
         <activity
+            android:name=".Activity.AreaManageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.ThemKhuVucActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".Activity.DangKyActivity"
             android:exported="true" />
         <activity

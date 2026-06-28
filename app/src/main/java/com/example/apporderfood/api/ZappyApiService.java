@@ -66,6 +66,15 @@ public interface ZappyApiService {
     @POST("api/areas")
     Call<Area> createArea(@Body Map<String, Object> data);
 
+    @PUT("api/areas/{id}")
+    Call<Area> updateArea(@Path("id") Integer id, @Body Map<String, Object> data);
+
+    @DELETE("api/areas/{id}")
+    Call<Map> deleteArea(@Path("id") Integer id);
+
+    @PUT("api/areas/{id}/toggle-status")
+    Call<Map> toggleAreaStatus(@Path("id") Integer id);
+
     // ==========================================
     // TABLES (Ban an) - is_occupied = red/green
     // ==========================================
