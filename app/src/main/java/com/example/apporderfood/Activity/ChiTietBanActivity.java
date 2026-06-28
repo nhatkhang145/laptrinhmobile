@@ -197,9 +197,8 @@ public class ChiTietBanActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
 
-        // Back -> Về danh sách order
+        // Back -> Về trang trước đó (Danh sách order hoặc Sơ đồ bàn)
         btnBack.setOnClickListener(v -> {
-            startActivity(new Intent(this, DanhSachOrderActivity.class));
             finish();
         });
 

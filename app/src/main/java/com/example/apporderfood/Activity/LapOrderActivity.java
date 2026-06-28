@@ -57,6 +57,8 @@ public class LapOrderActivity extends AppCompatActivity {
     private int orderId = -1; // Chỉ được set SAU KHI ấn ĐỒNG Ý và openTable() thành công
     private int resId = -1;
 
+    public static LapOrderActivity instance;
+
     private MenuItemLapOrderAdapter adapter;
     private List<Category> categoryList = new ArrayList<>();
     private ZappyApiService apiService;
@@ -85,6 +87,8 @@ public class LapOrderActivity extends AppCompatActivity {
         setupRecyclerView();
         setupClickListeners();
         setupSearch();
+
+        instance = this;
 
         // Xóa giỏ hàng cũ khi mở bàn mới (tránh lưu giỏ hàng của bàn khác)
         cartMap.clear();
@@ -384,5 +388,13 @@ public class LapOrderActivity extends AppCompatActivity {
         intent.putExtra("TABLE_NAME", tableName);
         intent.putExtra("TABLE_ID", tableId);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (instance == this) {
+            instance = null;
+        }
     }
 }

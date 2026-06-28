@@ -329,13 +329,17 @@ public class XacNhanOrderActivity extends AppCompatActivity {
                         Toast.makeText(XacNhanOrderActivity.this,
                                 "Đã gửi lên bếp thành công!", Toast.LENGTH_SHORT).show();
                         LapOrderActivity.cartMap.clear();
+                        if (LapOrderActivity.instance != null) {
+                            LapOrderActivity.instance.finish();
+                        }
 
-                    Intent intent = new Intent(XacNhanOrderActivity.this, ChiTietBanActivity.class);
-                    intent.putExtra("ORDER_ID", orderId);
-                    intent.putExtra("TABLE_ID", tableId);
-                    intent.putExtra("TABLE_NAME", tableName);
-                    startActivity(intent);
-                    finish();
+                        Intent intent = new Intent(XacNhanOrderActivity.this, ChiTietBanActivity.class);
+                        intent.putExtra("ORDER_ID", orderId);
+                        intent.putExtra("TABLE_ID", tableId);
+                        intent.putExtra("TABLE_NAME", tableName);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        startActivity(intent);
+                        finish();
                 } else {
                     btnGui.setEnabled(true);
                     btnGui.setAlpha(1.0f);
