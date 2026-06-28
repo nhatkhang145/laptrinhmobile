@@ -239,4 +239,10 @@ public interface ZappyApiService {
     //=========================
     @PUT("api/users/{id}/logout")
     Call<Map<String, String>> logoutUser(@Path("id") Integer id);
+
+    //=======================
+    // Khóa tài khoản
+    //=========================
+    @PUT("api/users/{id}/toggle-lock")
+    Call<Map<String, Boolean>> toggleLockUser(@Path("id") Integer id);
 }

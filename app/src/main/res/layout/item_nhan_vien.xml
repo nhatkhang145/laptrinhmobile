@@ -126,22 +126,16 @@
                 app:iiv_icon="faw_pen"
                 android:contentDescription="Sửa" />
 
-            <com.mikepenz.iconics.view.IconicsImageView
+            <ImageView
                 android:id="@+id/btnLock"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginEnd="12dp"
-                app:iiv_color="#EF4444"
-                app:iiv_icon="faw_lock"
+                android:src="@drawable/ic_lock"
+                app:tint="#EF4444"
                 android:contentDescription="Khóa" />
 
-            <com.mikepenz.iconics.view.IconicsImageView
-                android:id="@+id/btnMore"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                app:iiv_color="@color/text_secondary"
-                app:iiv_icon="faw_ellipsis_v"
-                android:contentDescription="Xem thêm" />
+
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
