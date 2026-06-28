@@ -76,6 +76,21 @@ public class CancelManageActivity extends AppCompatActivity {
                 }
             }
         }
+        if (fromDateStr == null || toDateStr == null) {
+            java.util.Calendar calendar = java.util.Calendar.getInstance();
+            java.util.Date today = calendar.getTime();
+            String apiFormatStr = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(today);
+            String displayFormatStr = new java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault()).format(today);
+            
+            if (fromDateStr == null) {
+                fromDateStr = apiFormatStr + "T00:00:00";
+                tvFromDate.setText(displayFormatStr);
+            }
+            if (toDateStr == null) {
+                toDateStr = apiFormatStr + "T23:59:59";
+                tvToDate.setText(displayFormatStr);
+            }
+        }
         
         setupRecyclerView();
         
