@@ -181,7 +181,7 @@ public class CategoryManageActivity extends AppCompatActivity
         }
         if (tvTotalCategories != null) tvTotalCategories.setText(String.valueOf(total));
         if (tvActiveCategories != null) tvActiveCategories.setText(String.valueOf(active));
-        if (tvHiddenCategories != null) tvHiddenCategories.setText(String.format(Locale.getDefault(), "%02d", hidden));
+        if (tvHiddenCategories != null) tvHiddenCategories.setText(String.valueOf(hidden));
     }
 
     /** Cập nhật stats từ data local hiện tại của adapter (sau khi toggle status) */
