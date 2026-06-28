@@ -14,6 +14,8 @@ public interface TableRepository extends JpaRepository<RestaurantTable, Integer>
     List<RestaurantTable> findByAreaId(Integer areaId);
     // Lay ban trong (cho phep nhan vien chon)
     List<RestaurantTable> findByAreaIdAndIsOccupied(Integer areaId, Boolean isOccupied);
+    // Kiem tra xem co ban nao dang co khach khong
+    boolean existsByAreaIdAndIsOccupiedTrue(Integer areaId);
     // Lay tat ca ban cua nha hang
     List<RestaurantTable> findByAreaRestaurantId(Integer resId);
     
