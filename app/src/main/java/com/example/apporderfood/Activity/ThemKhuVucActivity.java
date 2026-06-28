@@ -10,7 +10,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.apporderfood.R;
@@ -32,7 +31,7 @@ public class ThemKhuVucActivity extends AppCompatActivity {
     private TextView tvTitle, tvPreviewName, tvPreviewStatus, tvStatusActive, tvStatusHidden;
     private MaterialButton btnSave;
     private boolean isEditMode = false;
-    private boolean isActive = true; // trạng thái mặc định
+    private boolean isActive = true;
     private int resId = -1;
     private Integer editingAreaId = null;
 
@@ -64,7 +63,8 @@ public class ThemKhuVucActivity extends AppCompatActivity {
         if (intent != null && intent.getBooleanExtra("IS_EDIT", false)) {
             isEditMode = true;
             tvTitle.setText("Chỉnh sửa khu vực");
-            if (btnSave != null) btnSave.setText("CẬP NHẬT");
+            if (btnSave != null)
+                btnSave.setText("CẬP NHẬT");
 
             Area area = (Area) intent.getSerializableExtra("Area_DATA");
             if (area != null) {
@@ -90,8 +90,14 @@ public class ThemKhuVucActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 tvPreviewName.setText(s.length() > 0 ? s.toString() : "Tên khu vực");
             }
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void afterTextChanged(Editable s) {}
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         tvStatusActive.setOnClickListener(v -> updateStatusUI(true));
@@ -102,17 +108,17 @@ public class ThemKhuVucActivity extends AppCompatActivity {
     private void updateStatusUI(boolean active) {
         this.isActive = active;
         if (active) {
-            tvStatusActive.setBackgroundResource(R.drawable.bg_tab_active);
+            tvStatusActive.setBackgroundResource(R.drawable.bg_tab_active_dark);
             tvStatusActive.setTextColor(getColor(R.color.white));
-            tvStatusHidden.setBackgroundResource(R.drawable.bg_tab_inactive);
+            tvStatusHidden.setBackgroundResource(R.drawable.bg_search_bar);
             tvStatusHidden.setTextColor(getColor(R.color.text_secondary));
 
             tvPreviewStatus.setText("● HOẠT ĐỘNG");
             tvPreviewStatus.setTextColor(getColor(android.R.color.holo_green_dark));
         } else {
-            tvStatusHidden.setBackgroundResource(R.drawable.bg_tab_active);
+            tvStatusHidden.setBackgroundResource(R.drawable.bg_tab_active_dark);
             tvStatusHidden.setTextColor(getColor(R.color.white));
-            tvStatusActive.setBackgroundResource(R.drawable.bg_tab_inactive);
+            tvStatusActive.setBackgroundResource(R.drawable.bg_search_bar);
             tvStatusActive.setTextColor(getColor(R.color.text_secondary));
 
             tvPreviewStatus.setText("○ TẠM ẨN");
@@ -150,6 +156,7 @@ public class ThemKhuVucActivity extends AppCompatActivity {
                         Toast.makeText(ThemKhuVucActivity.this, "Cập nhật thất bại!", Toast.LENGTH_SHORT).show();
                     }
                 }
+
                 @Override
                 public void onFailure(Call<Area> call, Throwable t) {
                     btnSave.setEnabled(true);
@@ -171,6 +178,7 @@ public class ThemKhuVucActivity extends AppCompatActivity {
                         Toast.makeText(ThemKhuVucActivity.this, "Thêm thất bại!", Toast.LENGTH_SHORT).show();
                     }
                 }
+
                 @Override
                 public void onFailure(Call<Area> call, Throwable t) {
                     btnSave.setEnabled(true);
