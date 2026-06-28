@@ -185,6 +185,12 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
         boolean currentlyActive = item.getStatus() == null || "HOẠT ĐỘNG".equals(item.getStatus());
         String newStatus = currentlyActive ? "ĐANG KHÓA" : "HOẠT ĐỘNG";
 
+        // Ngăn chặn khóa bàn nếu đang có khách
+        if ("ĐANG KHÓA".equals(newStatus) && item.isOccupied()) {
+            Toast.makeText(this, "Bàn đang có hóa đơn/khách, không thể khóa!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         ZappyApiService api = RetrofitClient.getApiService();
         Map<String, Object> body = new HashMap<>();
         body.put("tableName", item.getTableName());
