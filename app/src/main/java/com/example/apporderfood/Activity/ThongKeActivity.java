@@ -209,13 +209,13 @@ public class ThongKeActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     tvTotalCancelledItems.setText(response.body().size() + " món");
                 } else {
-                    tvTotalCancelledItems.setText("Lỗi");
+                    tvTotalCancelledItems.setText("0 món");
                 }
             }
 
             @Override
             public void onFailure(Call<List<Map<String, Object>>> call, Throwable t) {
-                tvTotalCancelledItems.setText("Lỗi");
+                tvTotalCancelledItems.setText("0 món");
             }
         });
     }
