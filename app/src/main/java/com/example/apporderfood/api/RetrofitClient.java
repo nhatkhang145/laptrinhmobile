@@ -15,8 +15,8 @@ public class RetrofitClient {
 
     // Lấy IP từ file local.properties (đã được ẩn khỏi Git)
     //private static final String BASE_URL = com.example.apporderfood.BuildConfig.BASE_URL;
-   private static final String BASE_URL = "http://192.168.1.244:8080/";
-//     private static final String BASE_URL = "http://10.0.2.2:8080/";
+//    private static final String BASE_URL = "http://192.168.1.244:8080/";
+      private static final String BASE_URL = "http://10.0.2.2:8080/";
     private static Retrofit instance = null;
 
     public static Retrofit getInstance() {

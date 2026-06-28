@@ -48,6 +48,7 @@ public class XacNhanOrderActivity extends AppCompatActivity {
     private View btnBack;
     private LinearLayout btnGui;
     private LinearLayout btnThemMon;
+    private View btnTinhTien;
     private RecyclerView rvOrderDetails;
     private ProgressBar progressBar;
     private TextView tvTitle;
@@ -88,6 +89,7 @@ public class XacNhanOrderActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btnBack);
         btnGui = findViewById(R.id.btnGui);
         btnThemMon = findViewById(R.id.btnThemMon);
+        btnTinhTien = findViewById(R.id.btnTinhTien);
         rvOrderDetails = findViewById(R.id.rvOrderDetails);
         progressBar = findViewById(R.id.progressBar);
         tvTitle = findViewById(R.id.tvTitle);
@@ -104,6 +106,10 @@ public class XacNhanOrderActivity extends AppCompatActivity {
     private void setupRecyclerView() {
         android.content.SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
         boolean isAdmin = prefs.getInt("ROLE", 0) == 1;
+
+        if (!isAdmin && btnTinhTien != null) {
+            btnTinhTien.setVisibility(View.GONE);
+        }
 
         adapter = new OrderDetailAdapter(this, new java.util.ArrayList<>(), isAdmin, this::cancelItem);
         rvOrderDetails.setLayoutManager(new LinearLayoutManager(this));
@@ -235,6 +241,15 @@ public class XacNhanOrderActivity extends AppCompatActivity {
 
 
         btnGui.setOnClickListener(v -> sendOrder());
+        
+        if (btnTinhTien != null) {
+            btnTinhTien.setOnClickListener(v -> {
+                Intent intent = new Intent(this, HoaDonActivity.class);
+                intent.putExtra("ORDER_ID", orderId);
+                intent.putExtra("TABLE_NAME", tableName);
+                startActivity(intent);
+            });
+        }
     }
 
     private void sendOrder() {

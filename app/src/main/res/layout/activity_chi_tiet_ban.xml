@@ -247,7 +247,7 @@
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:layout_marginEnd="8dp"
-                    app:iiv_color="@color/accent"
+                    app:iiv_color="@color/primary"
                     app:iiv_icon="faw-utensils" />
 
                 <TextView
@@ -255,7 +255,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
                     android:text="Gửi bếp"
-                    android:textColor="@color/accent"
+                    android:textColor="@color/primary"
                     android:textSize="16sp" />
             </LinearLayout>
 
