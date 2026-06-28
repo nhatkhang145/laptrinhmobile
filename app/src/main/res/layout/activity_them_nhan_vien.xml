@@ -144,6 +144,7 @@
                     android:textSize="15sp" />
 
                 <com.mikepenz.iconics.view.IconicsImageView
+                    android:id="@+id/ivTogglePassword"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_gravity="end|center_vertical"
