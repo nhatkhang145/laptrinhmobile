@@ -40,8 +40,8 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Intege
 			FROM OrderDetail od
 			WHERE od.order.table.area.restaurant.id = :resId
 			AND od.status = 2
-			AND od.order.createdAt BETWEEN :startDate AND :endDate
-			ORDER BY od.updatedAt DESC, od.order.createdAt DESC
+			AND COALESCE(od.updatedAt, CURRENT_TIMESTAMP) BETWEEN :startDate AND :endDate
+			ORDER BY COALESCE(od.updatedAt, CURRENT_TIMESTAMP) DESC
 			""")
 	List<OrderDetail> findCancelledItems(
 			@Param("resId") Integer resId,
