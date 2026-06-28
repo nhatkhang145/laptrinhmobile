@@ -170,6 +170,13 @@ public interface ZappyApiService {
             @Query("toDate") String toDate
     );
 
+    @GET("api/orders/restaurant/{resId}/cancelled")
+    Call<List<Map<String, Object>>> getCancelledOrdersByRestaurant(
+            @Path("resId") int resId,
+            @Query("fromDate") String fromDate,
+            @Query("toDate") String toDate
+    );
+
     /** Nhan vien gui mon -> status=1 (KHOA, nhan vien khong sua/xoa duoc) */
     @PUT("api/orders/{orderId}/send")
     Call<Map> sendOrder(@Path("orderId") Integer orderId);
@@ -177,7 +184,7 @@ public interface ZappyApiService {
     /** QUAN LY huy mon da gui (status 1 -> 2) */
     @PUT("api/orders/details/{detailId}/cancel")
     Call<Map> cancelItem(@Path("detailId") Integer detailId,
-            @Body Map<String, Integer> data);
+            @Body Map<String, Object> data);
 
     /** Thanh toan: tinh tong, dong hoa don, ban -> trong */
     @POST("api/orders/{orderId}/checkout")

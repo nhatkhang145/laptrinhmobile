@@ -27,6 +27,10 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".Activity.CancelManageActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".Activity.ThemBanMoiActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />

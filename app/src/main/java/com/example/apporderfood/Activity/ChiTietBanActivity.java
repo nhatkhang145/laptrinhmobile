@@ -117,12 +117,25 @@ public class ChiTietBanActivity extends AppCompatActivity {
 
     private void cancelItem(OrderDetail detail) {
         if (detail.getId() == null) return;
+        
+        android.widget.EditText input = new android.widget.EditText(this);
+        input.setHint("Nhập lý do huỷ món...");
+        
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.setPadding(50, 20, 50, 0);
+        layout.addView(input);
+
         new androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle("Xác nhận hủy món")
             .setMessage("Hủy món " + (detail.getMenuItem() != null ? detail.getMenuItem().getItemName() : "") + "?")
+            .setView(layout)
             .setPositiveButton("Hủy món", (dialog, which) -> {
+                String reason = input.getText().toString().trim();
                 ZappyApiService api = RetrofitClient.getApiService();
-                Map<String, Integer> data = new java.util.HashMap<>();
+                Map<String, Object> data = new java.util.HashMap<>();
+                data.put("cancelReason", reason);
+                
                 api.cancelItem(detail.getId(), data).enqueue(new Callback<Map>() {
                     @Override
                     public void onResponse(Call<Map> call, Response<Map> response) {

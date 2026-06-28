@@ -40,10 +40,10 @@ import retrofit2.Response;
 public class ThongKeActivity extends AppCompatActivity {
 
     private IconicsImageView btnBack;
-    private TextView tvTotalRevenue, tvTotalOrders, tvAverageValue, tvDateRange;
-    private LinearLayout btnPickDate;
+    private TextView tvTotalRevenue, tvTotalOrders, tvAverageValue, tvDateRange, tvTotalCancelledItems;
+    private MaterialCardView cardTotalOrders, cardTotalCancelledItems;
+    private ImageButton btnPickDate;
     private View navOrder, navSoDo, navTienIch;
-    private View cardTotalOrders;
 
     private ZappyApiService apiService;
     private int currentResId = -1;
@@ -72,9 +72,6 @@ public class ThongKeActivity extends AppCompatActivity {
         initViews();
         setupListeners();
 
-
-
-
         // Mặc định load dữ liệu "Hôm nay"
         Calendar calendar = Calendar.getInstance();
         Date today = calendar.getTime();
@@ -93,6 +90,8 @@ public class ThongKeActivity extends AppCompatActivity {
         btnPickDate = findViewById(R.id.btnPickDate);
         tvDateRange = findViewById(R.id.tvDateRange);
         cardTotalOrders = findViewById(R.id.cardTotalOrders);
+        tvTotalCancelledItems = findViewById(R.id.tvTotalCancelledItems);
+        cardTotalCancelledItems = findViewById(R.id.cardTotalCancelledItems);
 
         navOrder = findViewById(R.id.navOrder);
         navSoDo = findViewById(R.id.navSoDo);
@@ -112,6 +111,13 @@ public class ThongKeActivity extends AppCompatActivity {
             if (!currentToDate.isEmpty()) {
                 intent.putExtra("TO_DATE", currentToDate + "T23:59:59");
             }
+            startActivity(intent);
+        });
+
+        cardTotalCancelledItems.setOnClickListener(v -> {
+            Intent intent = new Intent(this, CancelManageActivity.class);
+            if (!currentFromDate.isEmpty()) intent.putExtra("FROM_DATE", currentFromDate);
+            if (!currentToDate.isEmpty()) intent.putExtra("TO_DATE", currentToDate);
             startActivity(intent);
         });
 
@@ -163,6 +169,7 @@ public class ThongKeActivity extends AppCompatActivity {
         this.currentToDate = toDate;
 
         tvTotalRevenue.setText("Đang tính...");
+        DecimalFormat numberFormat = new DecimalFormat("#,###");
 
         apiService.getPaidOrdersByRestaurant(currentResId, fromDate, toDate).enqueue(new Callback<List<Map<String, Object>>>() {
             @Override
@@ -178,23 +185,37 @@ public class ThongKeActivity extends AppCompatActivity {
                         }
                     }
 
-                    double average = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-                    DecimalFormat formatter = new DecimalFormat("#,###");
+                    double avgValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
-                    tvTotalRevenue.setText(formatter.format(totalRevenue) + " đ");
+                    tvTotalRevenue.setText(numberFormat.format(totalRevenue) + " đ");
                     tvTotalOrders.setText(totalOrders + " đơn");
-                    tvAverageValue.setText(formatter.format(average) + " đ");
+                    tvAverageValue.setText(numberFormat.format(avgValue) + " đ");
 
                 } else {
-                    tvTotalRevenue.setText("Lỗi " + response.code());
-                    Toast.makeText(ThongKeActivity.this, "Lỗi lấy dữ liệu", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ThongKeActivity.this, "Không thể tải dữ liệu", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<List<Map<String, Object>>> call, Throwable t) {
-                Toast.makeText(ThongKeActivity.this, "Mất kết nối mạng!", Toast.LENGTH_SHORT).show();
-                tvTotalRevenue.setText("Lỗi mạng");
+                Toast.makeText(ThongKeActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        tvTotalCancelledItems.setText("...");
+        apiService.getCancelledOrdersByRestaurant(currentResId, fromDate, toDate).enqueue(new Callback<List<Map<String, Object>>>() {
+            @Override
+            public void onResponse(Call<List<Map<String, Object>>> call, Response<List<Map<String, Object>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    tvTotalCancelledItems.setText(response.body().size() + " món");
+                } else {
+                    tvTotalCancelledItems.setText("Lỗi");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Map<String, Object>>> call, Throwable t) {
+                tvTotalCancelledItems.setText("Lỗi");
             }
         });
     }
