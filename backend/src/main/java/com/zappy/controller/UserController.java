@@ -172,4 +172,14 @@ public class UserController {
             return ResponseEntity.ok(Map.of("message", "Đăng xuất thành công!"));
         }).orElse(ResponseEntity.notFound().build());
     }
+    // Khoa / Mo khoa tai khoan nhan vien
+    @PutMapping("/{id}/toggle-lock")
+    public ResponseEntity<?> toggleLock(@PathVariable Integer id) {
+        return userRepo.findById(id).map(user -> {
+            boolean currentStatus = user.getIsActive() != null ? user.getIsActive() : true;
+            user.setIsActive(!currentStatus);
+            userRepo.save(user);
+            return ResponseEntity.ok(Map.of("isActive", user.getIsActive()));
+        }).orElse(ResponseEntity.notFound().build());
+    }
 }

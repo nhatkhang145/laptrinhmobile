@@ -3,20 +3,30 @@ package com.example.apporderfood.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.apporderfood.Activity.ChiTietNhanVienActivity;
 import com.example.apporderfood.R;
+import com.example.apporderfood.api.RetrofitClient;
+import com.example.apporderfood.api.ZappyApiService;
 import com.example.apporderfood.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHolder> {
 
@@ -123,7 +133,6 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
             } else {
                 holder.tvStatusDetail.setText("Ngoại tuyến");
                 holder.tvStatusDetail.setTextColor(Color.parseColor("#9CA3AF")); // Xám
-                // Đảm bảo bạn đã tạo file bg_offline_dot.xml màu xám nhé!
                 holder.viewStatusDot.setBackgroundResource(R.drawable.bg_offline_dot);
             }
         }
@@ -132,6 +141,60 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
             // Truyền toàn bộ object user sang màn hình Chi tiết
             intent.putExtra("USER_DATA", user);
             context.startActivity(intent);
+        });
+        boolean isCurrentlyActive = (isActive == null || isActive);
+        if (isCurrentlyActive) {
+            holder.btnLock.setImageResource(R.drawable.ic_lock);
+            holder.btnLock.setColorFilter(Color.parseColor("#EF4444"));
+
+        } else {
+            holder.btnLock.setImageResource(R.drawable.ic_lock_reset_nv);
+            holder.btnLock.setColorFilter(Color.parseColor("#10B981"));
+        }
+
+        // 2. Bắt sự kiện bấm nút ổ khóa
+        holder.btnLock.setOnClickListener(v -> {
+            String actionName = isCurrentlyActive ? "khóa" : "mở khóa";
+
+            new androidx.appcompat.app.AlertDialog.Builder(context)
+                    .setTitle(isCurrentlyActive ? "Khóa tài khoản" : "Mở khóa tài khoản")
+                    .setMessage("Bạn có chắc muốn " + actionName + " tài khoản của " + (user.getFullname() != null ? user.getFullname() : user.getUsername()) + " không?")
+                    .setPositiveButton("Đồng ý", (dialog, which) -> {
+                        // Gọi API cập nhật trạng thái
+                        ZappyApiService api = RetrofitClient.getApiService();
+                        api.toggleLockUser(user.getId()).enqueue(new retrofit2.Callback<Map<String, Boolean>>() {
+                            @Override
+                            public void onResponse(Call<Map<String, Boolean>> call,Response<Map<String, Boolean>> response) {
+
+                                if (response.isSuccessful() && response.body() != null) {
+
+                                    Boolean newStatus = response.body().get("isActive");
+
+                                    user.setIsActive(newStatus);
+
+                                    int adapterPosition = holder.getAdapterPosition();
+
+                                    if (adapterPosition != RecyclerView.NO_POSITION) {
+                                        notifyItemChanged(adapterPosition);
+                                    }
+
+                                    Toast.makeText(context,"Đã " + actionName + " tài khoản!",Toast.LENGTH_SHORT).show();
+
+                                }
+
+
+
+                            }
+
+                            @Override
+                            public void onFailure(Call<Map<String, Boolean>> call,Throwable t) {
+
+                                Toast.makeText(context,"Lỗi mạng!",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    })
+                    .setNegativeButton("Hủy", null)
+                    .show();
         });
     }
 
@@ -143,6 +206,7 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
     public static class StaffViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvContact, tvRoleTag, tvStatusDetail;
         View viewStatusDot;
+        ImageView btnLock ;
         public StaffViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvName);
@@ -150,6 +214,7 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
             tvRoleTag = itemView.findViewById(R.id.tvRoleTag);
             tvStatusDetail = itemView.findViewById(R.id.tvStatusDetail);
             viewStatusDot = itemView.findViewById(R.id.viewStatusDot);
+            btnLock= itemView.findViewById(R.id.btnLock);
         }
     }
 }
