@@ -89,7 +89,7 @@
                     android:background="@color/danger_text"
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="2dp"
-                    android:text="ADMIN"
+                    android:text="QUẢN LÝ"
                     android:textColor="@color/white"
                     android:textSize="10sp"
                     android:textStyle="bold"

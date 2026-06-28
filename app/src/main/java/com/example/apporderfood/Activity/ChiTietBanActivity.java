@@ -101,9 +101,11 @@ public class ChiTietBanActivity extends AppCompatActivity {
 
     private void setupRecyclerView() {
         android.content.SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
-        boolean isAdmin = prefs.getInt("ROLE", 0) == 1;
+        int userRole = prefs.getInt("ROLE", 0);
+        boolean isAdmin = userRole == 1;
+        boolean canCheckout = userRole == 1 || userRole == 2;
         
-        if (!isAdmin && btnTinhTien != null) {
+        if (!canCheckout && btnTinhTien != null) {
             btnTinhTien.setVisibility(View.GONE);
         }
 

@@ -86,7 +86,7 @@ public class TienIchActivity extends AppCompatActivity {
             tvUserName.setText("Chưa cập nhật tên");
         }
 
-        if (role == 0) { // Nhan vien
+        if (role != 1) { // An voi nhung ai khong phai Admin (role 0 va 2)
             View tvAdminSectionTitle = findViewById(R.id.tvAdminSectionTitle);
             View adminMenuCard = findViewById(R.id.adminMenuCard);
             if (tvAdminSectionTitle != null) tvAdminSectionTitle.setVisibility(View.GONE);
