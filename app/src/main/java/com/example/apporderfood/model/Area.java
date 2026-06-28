@@ -13,9 +13,11 @@ public class Area implements Serializable {
     @SerializedName("isActive")
     private Boolean isActive;
 
-    private Integer itemCount; // Not in DB, but used in UI to count tables
+    private Integer itemCount;
+    private String tableNames;
 
-    public Area() {}
+    public Area() {
+    }
 
     public Area(Integer id, String areaName, Boolean isActive) {
         this.id = id;
@@ -29,10 +31,18 @@ public class Area implements Serializable {
         this.isActive = true;
     }
 
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public Integer getId() {
+        return id;
+    }
 
-    public String getAreaName() { return areaName; }
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getAreaName() {
+        return areaName;
+    }
+
     public void setAreaName(String areaName) {
         this.areaName = areaName;
     }
@@ -51,5 +61,13 @@ public class Area implements Serializable {
 
     public void setItemCount(Integer itemCount) {
         this.itemCount = itemCount;
+    }
+
+    public String getTableNames() {
+        return tableNames;
+    }
+
+    public void setTableNames(String tableNames) {
+        this.tableNames = tableNames;
     }
 }

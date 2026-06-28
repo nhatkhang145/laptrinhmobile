@@ -293,9 +293,13 @@ public class ThemBanMoiActivity extends AppCompatActivity {
     }
 
     private void createTable(int areaId, String tableName) {
+        String seatsStr = edtTableSeats.getText().toString().trim();
+        int seats = seatsStr.isEmpty() ? 0 : Integer.parseInt(seatsStr);
+
         Map<String, Object> body = new HashMap<>();
         body.put("areaId", areaId);
         body.put("tableName", tableName);
+        body.put("seats", seats);
         body.put("status", isToggleOn ? "HOẠT ĐỘNG" : "ĐANG KHÓA");
 
         ZappyApiService api = RetrofitClient.getApiService();
@@ -327,8 +331,13 @@ public class ThemBanMoiActivity extends AppCompatActivity {
     }
 
     private void updateTable(int tableId, String tableName) {
+        String seatsStr = edtTableSeats.getText().toString().trim();
+        int seats = seatsStr.isEmpty() ? 0 : Integer.parseInt(seatsStr);
+
         Map<String, Object> body = new HashMap<>();
         body.put("tableName", tableName);
+        body.put("seats", seats);
+        body.put("areaId", selectedAreaId);
         body.put("status", isToggleOn ? "HOẠT ĐỘNG" : "ĐANG KHÓA");
 
         ZappyApiService api = RetrofitClient.getApiService();

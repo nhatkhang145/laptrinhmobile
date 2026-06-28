@@ -59,7 +59,9 @@ public class AreaManageAdapter extends RecyclerView.Adapter<AreaManageAdapter.Ar
         boolean active = item.getIsActive() != null ? item.getIsActive() : true;
         applyStatusStyle(holder.tvAreaStatus, active);
 
-        holder.tvAreaInfo.setVisibility(View.GONE);
+        holder.tvAreaInfo.setVisibility(View.VISIBLE);
+        int tableCount = item.getItemCount() != null ? item.getItemCount() : 0;
+        holder.tvAreaInfo.setText(tableCount + " bàn");
 
         // Nhấn badge trạng thái → toggle ngay
         holder.tvAreaStatus.setOnClickListener(v -> {

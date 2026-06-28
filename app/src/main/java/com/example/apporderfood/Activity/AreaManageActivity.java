@@ -124,12 +124,16 @@ public class AreaManageActivity extends AppCompatActivity
                                     List<TableModel> tables = responseMenu.body();
                                     for (Area cat : AreaList) {
                                         int count = 0;
+                                        StringBuilder names = new StringBuilder();
                                         for (TableModel item : tables) {
                                             if (item.getArea() != null && item.getArea().getId() != null && item.getArea().getId().equals(cat.getId())) {
                                                 count++;
+                                                if (names.length() > 0) names.append(", ");
+                                                names.append(item.getTableName());
                                             }
                                         }
                                         cat.setItemCount(count);
+                                        cat.setTableNames(names.toString());
                                     }
                                 }
                                 displayAreas(AreaList);
@@ -288,6 +292,9 @@ public class AreaManageActivity extends AppCompatActivity
 
     @Override
     public void onItemClick(Area item) {
+        Intent intent = new Intent(this, ChiTietKhuVucActivity.class);
+        intent.putExtra("AREA_DATA", item);
+        startActivity(intent);
     }
 
     private void setupBottomNav() {
