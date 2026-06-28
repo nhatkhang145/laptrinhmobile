@@ -133,10 +133,8 @@ public class ChiTietBanActivity extends AppCompatActivity {
             .setPositiveButton("Hủy món", (dialog, which) -> {
                 String reason = input.getText().toString().trim();
                 ZappyApiService api = RetrofitClient.getApiService();
-                Map<String, Object> data = new java.util.HashMap<>();
-                data.put("cancelReason", reason);
                 
-                api.cancelItem(detail.getId(), data).enqueue(new Callback<Map>() {
+                api.cancelItem(detail.getId(), reason, new java.util.HashMap<>()).enqueue(new Callback<Map>() {
                     @Override
                     public void onResponse(Call<Map> call, Response<Map> response) {
                         if (response.isSuccessful()) {

@@ -184,7 +184,8 @@ public interface ZappyApiService {
     /** QUAN LY huy mon da gui (status 1 -> 2) */
     @PUT("api/orders/details/{detailId}/cancel")
     Call<Map> cancelItem(@Path("detailId") Integer detailId,
-            @Body Map<String, Object> data);
+            @Query("cancelReason") String cancelReason,
+            @Body Map<String, Integer> dummyData);
 
     /** Thanh toan: tinh tong, dong hoa don, ban -> trong */
     @POST("api/orders/{orderId}/checkout")
