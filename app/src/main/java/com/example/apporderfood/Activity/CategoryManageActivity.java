@@ -21,7 +21,13 @@ import com.example.apporderfood.adapter.CategoryManageAdapter;
 import com.example.apporderfood.api.RetrofitClient;
 import com.example.apporderfood.api.ZappyApiService;
 import com.example.apporderfood.model.Category;
+import com.example.apporderfood.model.MenuItem;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +62,14 @@ public class CategoryManageActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_quan_ly_danh_muc);
+        
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
         resId = prefs.getInt("RES_ID", -1);
@@ -103,17 +116,38 @@ public class CategoryManageActivity extends AppCompatActivity
                 if (response.isSuccessful() && response.body() != null) {
                     List<Category> categoryList = response.body();
                     if (categoryList.isEmpty()) {
+                        if (pbLoading != null) pbLoading.setVisibility(View.GONE);
                         if (tvEmptyState != null) tvEmptyState.setVisibility(View.VISIBLE);
                     } else {
-                        if (tvEmptyState != null) tvEmptyState.setVisibility(View.GONE);
-                        adapter = new CategoryManageAdapter(categoryList, CategoryManageActivity.this);
-                        if (rvCategoryList != null) {
-                            rvCategoryList.setVisibility(View.VISIBLE);
-                            rvCategoryList.setAdapter(adapter);
-                        }
-                        updateStats(categoryList);
+                        // Gọi thêm API lấy menu để đếm số món cho mỗi danh mục
+                        api.getMenuByRestaurant(resId, "").enqueue(new Callback<List<MenuItem>>() {
+                            @Override
+                            public void onResponse(Call<List<MenuItem>> call, Response<List<MenuItem>> responseMenu) {
+                                if (pbLoading != null) pbLoading.setVisibility(View.GONE);
+                                if (responseMenu.isSuccessful() && responseMenu.body() != null) {
+                                    List<MenuItem> menuItems = responseMenu.body();
+                                    for (Category cat : categoryList) {
+                                        int count = 0;
+                                        for (MenuItem item : menuItems) {
+                                            if (item.getCategory() != null && item.getCategory().getId().equals(cat.getId())) {
+                                                count++;
+                                            }
+                                        }
+                                        cat.setItemCount(count);
+                                    }
+                                }
+                                displayCategories(categoryList);
+                            }
+
+                            @Override
+                            public void onFailure(Call<List<MenuItem>> call, Throwable t) {
+                                if (pbLoading != null) pbLoading.setVisibility(View.GONE);
+                                displayCategories(categoryList);
+                            }
+                        });
                     }
                 } else {
+                    if (pbLoading != null) pbLoading.setVisibility(View.GONE);
                     Toast.makeText(CategoryManageActivity.this, "Lỗi tải danh mục", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -124,6 +158,16 @@ public class CategoryManageActivity extends AppCompatActivity
                 Toast.makeText(CategoryManageActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void displayCategories(List<Category> categoryList) {
+        if (tvEmptyState != null) tvEmptyState.setVisibility(View.GONE);
+        adapter = new CategoryManageAdapter(categoryList, CategoryManageActivity.this);
+        if (rvCategoryList != null) {
+            rvCategoryList.setVisibility(View.VISIBLE);
+            rvCategoryList.setAdapter(adapter);
+        }
+        updateStats(categoryList);
     }
 
     private void updateStats(List<Category> list) {
