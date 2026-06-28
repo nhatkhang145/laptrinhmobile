@@ -146,7 +146,7 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
         }
         if (tvTotalTables != null) tvTotalTables.setText(String.valueOf(total));
         if (tvActiveTables != null) tvActiveTables.setText(String.valueOf(active));
-        if (tvLockedTables != null) tvLockedTables.setText(String.format(Locale.getDefault(), "%02d", locked));
+        if (tvLockedTables != null) tvLockedTables.setText(String.valueOf(locked));
     }
 
     /** Cập nhật stats sau khi toggle status mà không cần reload API ngay lập tức */
