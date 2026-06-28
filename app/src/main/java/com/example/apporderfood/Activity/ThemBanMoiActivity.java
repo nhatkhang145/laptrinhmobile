@@ -47,6 +47,7 @@ public class ThemBanMoiActivity extends AppCompatActivity {
     private String selectedAreaName = "";
     private Integer selectedAreaId = null;  // ID thực của khu vực
     private boolean isEditMode = false;
+    private boolean areaExplicitlyChanged = false; // Chỉ đổi khu vực khi user bấm chip
     private TableModel editingTable = null;
 
     // Danh sách khu vực từ API
@@ -153,8 +154,9 @@ public class ThemBanMoiActivity extends AppCompatActivity {
                     (int) (8 * getResources().getDisplayMetrics().density)
             );
             
-            // Check if this area is currently selected
-            if (selectedAreaName.equals(area.getAreaName())) {
+            // So sánh bằng ID để tránh nhầm khu vực trùng tên
+            boolean isSelected = selectedAreaId != null && selectedAreaId.equals(area.getId());
+            if (isSelected) {
                 chip.setBackgroundResource(R.drawable.bg_tab_active_dark);
                 chip.setTextColor(ContextCompat.getColor(this, R.color.white));
             } else {
@@ -167,7 +169,7 @@ public class ThemBanMoiActivity extends AppCompatActivity {
             
             chip.setOnClickListener(v -> {
                 selectArea(area.getAreaName(), area.getId());
-                // Re-render chips to update colors
+                areaExplicitlyChanged = true; // đánh dấu user đã tự chọn khu vực
                 updateChipsWithAreas();
             });
             
@@ -337,8 +339,11 @@ public class ThemBanMoiActivity extends AppCompatActivity {
         Map<String, Object> body = new HashMap<>();
         body.put("tableName", tableName);
         body.put("seats", seats);
-        body.put("areaId", selectedAreaId);
         body.put("status", isToggleOn ? "HOẠT ĐỘNG" : "ĐANG KHÓA");
+        // Chỉ đổi khu vực khi user bấm chip - tránh đổi nhầm do trùng tên
+        if (areaExplicitlyChanged && selectedAreaId != null) {
+            body.put("areaId", selectedAreaId);
+        }
 
         ZappyApiService api = RetrofitClient.getApiService();
         api.updateTable(tableId, body).enqueue(new Callback<TableModel>() {
