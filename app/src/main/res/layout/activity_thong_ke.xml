@@ -81,47 +81,31 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Filter Tabs -->
+            <!-- Filter Button -->
             <LinearLayout
+                android:id="@+id/btnPickDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_nav_active"
-                android:padding="4dp"
-                android:baselineAligned="false"
+                android:background="@drawable/bg_btn_secondary"
+                android:padding="12dp"
+                android:gravity="center"
                 android:orientation="horizontal">
 
+                <com.mikepenz.iconics.view.IconicsImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    app:iiv_icon="faw-calendar-alt"
+                    app:iiv_color="@color/text_primary"
+                    android:layout_marginEnd="8dp"/>
+
                 <TextView
-                    android:id="@+id/tabToday"
-                    android:layout_width="0dp"
+                    android:id="@+id/tvDateRange"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_btn_primary"
-                    android:backgroundTint="@color/white"
-                    android:gravity="center"
-                    android:paddingVertical="10dp"
-                    android:text="@string/tab_hom_nay"
                     android:textColor="@color/text_primary"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tabWeek"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:paddingVertical="10dp"
-                    android:text="@string/tab_tuan_nay"
-                    android:textColor="@color/text_secondary" />
-
-                <TextView
-                    android:id="@+id/tabMonth"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:paddingVertical="10dp"
-                    android:text="@string/tab_thang_nay"
-                    android:textColor="@color/text_secondary" />
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:text="Hôm nay" />
             </LinearLayout>
 
             <!-- Main Revenue Card -->
@@ -177,6 +161,7 @@
 
                 <!-- Total Orders -->
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardTotalOrders"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
@@ -229,7 +214,7 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Cancelled Items -->
+                <!-- Average Value -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -251,83 +236,29 @@
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:background="@drawable/bg_icon_red">
-
-                            <ImageView
+                            <com.mikepenz.iconics.view.IconicsImageView
                                 android:layout_width="20dp"
                                 android:layout_height="20dp"
                                 android:layout_gravity="center"
-                                android:src="@drawable/ic_cricle_xmark"
-                                app:tint="@color/danger"
-                                android:contentDescription="@string/label_mon_da_huy" />
+                                app:iiv_icon="faw-coins"
+                                app:iiv_color="#EF4444"
+                                app:iiv_size="18dp" />
                         </FrameLayout>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="12dp"
-                            android:text="@string/label_mon_da_huy"
+                            android:text="Trung bình/đơn"
                             android:textColor="@color/text_secondary"
                             android:textSize="14sp" />
 
-                        <!-- DỮ LIỆU ĐỘNG: Số món đã hủy -->
                         <TextView
-                            android:id="@+id/tvCancelledItems"
+                            android:id="@+id/tvAverageValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="3 món"
-                            android:textColor="@color/text_primary"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Unpaid Tables -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:layout_marginEnd="8dp"
-                    app:cardBackgroundColor="@color/white"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="2dp"
-                    app:strokeWidth="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <FrameLayout
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:background="@drawable/bg_icon_orange">
-
-                            <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/ic_table"
-                                app:tint="#F97316"
-                                android:contentDescription="@string/label_ban_chua_thanh_toan" />
-                        </FrameLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:text="@string/label_ban_chua_thanh_toan"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="14sp" />
-
-                        <!-- DỮ LIỆU ĐỘNG: Số bàn chưa thanh toán -->
-                        <TextView
-                            android:id="@+id/tvUnpaidTables"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="5 bàn"
+                            android:text="0 đ"
                             android:textColor="@color/text_primary"
                             android:textSize="18sp"
                             android:textStyle="bold" />

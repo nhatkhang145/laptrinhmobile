@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -15,13 +16,21 @@ import androidx.activity.EdgeToEdge;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.util.Pair;
 
 import com.example.apporderfood.R;
 import com.example.apporderfood.api.RetrofitClient;
 import com.example.apporderfood.api.ZappyApiService;
 import com.mikepenz.iconics.view.IconicsImageView;
+import com.google.android.material.datepicker.MaterialDatePicker;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -31,12 +40,18 @@ import retrofit2.Response;
 public class ThongKeActivity extends AppCompatActivity {
 
     private IconicsImageView btnBack;
-    private TextView tvTotalRevenue, tvTotalOrders, tvCancelledItems, tvUnpaidTables;
-    private TextView tabToday, tabWeek, tabMonth;
+    private TextView tvTotalRevenue, tvTotalOrders, tvAverageValue, tvDateRange;
+    private LinearLayout btnPickDate;
     private View navOrder, navSoDo, navTienIch;
+    private View cardTotalOrders;
 
     private ZappyApiService apiService;
     private int currentResId = -1;
+    private SimpleDateFormat displayFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+    private SimpleDateFormat apiFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+    
+    private String currentFromDate = "";
+    private String currentToDate = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +76,11 @@ public class ThongKeActivity extends AppCompatActivity {
 
 
         // Mặc định load dữ liệu "Hôm nay"
-        selectTab(tabToday, "today");
+        Calendar calendar = Calendar.getInstance();
+        Date today = calendar.getTime();
+        String displayDate = displayFormat.format(today);
+        tvDateRange.setText(displayDate);
+        fetchPaidOrders(apiFormat.format(today), apiFormat.format(today));
     }
 
     private void initViews() {
@@ -69,12 +88,11 @@ public class ThongKeActivity extends AppCompatActivity {
 
         tvTotalRevenue = findViewById(R.id.tvTotalRevenue);
         tvTotalOrders = findViewById(R.id.tvTotalOrders);
-        tvCancelledItems = findViewById(R.id.tvCancelledItems);
-        tvUnpaidTables = findViewById(R.id.tvUnpaidTables);
-
-        tabToday = findViewById(R.id.tabToday);
-        tabWeek = findViewById(R.id.tabWeek);
-        tabMonth = findViewById(R.id.tabMonth);
+        tvAverageValue = findViewById(R.id.tvAverageValue);
+        
+        btnPickDate = findViewById(R.id.btnPickDate);
+        tvDateRange = findViewById(R.id.tvDateRange);
+        cardTotalOrders = findViewById(R.id.cardTotalOrders);
 
         navOrder = findViewById(R.id.navOrder);
         navSoDo = findViewById(R.id.navSoDo);
@@ -84,10 +102,18 @@ public class ThongKeActivity extends AppCompatActivity {
     private void setupListeners() {
         btnBack.setOnClickListener(v -> finish());
 
-        // Call API theo period (Hôm nay, Tuần, Tháng)
-        tabToday.setOnClickListener(v -> selectTab(tabToday, "today"));
-        tabWeek.setOnClickListener(v -> selectTab(tabWeek, "week"));
-        tabMonth.setOnClickListener(v -> selectTab(tabMonth, "month"));
+        btnPickDate.setOnClickListener(v -> showDateRangePicker());
+        
+        cardTotalOrders.setOnClickListener(v -> {
+            Intent intent = new Intent(this, InvoiceManageActivity.class);
+            if (!currentFromDate.isEmpty()) {
+                intent.putExtra("FROM_DATE", currentFromDate + "T00:00:00");
+            }
+            if (!currentToDate.isEmpty()) {
+                intent.putExtra("TO_DATE", currentToDate + "T23:59:59");
+            }
+            startActivity(intent);
+        });
 
         navOrder.setOnClickListener(v -> {
             startActivity(new Intent(this, DanhSachOrderActivity.class));
@@ -104,63 +130,69 @@ public class ThongKeActivity extends AppCompatActivity {
         });
     }
 
-    private void selectTab(TextView selectedTab, String period) {
-        // Reset Style
-        TextView[] tabs = {tabToday, tabWeek, tabMonth};
-        for (TextView tab : tabs) {
-            tab.setBackground(null);
-            tab.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-            tab.setTypeface(null, Typeface.NORMAL);
-        }
+    private void showDateRangePicker() {
+        MaterialDatePicker<Pair<Long, Long>> dateRangePicker =
+                MaterialDatePicker.Builder.dateRangePicker()
+                        .setTitleText("Chọn khoảng thời gian")
+                        .build();
 
-        // Active Style
-        selectedTab.setBackgroundResource(R.drawable.bg_btn_primary);
-        selectedTab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white)));
-        selectedTab.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
-        selectedTab.setTypeface(null, Typeface.BOLD);
-
-        // Fetch Data từ Server
-        fetchStats(period);
+        dateRangePicker.addOnPositiveButtonClickListener(selection -> {
+            Long startDate = selection.first;
+            Long endDate = selection.second;
+            
+            if (startDate != null && endDate != null) {
+                Date start = new Date(startDate);
+                Date end = new Date(endDate);
+                
+                String displayText = displayFormat.format(start);
+                if (!displayFormat.format(start).equals(displayFormat.format(end))) {
+                    displayText += " - " + displayFormat.format(end);
+                }
+                tvDateRange.setText(displayText);
+                
+                fetchPaidOrders(apiFormat.format(start), apiFormat.format(end));
+            }
+        });
+        dateRangePicker.show(getSupportFragmentManager(), "DATE_PICKER");
     }
 
-    private void fetchStats(String period) {
+    private void fetchPaidOrders(String fromDate, String toDate) {
         if (currentResId == -1) return;
+        
+        this.currentFromDate = fromDate;
+        this.currentToDate = toDate;
 
         tvTotalRevenue.setText("Đang tính...");
 
-        apiService.getDashboardStats(currentResId, period).enqueue(new Callback<Map<String, Object>>() {
+        apiService.getPaidOrdersByRestaurant(currentResId, fromDate, toDate).enqueue(new Callback<List<Map<String, Object>>>() {
             @Override
-            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
-
+            public void onResponse(Call<List<Map<String, Object>>> call, Response<List<Map<String, Object>>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    try {
-                        Map<String, Object> data = response.body();
+                    List<Map<String, Object>> orders = response.body();
+                    double totalRevenue = 0;
+                    int totalOrders = orders.size();
 
-
-                        double revenue = ((Number) data.get("totalRevenue")).doubleValue();
-                        int orders = ((Number) data.get("totalOrders")).intValue();
-                        int cancelled = ((Number) data.get("cancelledItems")).intValue();
-                        int unpaid = ((Number) data.get("unpaidTables")).intValue();
-
-                        DecimalFormat formatter = new DecimalFormat("#,###");
-
-                        tvTotalRevenue.setText(formatter.format(revenue) + " đ");
-                        tvTotalOrders.setText(orders + " đơn");
-                        tvCancelledItems.setText(cancelled + " món");
-                        tvUnpaidTables.setText(unpaid + " bàn");
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Toast.makeText(ThongKeActivity.this, "Lỗi đọc dữ liệu thống kê!", Toast.LENGTH_SHORT).show();
+                    for (Map<String, Object> order : orders) {
+                        if (order.get("totalAmount") != null) {
+                            totalRevenue += ((Number) order.get("totalAmount")).doubleValue();
+                        }
                     }
+
+                    double average = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+                    DecimalFormat formatter = new DecimalFormat("#,###");
+
+                    tvTotalRevenue.setText(formatter.format(totalRevenue) + " đ");
+                    tvTotalOrders.setText(totalOrders + " đơn");
+                    tvAverageValue.setText(formatter.format(average) + " đ");
+
                 } else {
                     tvTotalRevenue.setText("Lỗi " + response.code());
-                    Toast.makeText(ThongKeActivity.this, "Lỗi từ Server: " + response.code(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ThongKeActivity.this, "Lỗi lấy dữ liệu", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
+            public void onFailure(Call<List<Map<String, Object>>> call, Throwable t) {
                 Toast.makeText(ThongKeActivity.this, "Mất kết nối mạng!", Toast.LENGTH_SHORT).show();
                 tvTotalRevenue.setText("Lỗi mạng");
             }

@@ -11,6 +11,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.apporderfood.R;
 import com.example.apporderfood.adapter.InvoiceManageAdapter;
@@ -42,12 +46,41 @@ public class InvoiceManageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_invoice_manage);
+        
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         SharedPreferences prefs = getSharedPreferences("ZappySession", Context.MODE_PRIVATE);
         resId = prefs.getInt("RES_ID", -1);
 
         initViews();
+        
+        android.content.Intent intent = getIntent();
+        if (intent != null) {
+            if (intent.hasExtra("FROM_DATE")) {
+                fromDateStr = intent.getStringExtra("FROM_DATE");
+                if (fromDateStr != null && fromDateStr.length() >= 10) {
+                    String[] parts = fromDateStr.substring(0, 10).split("-");
+                    if (parts.length == 3) tvFromDate.setText(parts[2] + "/" + parts[1] + "/" + parts[0]);
+                }
+            }
+            if (intent.hasExtra("TO_DATE")) {
+                toDateStr = intent.getStringExtra("TO_DATE");
+                if (toDateStr != null && toDateStr.length() >= 10) {
+                    String[] parts = toDateStr.substring(0, 10).split("-");
+                    if (parts.length == 3) tvToDate.setText(parts[2] + "/" + parts[1] + "/" + parts[0]);
+                }
+            }
+            if (fromDateStr != null || toDateStr != null) {
+                btnClearFilter.setVisibility(View.VISIBLE);
+            }
+        }
+        
         setupRecyclerView();
         
         btnBack.setOnClickListener(v -> finish());
