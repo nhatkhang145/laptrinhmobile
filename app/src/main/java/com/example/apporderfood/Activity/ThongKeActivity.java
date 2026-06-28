@@ -10,6 +10,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.LinearLayout;
 
+import com.google.android.material.card.MaterialCardView;
+import com.example.apporderfood.Activity.InvoiceManageActivity;
+import com.example.apporderfood.Activity.CancelManageActivity;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.activity.EdgeToEdge;
@@ -42,7 +46,7 @@ public class ThongKeActivity extends AppCompatActivity {
     private IconicsImageView btnBack;
     private TextView tvTotalRevenue, tvTotalOrders, tvAverageValue, tvDateRange, tvTotalCancelledItems;
     private MaterialCardView cardTotalOrders, cardTotalCancelledItems;
-    private ImageButton btnPickDate;
+    private LinearLayout btnPickDate;
     private View navOrder, navSoDo, navTienIch;
 
     private ZappyApiService apiService;
@@ -104,33 +108,29 @@ public class ThongKeActivity extends AppCompatActivity {
         btnPickDate.setOnClickListener(v -> showDateRangePicker());
         
         cardTotalOrders.setOnClickListener(v -> {
-            Intent intent = new Intent(this, InvoiceManageActivity.class);
-            if (!currentFromDate.isEmpty()) {
-                intent.putExtra("FROM_DATE", currentFromDate + "T00:00:00");
-            }
-            if (!currentToDate.isEmpty()) {
-                intent.putExtra("TO_DATE", currentToDate + "T23:59:59");
-            }
+            Intent intent = new Intent(ThongKeActivity.this, InvoiceManageActivity.class);
+            if (currentFromDate != null) intent.putExtra("FROM_DATE", currentFromDate);
+            if (currentToDate != null) intent.putExtra("TO_DATE", currentToDate);
             startActivity(intent);
         });
 
         cardTotalCancelledItems.setOnClickListener(v -> {
-            Intent intent = new Intent(this, CancelManageActivity.class);
+            Intent intent = new Intent(ThongKeActivity.this, CancelManageActivity.class);
             if (!currentFromDate.isEmpty()) intent.putExtra("FROM_DATE", currentFromDate);
             if (!currentToDate.isEmpty()) intent.putExtra("TO_DATE", currentToDate);
             startActivity(intent);
         });
 
         navOrder.setOnClickListener(v -> {
-            startActivity(new Intent(this, DanhSachOrderActivity.class));
+            startActivity(new Intent(ThongKeActivity.this, DanhSachOrderActivity.class));
             overridePendingTransition(0, 0);
         });
         navSoDo.setOnClickListener(v -> {
-            startActivity(new Intent(this, SoDobanActivity.class));
+            startActivity(new Intent(ThongKeActivity.this, SoDobanActivity.class));
             overridePendingTransition(0, 0);
         });
         navTienIch.setOnClickListener(v -> {
-            startActivity(new Intent(this, TienIchActivity.class));
+            startActivity(new Intent(ThongKeActivity.this, TienIchActivity.class));
             overridePendingTransition(0, 0);
             finish();
         });
