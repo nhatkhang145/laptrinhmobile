@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +49,7 @@ public class AreaManageActivity extends AppCompatActivity
     private ProgressBar pbLoading;
     private TextView tvEmptyState;
     private TextView tvTotalAreas, tvActiveAreas, tvHiddenAreas;
+    private EditText etSearch;
 
     private int resId = -1;
 
@@ -88,6 +92,7 @@ public class AreaManageActivity extends AppCompatActivity
         tvTotalAreas   = findViewById(R.id.tvTotalAreas);
         tvActiveAreas  = findViewById(R.id.tvActiveAreas);
         tvHiddenAreas  = findViewById(R.id.tvHiddenAreas);
+        etSearch       = findViewById(R.id.etSearch);
     }
 
     private void setupRecyclerView() {
@@ -196,6 +201,16 @@ public class AreaManageActivity extends AppCompatActivity
             fabAddArea.setOnClickListener(v -> {
                 Intent intent = new Intent(this, ThemKhuVucActivity.class);
                 addAreaLauncher.launch(intent);
+            });
+        }
+
+        if (etSearch != null) {
+            etSearch.addTextChangedListener(new TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (adapter != null) adapter.filter(s.toString());
+                }
+                @Override public void afterTextChanged(Editable s) {}
             });
         }
     }

@@ -76,6 +76,7 @@
                         android:contentDescription="Search" />
 
                     <EditText
+                        android:id="@+id/etSearch"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_marginStart="8dp"

@@ -14,6 +14,7 @@ import java.util.List;
 public class TableManageAdapter extends RecyclerView.Adapter<TableManageAdapter.TableViewHolder> {
 
     private List<TableModel> tableList;
+    private List<TableModel> fullList;
     private OnTableItemClickListener listener;
 
     public interface OnTableItemClickListener {
@@ -25,7 +26,24 @@ public class TableManageAdapter extends RecyclerView.Adapter<TableManageAdapter.
 
     public TableManageAdapter(List<TableModel> tableList, OnTableItemClickListener listener) {
         this.tableList = tableList;
+        this.fullList = tableList;
         this.listener = listener;
+    }
+
+    public void filter(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            tableList = fullList;
+        } else {
+            String q = query.toLowerCase().trim();
+            java.util.List<TableModel> filtered = new java.util.ArrayList<>();
+            for (TableModel t : fullList) {
+                if (t.getTableName() != null && t.getTableName().toLowerCase().contains(q)) {
+                    filtered.add(t);
+                }
+            }
+            tableList = filtered;
+        }
+        notifyDataSetChanged();
     }
 
     public List<TableModel> getTableList() {

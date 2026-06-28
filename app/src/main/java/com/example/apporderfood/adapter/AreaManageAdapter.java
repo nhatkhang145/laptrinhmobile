@@ -14,6 +14,7 @@ import java.util.List;
 public class AreaManageAdapter extends RecyclerView.Adapter<AreaManageAdapter.AreaViewHolder> {
 
     private List<Area> AreaList;
+    private List<Area> fullList;
     private OnAreaItemClickListener listener;
 
     public interface OnAreaItemClickListener {
@@ -25,7 +26,24 @@ public class AreaManageAdapter extends RecyclerView.Adapter<AreaManageAdapter.Ar
 
     public AreaManageAdapter(List<Area> AreaList, OnAreaItemClickListener listener) {
         this.AreaList = AreaList;
+        this.fullList = AreaList;
         this.listener = listener;
+    }
+
+    public void filter(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            AreaList = fullList;
+        } else {
+            String q = query.toLowerCase().trim();
+            java.util.List<Area> filtered = new java.util.ArrayList<>();
+            for (Area a : fullList) {
+                if (a.getAreaName() != null && a.getAreaName().toLowerCase().contains(q)) {
+                    filtered.add(a);
+                }
+            }
+            AreaList = filtered;
+        }
+        notifyDataSetChanged();
     }
 
     public void removeItem(Area item) {

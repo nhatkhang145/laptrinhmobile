@@ -43,9 +43,16 @@ public class TableInAreaAdapter extends RecyclerView.Adapter<TableInAreaAdapter.
         int seats = item.getSeats() != null ? item.getSeats() : 0;
         holder.tvTableSeats.setText("Số ghế: " + seats);
 
-        // Trạng thái
+        // Trạng thái: ưu tiên kiểm tra ĐANG KHÓA trước
+        String status = item.getStatus();
+        boolean locked = "ĐANG KHÓA".equals(status);
         boolean isOccupied = item.isOccupied();
-        if (isOccupied) {
+
+        if (locked) {
+            holder.tvTableStatus.setText("ĐANG KHÓA");
+            holder.tvTableStatus.setBackgroundResource(R.drawable.bg_status_paused);
+            holder.tvTableStatus.setTextColor(holder.itemView.getContext().getColor(android.R.color.holo_orange_dark));
+        } else if (isOccupied) {
             holder.tvTableStatus.setText("ĐANG CÓ KHÁCH");
             holder.tvTableStatus.setBackgroundResource(R.drawable.bg_status_unavailable);
             holder.tvTableStatus.setTextColor(holder.itemView.getContext().getColor(R.color.white));
