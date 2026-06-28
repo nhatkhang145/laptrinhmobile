@@ -55,7 +55,6 @@ public class CancelManageAdapter extends RecyclerView.Adapter<CancelManageAdapte
         String time = "";
         if (item.containsKey("updatedAt") && item.get("updatedAt") != null) {
             time = String.valueOf(item.get("updatedAt"));
-            // Format time if needed, backend usually returns ISO string
             if (time.length() > 16) {
                 time = time.replace("T", " ").substring(0, 16);
             }
@@ -66,23 +65,26 @@ public class CancelManageAdapter extends RecyclerView.Adapter<CancelManageAdapte
         if (item.containsKey("price") && item.get("price") != null) {
             try {
                 price = Double.parseDouble(String.valueOf(item.get("price")));
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
-        
+
         int quantity = 1;
         if (item.containsKey("quantity") && item.get("quantity") != null) {
             try {
                 quantity = (int) Double.parseDouble(String.valueOf(item.get("quantity")));
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
-        
+
         double total = price * quantity;
         holder.tvPrice.setText(formatter.format(total));
 
         String reason = "Không có lý do";
         if (item.containsKey("cancelReason") && item.get("cancelReason") != null) {
             reason = String.valueOf(item.get("cancelReason"));
-            if (reason.trim().isEmpty()) reason = "Không có lý do";
+            if (reason.trim().isEmpty())
+                reason = "Không có lý do";
         }
         holder.tvCancelReason.setText(reason);
     }
