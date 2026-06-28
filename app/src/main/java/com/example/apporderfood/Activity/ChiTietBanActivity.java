@@ -153,6 +153,7 @@ public class ChiTietBanActivity extends AppCompatActivity {
                     List<OrderDetail> details = response.body();
                     adapter.setItems(details);
                     updateSummary(details);
+                    updateGuiButton(details);
                 }
             }
             @Override
@@ -169,6 +170,23 @@ public class ChiTietBanActivity extends AppCompatActivity {
         }
         tvTotalAmount.setText(formatter.format(total));
         tvBadgeCount.setText(details.size() + " MÓN");
+    }
+
+    private void updateGuiButton(List<OrderDetail> details) {
+        if (btnGuiBep == null) return;
+        boolean hasPending = false;
+        for (OrderDetail d : details) {
+            if (d.getStatus() != null && d.getStatus() == 0) {
+                hasPending = true;
+                break;
+            }
+        }
+        btnGuiBep.setEnabled(hasPending);
+        if (hasPending) {
+            btnGuiBep.setBackgroundResource(R.drawable.bg_btn_primary);
+        } else {
+            btnGuiBep.setBackgroundResource(R.drawable.bg_btn_disabled);
+        }
     }
 
     @Override

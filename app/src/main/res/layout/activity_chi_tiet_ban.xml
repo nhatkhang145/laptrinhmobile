@@ -238,7 +238,7 @@
                 android:layout_width="0dp"
                 android:layout_height="52dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_btn_secondary"
+                android:background="@drawable/bg_btn_primary"
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:layout_marginEnd="4dp">
@@ -247,7 +247,7 @@
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:layout_marginEnd="8dp"
-                    app:iiv_color="@color/primary"
+                    app:iiv_color="@color/surface"
                     app:iiv_icon="faw-utensils" />
 
                 <TextView
@@ -255,7 +255,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
                     android:text="Gửi bếp"
-                    android:textColor="@color/primary"
+                    android:textColor="@color/surface"
                     android:textSize="16sp" />
             </LinearLayout>
 

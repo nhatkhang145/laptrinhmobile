@@ -86,6 +86,9 @@ public class LapOrderActivity extends AppCompatActivity {
         setupClickListeners();
         setupSearch();
 
+        // Xóa giỏ hàng cũ khi mở bàn mới (tránh lưu giỏ hàng của bàn khác)
+        cartMap.clear();
+
         checkShiftPermission();
     }
 
@@ -160,7 +163,7 @@ public class LapOrderActivity extends AppCompatActivity {
         }
     }
 
-    private Map<Integer, CartItem> cartMap = new HashMap<>();
+    public static Map<Integer, CartItem> cartMap = new HashMap<>();
 
     private void setupRecyclerView() {
         adapter = new MenuItemLapOrderAdapter(this, new ArrayList<>(), cartMap, updatedCart -> {
@@ -281,19 +284,14 @@ public class LapOrderActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-
-        // Nút HỦY BỎ -> quay lại sơ đồ bàn (bàn vẫn trống vì chưa tạo order)
         btnHuyBo.setOnClickListener(v -> finish());
 
-        // Nút ĐỒNG Ý: Kiểm tra giỏ hàng -> Tạo order -> Thêm món -> Sang XacNhanOrderActivity
         btnDongY.setOnClickListener(v -> {
             if (cartMap.isEmpty()) {
                 Toast.makeText(this, "Vui lòng chọn ít nhất 1 món!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            // Vô hiệu hóa nút để tránh bấm nhiều lần
             btnDongY.setEnabled(false);
-            // Bước 1: Tạo order (mở bàn) -> sau đó mới thêm món
             createOrderThenAddItems();
         });
 
@@ -380,37 +378,11 @@ public class LapOrderActivity extends AppCompatActivity {
     }
 
     private void addItemsToOrder() {
-        List<Map<String, Object>> batchData = new ArrayList<>();
-        for (CartItem ci : cartMap.values()) {
-            Map<String, Object> item = new HashMap<>();
-            item.put("itemId", ci.getMenuItem().getId());
-            item.put("quantity", ci.getQuantity());
-            item.put("note", ci.getNote() != null ? ci.getNote() : "");
-            batchData.add(item);
-        }
-
-        apiService.addBatchItems(orderId, batchData).enqueue(new Callback<Map<String, String>>() {
-            @Override
-            public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
-                btnDongY.setEnabled(true);
-                if (response.isSuccessful()) {
-                    // Chuyển sang màn hình XacNhanOrder để xem lại và ấn GỬI BẾP
-                    Intent intent = new Intent(LapOrderActivity.this, XacNhanOrderActivity.class);
-                    intent.putExtra("ORDER_ID", orderId);
-                    intent.putExtra("TABLE_NAME", tableName);
-                    intent.putExtra("TABLE_ID", tableId);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    Toast.makeText(LapOrderActivity.this, "Lỗi thêm món, thử lại!", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Map<String, String>> call, Throwable t) {
-                btnDongY.setEnabled(true);
-                Toast.makeText(LapOrderActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
-            }
-        });
+        btnDongY.setEnabled(true);
+        Intent intent = new Intent(LapOrderActivity.this, XacNhanOrderActivity.class);
+        intent.putExtra("ORDER_ID", orderId);
+        intent.putExtra("TABLE_NAME", tableName);
+        intent.putExtra("TABLE_ID", tableId);
+        startActivity(intent);
     }
 }

@@ -187,7 +187,7 @@
                 android:layout_width="0dp"
                 android:layout_height="52dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_btn_secondary"
+                android:background="@drawable/bg_btn_primary"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center"
@@ -198,7 +198,7 @@
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:layout_marginEnd="8dp"
-                    app:iiv_color="@color/primary"
+                    app:iiv_color="@color/surface"
                     app:iiv_icon="faw-money-bill-alt"
                     app:iiv_size="20dp" />
 
@@ -208,7 +208,7 @@
                     android:fontFamily="sans-serif-medium"
                     android:letterSpacing="0.08"
                     android:text="TÍNH TIỀN"
-                    android:textColor="@color/primary"
+                    android:textColor="@color/surface"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 

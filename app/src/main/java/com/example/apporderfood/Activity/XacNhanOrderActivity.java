@@ -97,7 +97,6 @@ public class XacNhanOrderActivity extends AppCompatActivity {
         tvItemCount = findViewById(R.id.tvItemCount);
         tvTotalAmount = findViewById(R.id.tvTotalAmount);
 
-
         if (tvTitle != null) {
             tvTitle.setText("Xác nhận - " + tableName);
         }
@@ -120,37 +119,44 @@ public class XacNhanOrderActivity extends AppCompatActivity {
     }
 
     private void cancelItem(OrderDetail detail) {
-        if (detail.getId() == null) return;
-        
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("Xác nhận hủy món")
-            .setMessage("Hủy món " + (detail.getMenuItem() != null ? detail.getMenuItem().getItemName() : "") + "?")
-            .setPositiveButton("Hủy món", (dialog, which) -> {
-                progressBar.setVisibility(View.VISIBLE);
-                ZappyApiService api = RetrofitClient.getApiService();
-                Map<String, Integer> data = new java.util.HashMap<>();
-                
-                api.cancelItem(detail.getId(), data).enqueue(new Callback<Map>() {
-                    @Override
-                    public void onResponse(Call<Map> call, Response<Map> response) {
-                        if (response.isSuccessful()) {
-                            Toast.makeText(XacNhanOrderActivity.this, "Đã hủy món!", Toast.LENGTH_SHORT).show();
-                            loadOrderDetails();
-                        } else {
-                            progressBar.setVisibility(View.GONE);
-                            Toast.makeText(XacNhanOrderActivity.this, "Lỗi hủy món", Toast.LENGTH_SHORT).show();
-                        }
-                    }
+        if (detail.getId() == null) {
+            if (detail.getMenuItem() != null && com.example.apporderfood.Activity.LapOrderActivity.cartMap.containsKey(detail.getMenuItem().getId())) {
+                com.example.apporderfood.Activity.LapOrderActivity.cartMap.remove(detail.getMenuItem().getId());
+                Toast.makeText(XacNhanOrderActivity.this, "Đã xóa món khỏi giỏ!", Toast.LENGTH_SHORT).show();
+                loadOrderDetails();
+            }
+            return;
+        }
 
-                    @Override
-                    public void onFailure(Call<Map> call, Throwable t) {
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(XacNhanOrderActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            })
-            .setNegativeButton("Đóng", null)
-            .show();
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Xác nhận hủy món")
+                .setMessage("Hủy món " + (detail.getMenuItem() != null ? detail.getMenuItem().getItemName() : "") + "?")
+                .setPositiveButton("Hủy món", (dialog, which) -> {
+                    progressBar.setVisibility(View.VISIBLE);
+                    ZappyApiService api = RetrofitClient.getApiService();
+                    Map<String, Integer> data = new java.util.HashMap<>();
+
+                    api.cancelItem(detail.getId(), data).enqueue(new Callback<Map>() {
+                        @Override
+                        public void onResponse(Call<Map> call, Response<Map> response) {
+                            if (response.isSuccessful()) {
+                                Toast.makeText(XacNhanOrderActivity.this, "Đã hủy món!", Toast.LENGTH_SHORT).show();
+                                loadOrderDetails();
+                            } else {
+                                progressBar.setVisibility(View.GONE);
+                                Toast.makeText(XacNhanOrderActivity.this, "Lỗi hủy món", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<Map> call, Throwable t) {
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(XacNhanOrderActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                })
+                .setNegativeButton("Đóng", null)
+                .show();
     }
 
     private void loadOrderDetails() {
@@ -171,6 +177,20 @@ public class XacNhanOrderActivity extends AppCompatActivity {
 
                 if (response.isSuccessful() && response.body() != null) {
                     List<OrderDetail> details = response.body();
+                    
+                    for (com.example.apporderfood.model.CartItem ci : com.example.apporderfood.Activity.LapOrderActivity.cartMap.values()) {
+                        OrderDetail localItem = new OrderDetail();
+                        localItem.setId(null);
+                        localItem.setMenuItem(ci.getMenuItem());
+                        localItem.setQuantity(ci.getQuantity());
+                        localItem.setNote(ci.getNote());
+                        BigDecimal price = new BigDecimal(ci.getMenuItem().getPrice());
+                        localItem.setPriceAtSale(price); 
+                        localItem.setStatus(0);
+                        
+                        details.add(0, localItem);
+                    }
+
                     adapter.setItems(details);
                     updateSummary(details);
                     updateGuiButton(details);
@@ -216,7 +236,13 @@ public class XacNhanOrderActivity extends AppCompatActivity {
             }
         }
         btnGui.setEnabled(hasPending);
-        btnGui.setAlpha(hasPending ? 1.0f : 0.45f);
+        if (hasPending) {
+            btnGui.setBackgroundResource(R.drawable.bg_btn_primary);
+            btnGui.setAlpha(1.0f);
+        } else {
+            btnGui.setBackgroundResource(R.drawable.bg_btn_disabled);
+            btnGui.setAlpha(1.0f);
+        }
     }
 
     @Override
@@ -225,14 +251,15 @@ public class XacNhanOrderActivity extends AppCompatActivity {
         loadOrderDetails();
     }
 
+    @Override
+    public void onBackPressed() {
+        finish();
+        super.onBackPressed();
+    }
+
     private void setupClickListeners() {
 
-
-        btnBack.setOnClickListener(v -> {
-            startActivity(new Intent(this, SoDobanActivity.class));
-            finish();
-        });
-
+        btnBack.setOnClickListener(v -> finish());
 
         btnThemMon.setOnClickListener(v -> {
             Intent intent = new Intent(this, LapOrderActivity.class);
@@ -241,9 +268,8 @@ public class XacNhanOrderActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-
         btnGui.setOnClickListener(v -> sendOrder());
-        
+
         if (btnTinhTien != null) {
             btnTinhTien.setOnClickListener(v -> {
                 Intent intent = new Intent(this, HoaDonActivity.class);
@@ -255,21 +281,51 @@ public class XacNhanOrderActivity extends AppCompatActivity {
     }
 
     private void sendOrder() {
-        if (orderId == -1) {
-            Toast.makeText(this, "Không tìm thấy đơn hàng!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
+        if (orderId == -1) return;
         btnGui.setEnabled(false);
         btnGui.setAlpha(0.45f);
         ZappyApiService api = RetrofitClient.getApiService();
 
-        api.sendOrder(orderId).enqueue(new Callback<Map>() {
+        if (!com.example.apporderfood.Activity.LapOrderActivity.cartMap.isEmpty()) {
+            java.util.List<java.util.Map<String, Object>> batchData = new java.util.ArrayList<>();
+            for (com.example.apporderfood.model.CartItem ci : com.example.apporderfood.Activity.LapOrderActivity.cartMap.values()) {
+                java.util.Map<String, Object> item = new java.util.HashMap<>();
+                item.put("itemId", ci.getMenuItem().getId());
+                item.put("quantity", ci.getQuantity());
+                item.put("note", ci.getNote() != null ? ci.getNote() : "");
+                batchData.add(item);
+            }
+            api.addBatchItems(orderId, batchData).enqueue(new Callback<java.util.Map<String, String>>() {
+                @Override
+                public void onResponse(Call<java.util.Map<String, String>> call, Response<java.util.Map<String, String>> response) {
+                    if (response.isSuccessful()) {
+                        executeSendOrderAPI(api);
+                    } else {
+                        btnGui.setEnabled(true);
+                        btnGui.setAlpha(1.0f);
+                        Toast.makeText(XacNhanOrderActivity.this, "Lỗi thêm món trước khi gửi!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onFailure(Call<java.util.Map<String, String>> call, Throwable t) {
+                    btnGui.setEnabled(true);
+                    btnGui.setAlpha(1.0f);
+                    Toast.makeText(XacNhanOrderActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            executeSendOrderAPI(api);
+        }
+    }
+
+    private void executeSendOrderAPI(ZappyApiService api) {
+        api.sendOrder(orderId).enqueue(new Callback<java.util.Map>() {
             @Override
-            public void onResponse(Call<Map> call, Response<Map> response) {
+            public void onResponse(Call<java.util.Map> call, Response<java.util.Map> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(XacNhanOrderActivity.this,
                             "Đã gửi lên bếp thành công!", Toast.LENGTH_SHORT).show();
+                    com.example.apporderfood.Activity.LapOrderActivity.cartMap.clear();
 
                     Intent intent = new Intent(XacNhanOrderActivity.this, ChiTietBanActivity.class);
                     intent.putExtra("ORDER_ID", orderId);
@@ -286,7 +342,7 @@ public class XacNhanOrderActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Map> call, Throwable t) {
+            public void onFailure(Call<java.util.Map> call, Throwable t) {
                 btnGui.setEnabled(true);
                 btnGui.setAlpha(1.0f);
                 Toast.makeText(XacNhanOrderActivity.this,
