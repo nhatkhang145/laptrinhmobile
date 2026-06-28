@@ -40,12 +40,11 @@
                 android:textColor="@color/text_primary"
                 android:textSize="18sp" />
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="end"
-                android:src="@drawable/ic_user"
-                app:shapeAppearanceOverlay="@style/RoundedSquare"
+                android:src="@drawable/logo"
                 android:contentDescription="User profile" />
 
         </androidx.appcompat.widget.Toolbar>

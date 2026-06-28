@@ -33,7 +33,7 @@
     <string name="admin_username_label">Username (Quản lý)</string>
     <string name="restaurant_address_label">Địa chỉ nhà hàng</string>
     <string name="signup_subtitle">Tạo tài khoản quản lý nhà hàng</string>
-    <string name="restaurant_name_hint">VD: The Continental</string>
+    <string name="restaurant_name_hint">VD: mycayseoul</string>
     <string name="restaurant_username_hint">thecontinental</string>
     <string name="restaurant_url_suffix">.zappy</string>
     <string name="restaurant_url_desc">Đây sẽ là đường dẫn truy cập riêng của nhà hàng.</string>
@@ -52,7 +52,7 @@
     <string name="forget_password_label">Quên mật khẩu ?</string>
     <string name="question_label">Chưa có tài khoản ? </string>
     <string name="call_to_action_label">Đăng ký ngay</string>
-    <string name="user_name_hint">tên người dùng</string>
+    <string name="user_name_hint">Tên đăng nhập</string>
     <string name="password_hint">••••••••</string>
     <string name="login_button_label">Đăng nhập</string>
     <string name="password_again_label">Nhập lại mật khẩu</string>

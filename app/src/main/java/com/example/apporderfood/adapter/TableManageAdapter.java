@@ -36,7 +36,7 @@ public class TableManageAdapter extends RecyclerView.Adapter<TableManageAdapter.
 
         for (TableModel t : fullList) {
             boolean matchesQuery = q.isEmpty() || (t.getTableName() != null && t.getTableName().toLowerCase().contains(q));
-            boolean matchesArea = (areaId == null) || (t.getAreaId() != null && t.getAreaId().equals(areaId));
+            boolean matchesArea = (areaId == null) || (t.getArea() != null && t.getArea().getId() != null && t.getArea().getId().equals(areaId));
             
             if (matchesQuery && matchesArea) {
                 filtered.add(t);
