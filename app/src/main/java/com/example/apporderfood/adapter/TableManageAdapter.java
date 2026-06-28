@@ -30,19 +30,19 @@ public class TableManageAdapter extends RecyclerView.Adapter<TableManageAdapter.
         this.listener = listener;
     }
 
-    public void filter(String query) {
-        if (query == null || query.trim().isEmpty()) {
-            tableList = fullList;
-        } else {
-            String q = query.toLowerCase().trim();
-            java.util.List<TableModel> filtered = new java.util.ArrayList<>();
-            for (TableModel t : fullList) {
-                if (t.getTableName() != null && t.getTableName().toLowerCase().contains(q)) {
-                    filtered.add(t);
-                }
+    public void filter(String query, Integer areaId) {
+        String q = (query == null) ? "" : query.toLowerCase().trim();
+        java.util.List<TableModel> filtered = new java.util.ArrayList<>();
+
+        for (TableModel t : fullList) {
+            boolean matchesQuery = q.isEmpty() || (t.getTableName() != null && t.getTableName().toLowerCase().contains(q));
+            boolean matchesArea = (areaId == null) || (t.getAreaId() != null && t.getAreaId().equals(areaId));
+            
+            if (matchesQuery && matchesArea) {
+                filtered.add(t);
             }
-            tableList = filtered;
         }
+        tableList = filtered;
         notifyDataSetChanged();
     }
 

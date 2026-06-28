@@ -24,9 +24,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.apporderfood.R;
+import com.example.apporderfood.adapter.AreaFilterAdapter;
 import com.example.apporderfood.adapter.TableManageAdapter;
 import com.example.apporderfood.api.RetrofitClient;
 import com.example.apporderfood.api.ZappyApiService;
+import com.example.apporderfood.model.Area;
 import com.example.apporderfood.model.TableModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -48,6 +50,11 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
     private TextView tvEmptyState;
     private TextView tvTotalTables, tvActiveTables, tvLockedTables;
     private EditText etSearch;
+    private RecyclerView rvAreaList;
+
+    private AreaFilterAdapter areaAdapter;
+    private Integer currentFilterAreaId = null;
+    private String currentKeyword = "";
 
     private int resId = -1;
 
@@ -78,6 +85,7 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
 
         initViews();
         setupRecyclerView();
+        loadAreasForFilter();
         loadTables();
         setupListeners();
         setupBottomNav();
@@ -93,11 +101,15 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
         tvActiveTables = findViewById(R.id.tvActiveTables);
         tvLockedTables = findViewById(R.id.tvLockedTables);
         etSearch = findViewById(R.id.etSearch);
+        rvAreaList = findViewById(R.id.rvAreaList);
     }
 
     private void setupRecyclerView() {
         if (rvTableList != null) {
             rvTableList.setLayoutManager(new LinearLayoutManager(this));
+        }
+        if (rvAreaList != null) {
+            rvAreaList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         }
     }
 
@@ -135,6 +147,38 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
             public void onFailure(Call<List<TableModel>> call, Throwable t) {
                 if (pbLoading != null) pbLoading.setVisibility(View.GONE);
                 Toast.makeText(TableManageActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadAreasForFilter() {
+        if (resId == -1) return;
+        ZappyApiService api = RetrofitClient.getApiService();
+        api.getAreas(resId).enqueue(new Callback<List<Area>>() {
+            @Override
+            public void onResponse(Call<List<Area>> call, Response<List<Area>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Area> filterList = new java.util.ArrayList<>();
+                    Area allArea = new Area();
+                    allArea.setId(null);
+                    allArea.setAreaName("Tất cả");
+                    filterList.add(allArea);
+                    filterList.addAll(response.body());
+
+                    areaAdapter = new AreaFilterAdapter(filterList, area -> {
+                        currentFilterAreaId = area.getId();
+                        if (adapter != null) {
+                            adapter.filter(currentKeyword, currentFilterAreaId);
+                            updateStats(adapter.getTableList());
+                        }
+                    });
+                    if (rvAreaList != null) rvAreaList.setAdapter(areaAdapter);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Area>> call, Throwable t) {
+                Toast.makeText(TableManageActivity.this, "Không thể tải danh sách khu vực", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -178,7 +222,11 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
             etSearch.addTextChangedListener(new TextWatcher() {
                 @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
                 @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    if (adapter != null) adapter.filter(s.toString());
+                    currentKeyword = s.toString();
+                    if (adapter != null) {
+                        adapter.filter(currentKeyword, currentFilterAreaId);
+                        updateStats(adapter.getTableList());
+                    }
                 }
                 @Override public void afterTextChanged(Editable s) {}
             });
