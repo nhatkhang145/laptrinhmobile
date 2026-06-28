@@ -14,6 +14,13 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import java.time.LocalDateTime;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
  * API Hoa don - Nghiep vu chinh cua app
  *
@@ -98,13 +105,32 @@ public class OrderController {
 
     /** Lay danh sach tat ca hoa don da thanh toan cua nha hang */
     @GetMapping("/restaurant/{resId}/paid")
-    public ResponseEntity<?> getPaidOrdersByRestaurant(@PathVariable Integer resId) {
-        List<Order> paidOrders = orderRepo.findByRestaurantIdAndStatus(resId, 1);
+    public ResponseEntity<?> getPaidOrdersByRestaurant(
+            @PathVariable Integer resId,
+            @RequestParam(required = false) String fromDate,
+            @RequestParam(required = false) String toDate) {
+
+        java.time.LocalDateTime from = null;
+        java.time.LocalDateTime to = null;
+        try {
+            if (fromDate != null && !fromDate.isEmpty()) from = java.time.LocalDateTime.parse(fromDate);
+            if (toDate != null && !toDate.isEmpty()) to = java.time.LocalDateTime.parse(toDate);
+        } catch (Exception e) {
+            // ignore parse errors
+        }
+
+        List<Order> paidOrders = orderRepo.findPaidOrdersWithFilter(resId, 1, from, to);
         
-        // Sap xep moi nhat len tren
+        // Sap xep moi nhat len tren theo checkoutAt
         paidOrders.sort((o1, o2) -> {
-            if (o1.getCreatedAt() == null || o2.getCreatedAt() == null) return 0;
-            return o2.getCreatedAt().compareTo(o1.getCreatedAt());
+            if (o1.getCheckoutAt() != null && o2.getCheckoutAt() != null) {
+                return o2.getCheckoutAt().compareTo(o1.getCheckoutAt());
+            }
+            if (o1.getCreatedAt() != null && o2.getCreatedAt() != null) {
+                return o2.getCreatedAt().compareTo(o1.getCreatedAt());
+            }
+            // Fallback: don't have createdAt, sort by id desc
+            return Integer.compare(o2.getId(), o1.getId());
         });
         
         return ResponseEntity.ok(paidOrders);
@@ -237,6 +263,7 @@ public class OrderController {
         // Dong hoa don
         order.setTotalAmount(total);
         order.setStatus(1); // Da thanh toan
+        order.setCheckoutAt(java.time.LocalDateTime.now());
         orderRepo.save(order);
 
         // Giai phong ban -> trang thai trong
@@ -249,5 +276,68 @@ public class OrderController {
                 "totalAmount", total,
                 "orderId", orderId
         ));
+    }
+ // ==========================================
+    // THỐNG KÊ (STATS) - THEO THỜI GIAN
+    // ==========================================
+    @GetMapping("/stats/restaurant/{resId}")
+    public ResponseEntity<?> getDashboardStats(
+            @PathVariable Integer resId,
+            @RequestParam(defaultValue = "today") String period) {
+
+        LocalDateTime startDate;
+        LocalDateTime endDate;
+
+        LocalDate today = LocalDate.now();
+
+        switch (period.toLowerCase()) {
+
+            case "week":
+                startDate = today.with(DayOfWeek.MONDAY).atStartOfDay();
+                endDate = startDate.plusWeeks(1);
+                break;
+
+            case "month":
+                startDate = today.withDayOfMonth(1).atStartOfDay();
+                endDate = startDate.plusMonths(1);
+                break;
+
+            case "today":
+            default:
+                startDate = today.atStartOfDay();
+                endDate = startDate.plusDays(1);
+                break;
+        }
+
+        BigDecimal revenue = orderRepo.getRevenue(
+                resId,
+                startDate,
+                endDate
+        );
+
+        Long totalOrders = orderRepo.countOrders(
+                resId,
+                startDate,
+                endDate
+        );
+
+        Long cancelledItems = detailRepo.countCancelledItems(
+                resId,
+                startDate,
+                endDate
+        );
+
+        Long unpaidTables = tableRepo.countOccupiedTables(
+                resId
+        );
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("totalRevenue", revenue);
+        result.put("totalOrders", totalOrders);
+        result.put("cancelledItems", cancelledItems);
+        result.put("unpaidTables", unpaidTables);
+
+        return ResponseEntity.ok(result);
     }
 }

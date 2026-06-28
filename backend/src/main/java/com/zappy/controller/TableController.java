@@ -79,6 +79,9 @@ public class TableController {
         table.setArea(area);
         table.setTableName(tableName);
         table.setIsOccupied(false);
+        if (data.containsKey("status") && data.get("status") != null) {
+            table.setStatus(data.get("status").toString().trim());
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(tableRepo.save(table));
     }
 
@@ -96,12 +99,15 @@ public class TableController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Integer id,
-                                    @RequestBody Map<String, String> data) {
-        if (data.get("tableName") == null || data.get("tableName").trim().isEmpty()) {
+                                    @RequestBody Map<String, Object> data) {
+        if (data.get("tableName") == null || data.get("tableName").toString().trim().isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("message", "Tên bàn không hợp lệ!"));
         }
         return tableRepo.findById(id).map(table -> {
-            table.setTableName(data.get("tableName").trim());
+            table.setTableName(data.get("tableName").toString().trim());
+            if (data.containsKey("status") && data.get("status") != null) {
+                table.setStatus(data.get("status").toString().trim());
+            }
             return ResponseEntity.ok(tableRepo.save(table));
         }).orElse(ResponseEntity.notFound().build());
     }
@@ -109,7 +115,12 @@ public class TableController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Integer id) {
         if (!tableRepo.existsById(id)) return ResponseEntity.notFound().build();
-        tableRepo.deleteById(id);
-        return ResponseEntity.ok(Map.of("message", "Da xoa ban!"));
+        try {
+            tableRepo.deleteById(id);
+            return ResponseEntity.ok(Map.of("message", "Da xoa ban!"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", "Không thể xóa bàn đã có hóa đơn/khách"));
+        }
     }
 }

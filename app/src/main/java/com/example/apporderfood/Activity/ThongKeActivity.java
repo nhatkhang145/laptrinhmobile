@@ -1,6 +1,7 @@
 package com.example.apporderfood.Activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -12,76 +13,71 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.example.apporderfood.R;
+import com.example.apporderfood.api.RetrofitClient;
+import com.example.apporderfood.api.ZappyApiService;
 import com.mikepenz.iconics.view.IconicsImageView;
+
+import java.text.DecimalFormat;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ThongKeActivity extends AppCompatActivity {
 
-    // Views tiêu đề và điều hướng
     private IconicsImageView btnBack;
-    private TextView tvTotalRevenue, tvGrowth, tvTotalOrders, tvCancelledItems, tvUnpaidTables;
-    
-    // Tabs bộ lọc
+    private TextView tvTotalRevenue, tvTotalOrders, tvCancelledItems, tvUnpaidTables;
     private TextView tabToday, tabWeek, tabMonth;
-    
-    // Bottom Navigation Custom
     private View navOrder, navSoDo, navTienIch;
+
+    private ZappyApiService apiService;
+    private int currentResId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_thong_ke);
 
+        apiService = RetrofitClient.getApiService();
+        SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
+        currentResId = prefs.getInt("RES_ID", -1);
+
         initViews();
         setupListeners();
-        
+
+
+
+
         // Mặc định load dữ liệu "Hôm nay"
-        loadDataForTab("Hôm nay");
+        selectTab(tabToday, "today");
     }
 
     private void initViews() {
         btnBack = findViewById(R.id.btnBack);
-        
-        // Các TextView hiển thị dữ liệu động
+
         tvTotalRevenue = findViewById(R.id.tvTotalRevenue);
-        tvGrowth = findViewById(R.id.tvGrowth);
         tvTotalOrders = findViewById(R.id.tvTotalOrders);
         tvCancelledItems = findViewById(R.id.tvCancelledItems);
         tvUnpaidTables = findViewById(R.id.tvUnpaidTables);
 
-        // Bộ lọc thời gian (Tabs)
         tabToday = findViewById(R.id.tabToday);
         tabWeek = findViewById(R.id.tabWeek);
         tabMonth = findViewById(R.id.tabMonth);
 
-        // Bottom Navigation Custom (LinearLayouts)
         navOrder = findViewById(R.id.navOrder);
         navSoDo = findViewById(R.id.navSoDo);
         navTienIch = findViewById(R.id.navTienIch);
     }
 
     private void setupListeners() {
-        // Nút quay lại
         btnBack.setOnClickListener(v -> finish());
 
-        // Xử lý chuyển đổi Tab "Hôm nay"
-        tabToday.setOnClickListener(v -> {
-            updateTabUI(tabToday);
-            loadDataForTab("Hôm nay");
-        });
+        // Call API theo period (Hôm nay, Tuần, Tháng)
+        tabToday.setOnClickListener(v -> selectTab(tabToday, "today"));
+        tabWeek.setOnClickListener(v -> selectTab(tabWeek, "week"));
+        tabMonth.setOnClickListener(v -> selectTab(tabMonth, "month"));
 
-        // Xử lý chuyển đổi Tab "Tuần này"
-        tabWeek.setOnClickListener(v -> {
-            updateTabUI(tabWeek);
-            loadDataForTab("Tuần này");
-        });
-
-        // Xử lý chuyển đổi Tab "Tháng này"
-        tabMonth.setOnClickListener(v -> {
-            updateTabUI(tabMonth);
-            loadDataForTab("Tháng này");
-        });
-
-        // Bottom Navigation Listeners
         navOrder.setOnClickListener(v -> {
             startActivity(new Intent(this, DanhSachOrderActivity.class));
             overridePendingTransition(0, 0);
@@ -97,11 +93,8 @@ public class ThongKeActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Cập nhật giao diện (Màu sắc, Font chữ) khi người dùng chuyển Tab
-     */
-    private void updateTabUI(TextView selectedTab) {
-        // Reset tất cả tab về trạng thái không được chọn
+    private void selectTab(TextView selectedTab, String period) {
+        // Reset Style
         TextView[] tabs = {tabToday, tabWeek, tabMonth};
         for (TextView tab : tabs) {
             tab.setBackground(null);
@@ -109,36 +102,57 @@ public class ThongKeActivity extends AppCompatActivity {
             tab.setTypeface(null, Typeface.NORMAL);
         }
 
-        // Làm nổi bật tab được chọn
+        // Active Style
         selectedTab.setBackgroundResource(R.drawable.bg_btn_primary);
         selectedTab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white)));
         selectedTab.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
         selectedTab.setTypeface(null, Typeface.BOLD);
+
+        // Fetch Data từ Server
+        fetchStats(period);
     }
 
-    /**
-     * Giả lập việc tải dữ liệu từ Database/Firebase dựa trên thời gian
-     */
-    private void loadDataForTab(String timeRange) {
-        // Sử dụng string format đã thiết lập trong strings.xml để đồng bộ
-        if (timeRange.equals("Hôm nay")) {
-            tvTotalRevenue.setText(String.format(getString(R.string.format_tien_te), "15.250.000"));
-            tvTotalOrders.setText(String.format(getString(R.string.format_don_hang), 45));
-            tvCancelledItems.setText(String.format(getString(R.string.format_mon), 3));
-            tvUnpaidTables.setText(String.format(getString(R.string.format_ban), 5));
-            tvGrowth.setText("+12.5% so với hôm qua");
-        } else if (timeRange.equals("Tuần này")) {
-            tvTotalRevenue.setText(String.format(getString(R.string.format_tien_te), "102.800.000"));
-            tvTotalOrders.setText(String.format(getString(R.string.format_don_hang), 312));
-            tvCancelledItems.setText(String.format(getString(R.string.format_mon), 12));
-            tvUnpaidTables.setText(String.format(getString(R.string.format_ban), 2));
-            tvGrowth.setText("+5.2% so với kỳ trước");
-        } else {
-            tvTotalRevenue.setText(String.format(getString(R.string.format_tien_te), "450.320.000"));
-            tvTotalOrders.setText(String.format(getString(R.string.format_don_hang), 1250));
-            tvCancelledItems.setText(String.format(getString(R.string.format_mon), 24));
-            tvUnpaidTables.setText(String.format(getString(R.string.format_ban), 0));
-            tvGrowth.setText("+15.8% so với tháng trước");
-        }
+    private void fetchStats(String period) {
+        if (currentResId == -1) return;
+
+        tvTotalRevenue.setText("Đang tính...");
+
+        apiService.getDashboardStats(currentResId, period).enqueue(new Callback<Map<String, Object>>() {
+            @Override
+            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
+
+                if (response.isSuccessful() && response.body() != null) {
+                    try {
+                        Map<String, Object> data = response.body();
+
+
+                        double revenue = ((Number) data.get("totalRevenue")).doubleValue();
+                        int orders = ((Number) data.get("totalOrders")).intValue();
+                        int cancelled = ((Number) data.get("cancelledItems")).intValue();
+                        int unpaid = ((Number) data.get("unpaidTables")).intValue();
+
+                        DecimalFormat formatter = new DecimalFormat("#,###");
+
+                        tvTotalRevenue.setText(formatter.format(revenue) + " đ");
+                        tvTotalOrders.setText(orders + " đơn");
+                        tvCancelledItems.setText(cancelled + " món");
+                        tvUnpaidTables.setText(unpaid + " bàn");
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(ThongKeActivity.this, "Lỗi đọc dữ liệu thống kê!", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    tvTotalRevenue.setText("Lỗi " + response.code());
+                    Toast.makeText(ThongKeActivity.this, "Lỗi từ Server: " + response.code(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
+                Toast.makeText(ThongKeActivity.this, "Mất kết nối mạng!", Toast.LENGTH_SHORT).show();
+                tvTotalRevenue.setText("Lỗi mạng");
+            }
+        });
     }
 }

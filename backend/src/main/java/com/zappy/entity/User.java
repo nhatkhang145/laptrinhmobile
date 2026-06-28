@@ -42,8 +42,13 @@ public class User {
     // Email cua nguoi dung
     @Column(name = "email", nullable = false)
     private String email;
-
     @Column(name = "fullname")
     private String fullname;
+    // Trạng thái hoạt động (true = Online, false = Offline)
+    @Column(name = "is_online", columnDefinition = "boolean default false")
+    private Boolean isOnline = false;
+    // Trạng thái tài khoản (true = Bình thường, false = Bị khóa)
+    @Column(name = "is_active", columnDefinition = "boolean default true")
+    private Boolean isActive = true;
 }
 

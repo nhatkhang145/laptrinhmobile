@@ -18,7 +18,8 @@ public class CategoryManageAdapter extends RecyclerView.Adapter<CategoryManageAd
 
     public interface OnCategoryItemClickListener {
         void onEditClick(Category item);
-        void onMoreClick(Category item, View view);
+        void onDeleteClick(Category item);
+        void onStatusToggleClick(Category item, int position);
         void onItemClick(Category item);
     }
 
@@ -27,10 +28,26 @@ public class CategoryManageAdapter extends RecyclerView.Adapter<CategoryManageAd
         this.listener = listener;
     }
 
+    public void removeItem(Category item) {
+        int pos = categoryList.indexOf(item);
+        if (pos >= 0) {
+            categoryList.remove(pos);
+            notifyItemRemoved(pos);
+        }
+    }
+
+    /** Cập nhật status local và refresh item UI ngay lập tức */
+    public void updateItemStatus(int position, int newStatus) {
+        if (position < 0 || position >= categoryList.size()) return;
+        categoryList.get(position).setStatus(newStatus);
+        notifyItemChanged(position);
+    }
+
     @NonNull
     @Override
     public CategoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_category_manage, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_category_manage, parent, false);
         return new CategoryViewHolder(view);
     }
 
@@ -38,20 +55,20 @@ public class CategoryManageAdapter extends RecyclerView.Adapter<CategoryManageAd
     public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
         Category item = categoryList.get(position);
         holder.tvCategoryName.setText(item.getCatName());
-        
-        String statusText = (item.getStatus() != null && item.getStatus() == 1) ? "HOẠT ĐỘNG" : "TẠM ẨN";
-        holder.tvCategoryStatus.setText(statusText);
-        
-        int count = item.getItemCount() != null ? item.getItemCount() : 0;
-        holder.tvCategoryInfo.setText(count + " món • " + (item.getDescription() != null ? item.getDescription() : ""));
 
-        if ("HOẠT ĐỘNG".equals(statusText)) {
-            holder.tvCategoryStatus.setBackgroundResource(R.drawable.bg_status_available);
-            holder.tvCategoryStatus.setTextColor(holder.itemView.getContext().getColor(android.R.color.holo_green_dark));
-        } else {
-            holder.tvCategoryStatus.setBackgroundResource(R.drawable.bg_status_paused);
-            holder.tvCategoryStatus.setTextColor(holder.itemView.getContext().getColor(android.R.color.holo_orange_dark));
-        }
+        // null hoặc 1 = HOẠT ĐỘNG
+        boolean active = item.getStatus() == null || item.getStatus() == 1;
+        applyStatusStyle(holder.tvCategoryStatus, active);
+
+        int count = item.getItemCount() != null ? item.getItemCount() : 0;
+        String desc = item.getDescription() != null && !item.getDescription().isEmpty()
+                ? " • " + item.getDescription() : "";
+        holder.tvCategoryInfo.setText(count + " món" + desc);
+
+        // Nhấn badge trạng thái → toggle ngay
+        holder.tvCategoryStatus.setOnClickListener(v -> {
+            if (listener != null) listener.onStatusToggleClick(item, holder.getAdapterPosition());
+        });
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onItemClick(item);
@@ -61,9 +78,21 @@ public class CategoryManageAdapter extends RecyclerView.Adapter<CategoryManageAd
             if (listener != null) listener.onEditClick(item);
         });
 
-        holder.ivCategoryMore.setOnClickListener(v -> {
-            if (listener != null) listener.onMoreClick(item, v);
+        holder.ivCategoryDelete.setOnClickListener(v -> {
+            if (listener != null) listener.onDeleteClick(item);
         });
+    }
+
+    private void applyStatusStyle(TextView tv, boolean active) {
+        if (active) {
+            tv.setText("● HOẠT ĐỘNG");
+            tv.setBackgroundResource(R.drawable.bg_status_available);
+            tv.setTextColor(tv.getContext().getColor(android.R.color.holo_green_dark));
+        } else {
+            tv.setText("○ TẠM ẨN");
+            tv.setBackgroundResource(R.drawable.bg_status_paused);
+            tv.setTextColor(tv.getContext().getColor(android.R.color.holo_orange_dark));
+        }
     }
 
     @Override
@@ -73,15 +102,15 @@ public class CategoryManageAdapter extends RecyclerView.Adapter<CategoryManageAd
 
     public static class CategoryViewHolder extends RecyclerView.ViewHolder {
         TextView tvCategoryName, tvCategoryStatus, tvCategoryInfo;
-        ImageView ivCategoryEdit, ivCategoryMore;
+        ImageView ivCategoryEdit, ivCategoryDelete;
 
         public CategoryViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvCategoryName = itemView.findViewById(R.id.tvCategoryName);
+            tvCategoryName   = itemView.findViewById(R.id.tvCategoryName);
             tvCategoryStatus = itemView.findViewById(R.id.tvCategoryStatus);
-            tvCategoryInfo = itemView.findViewById(R.id.tvCategoryInfo);
-            ivCategoryEdit = itemView.findViewById(R.id.ivCategoryEdit);
-            ivCategoryMore = itemView.findViewById(R.id.ivCategoryMore);
+            tvCategoryInfo   = itemView.findViewById(R.id.tvCategoryInfo);
+            ivCategoryEdit   = itemView.findViewById(R.id.ivCategoryEdit);
+            ivCategoryDelete = itemView.findViewById(R.id.ivCategoryDelete);
         }
     }
 }

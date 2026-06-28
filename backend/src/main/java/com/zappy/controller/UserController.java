@@ -55,7 +55,9 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Sai username hoac mat khau!"));
         }
-
+        //set trạng thái là online khi đăng nhập
+        user.setIsOnline(true);
+        userRepo.save(user);
         // B3: Dang nhap thanh cong - tra ve thong tin user
         return ResponseEntity.ok(Map.of(
                 "id",         user.getId(),
@@ -63,7 +65,9 @@ public class UserController {
                 "role",       user.getRole(),
                 "resId",      restaurant.getId(),
                 "resName",    restaurant.getResName(),
-                "resDomain",  restaurant.getResDomain()
+                "resDomain",  restaurant.getResDomain(),
+                "fullname",   user.getFullname() != null ? user.getFullname() : "",
+                "email",      user.getEmail() != null ? user.getEmail() : ""
         ));
     }
 
@@ -127,6 +131,7 @@ public class UserController {
         userRepo.deleteById(id);
         return ResponseEntity.ok(Map.of("message", "Da xoa tai khoan!"));
     }
+    //Cap nhat thong tin nhan vien
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody Map<String, Object> data) {
         // 1. Tìm user trong DB
@@ -157,5 +162,24 @@ public class UserController {
         // 4. Lưu lại vào DB
         User updatedUser = userRepo.save(user);
         return ResponseEntity.ok(updatedUser);
+    }
+    // Dang xuat (Cap nhat trang thai Offline)
+    @PutMapping("/{id}/logout")
+    public ResponseEntity<?> logout(@PathVariable Integer id) {
+        return userRepo.findById(id).map(user -> {
+            user.setIsOnline(false); // Chuyển cờ hoạt động về false
+            userRepo.save(user);
+            return ResponseEntity.ok(Map.of("message", "Đăng xuất thành công!"));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+    // Khoa / Mo khoa tai khoan nhan vien
+    @PutMapping("/{id}/toggle-lock")
+    public ResponseEntity<?> toggleLock(@PathVariable Integer id) {
+        return userRepo.findById(id).map(user -> {
+            boolean currentStatus = user.getIsActive() != null ? user.getIsActive() : true;
+            user.setIsActive(!currentStatus);
+            userRepo.save(user);
+            return ResponseEntity.ok(Map.of("isActive", user.getIsActive()));
+        }).orElse(ResponseEntity.notFound().build());
     }
 }
