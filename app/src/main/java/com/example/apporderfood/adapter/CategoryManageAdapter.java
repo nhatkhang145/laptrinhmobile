@@ -11,13 +11,26 @@ import com.example.apporderfood.R;
 import com.example.apporderfood.model.Category;
 import java.util.List;
 
+/**
+ * CategoryManageAdapter
+ * Adapter dùng để hiển thị danh sách danh mục trên RecyclerView.
+ * Cung cấp cơ chế gắn kết dữ liệu (bind data) từ đối tượng Category sang các view tương ứng (item_category_manage.xml).
+ */
 public class CategoryManageAdapter extends RecyclerView.Adapter<CategoryManageAdapter.CategoryViewHolder> {
 
     private List<Category> categoryList;
     private List<Category> fullList;
     private OnCategoryItemClickListener listener;
 
+    /**
+     * Interface định nghĩa các sự kiện tương tác của người dùng trên mỗi item danh mục.
+     * Cần được cài đặt (implement) bởi Activity chứa adapter.
+     */
     public interface OnCategoryItemClickListener {
+        void onEditClick(Category item);      // Xử lý sự kiện khi nhấn nút Chỉnh sửa
+        void onDeleteClick(Category item);    // Xử lý sự kiện khi nhấn nút Xóa
+        void onStatusToggleClick(Category item, int position); // Xử lý sự kiện khi nhấn đổi trạng thái
+        void onItemClick(Category item);      // Xử lý sự kiện khi nhấn vào item (xem chi tiết)
         void onEditClick(Category item);
 
         void onDeleteClick(Category item);
@@ -73,21 +86,26 @@ public class CategoryManageAdapter extends RecyclerView.Adapter<CategoryManageAd
         return new CategoryViewHolder(view);
     }
 
+    /**
+     * Gắn kết dữ liệu vào ViewHolder cho từng item.
+     */
     @Override
     public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
         Category item = categoryList.get(position);
         holder.tvCategoryName.setText(item.getCatName());
 
-        // null hoặc 1 = HOẠT ĐỘNG
+        // Kiểm tra và hiển thị trạng thái (null hoặc 1 = HOẠT ĐỘNG, 0 = TẠM ẨN)
         boolean active = item.getStatus() == null || item.getStatus() == 1;
         applyStatusStyle(holder.tvCategoryStatus, active);
 
+        // Hiển thị số lượng món ăn và mô tả nếu có
         int count = item.getItemCount() != null ? item.getItemCount() : 0;
         String desc = item.getDescription() != null && !item.getDescription().isEmpty()
                 ? " • " + item.getDescription()
                 : "";
         holder.tvCategoryInfo.setText(count + " món" + desc);
 
+        // Đăng ký các sự kiện onClick thông qua listener
         // Nhấn badge trạng thái → toggle ngay
         holder.tvCategoryStatus.setOnClickListener(v -> {
             if (listener != null)

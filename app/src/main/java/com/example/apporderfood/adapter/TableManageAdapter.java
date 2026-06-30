@@ -11,17 +11,25 @@ import com.example.apporderfood.R;
 import com.example.apporderfood.model.TableModel;
 import java.util.List;
 
+/**
+ * TableManageAdapter
+ * Adapter dùng để hiển thị danh sách các bàn/khu vực trên RecyclerView.
+ * Cung cấp khả năng gắn kết dữ liệu từ đối tượng TableModel vào giao diện (item_table_manage.xml).
+ */
 public class TableManageAdapter extends RecyclerView.Adapter<TableManageAdapter.TableViewHolder> {
 
     private List<TableModel> tableList;
     private List<TableModel> fullList;
     private OnTableItemClickListener listener;
 
+    /**
+     * Interface định nghĩa các sự kiện click trên từng item bàn.
+     */
     public interface OnTableItemClickListener {
-        void onEditClick(TableModel item);
-        void onDeleteClick(TableModel item);
-        void onStatusToggleClick(TableModel item, int position);
-        void onItemClick(TableModel item);
+        void onEditClick(TableModel item);               // Sự kiện nhấn nút Chỉnh sửa
+        void onDeleteClick(TableModel item);             // Sự kiện nhấn nút Xóa
+        void onStatusToggleClick(TableModel item, int position); // Sự kiện nhấn vào badge Trạng thái
+        void onItemClick(TableModel item);               // Sự kiện nhấn vào toàn bộ item
     }
 
     public TableManageAdapter(List<TableModel> tableList, OnTableItemClickListener listener) {
@@ -72,6 +80,9 @@ public class TableManageAdapter extends RecyclerView.Adapter<TableManageAdapter.
         return new TableViewHolder(view);
     }
 
+    /**
+     * Gắn dữ liệu của một bàn cụ thể vào ViewHolder
+     */
     @Override
     public void onBindViewHolder(@NonNull TableViewHolder holder, int position) {
         TableModel item = tableList.get(position);
@@ -87,7 +98,7 @@ public class TableManageAdapter extends RecyclerView.Adapter<TableManageAdapter.
         // Giả lập ngày tạo nếu chưa có trong model
         holder.tvDateCreated.setText("ID: " + item.getId());
 
-        // Update status UI
+        // Cập nhật giao diện trạng thái (màu sắc, text)
         if ("HOẠT ĐỘNG".equals(status)) {
             holder.tvTableStatus.setText("● HOẠT ĐỘNG");
             holder.tvTableStatus.setBackgroundResource(R.drawable.bg_status_available);
