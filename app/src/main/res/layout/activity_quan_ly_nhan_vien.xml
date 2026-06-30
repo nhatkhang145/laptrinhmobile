@@ -46,6 +46,7 @@
             android:layout_height="40dp"
             android:layout_gravity="end"
             android:src="@drawable/logo"
+            android:scaleType="fitCenter"
             android:contentDescription="User profile"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

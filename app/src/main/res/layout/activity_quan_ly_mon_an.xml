@@ -45,6 +45,7 @@
                 android:layout_height="40dp"
                 android:layout_gravity="end"
                 android:src="@drawable/logo"
+                android:scaleType="fitCenter"
                 android:contentDescription="User profile" />
 
         </androidx.appcompat.widget.Toolbar>
