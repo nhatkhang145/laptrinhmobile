@@ -228,24 +228,60 @@ public interface ZappyApiService {
     // ==========================================
     // SHIFT (CA LÀM VIỆC)
     // ==========================================
-
+    /**
+     * Lấy lịch sử tất cả các ca làm việc của nhà hàng.
+     * Dùng để hiển thị danh sách các ca đã mở và đã đóng.
+     */
     @GET("api/shifts/restaurant/{resId}")
     Call<List<Map<String, Object>>> getShiftHistory(@Path("resId") int resId);
-
+    /**
+     * Lấy ca làm việc đang hoạt động (OPEN).
+     * Trả về thông tin ca hiện tại và doanh thu tạm tính.
+     */
     @GET("api/shifts/restaurant/{resId}/active")
     Call<Map<String, Object>> getActiveShift(@Path("resId") int resId);
-
+    /**
+     * Mở một ca làm việc mới.
+     *
+     * Dữ liệu gửi lên gồm:
+     * - Mã nhà hàng.
+     * - Tiền đầu ca.
+     * - Danh sách nhân viên tham gia ca.
+     */
     @POST("api/shifts/open")
     Call<Map<String, Object>> openShift(@Body Map<String, Object> shiftData);
-
+    /**
+     * Cập nhật danh sách nhân viên của ca đang hoạt động.
+     * Chỉ thực hiện được khi ca chưa đóng.
+     */
     @PUT("api/shifts/{id}/employees")
     Call<Map<String, Object>> updateShiftEmployees(@Path("id") int shiftId, @Body Map<String, Object> shiftData);
-
+    /**
+     * Đóng ca làm việc.
+     *
+     * Khi đóng ca sẽ cập nhật:
+     * - Trạng thái CLOSED.
+     * - Thời gian kết thúc.
+     * - Tổng doanh thu của ca.
+     */
     @PUT("api/shifts/{id}/close")
     Call<Map<String, Object>> closeShift(@Path("id") int shiftId, @Body Map<String, Object> shiftData);
     // ==========================================
     // THỐNG KÊ (STATS)
     // ==========================================
+    /**
+     * Lấy dữ liệu thống kê của nhà hàng.
+     *
+     * Tham số:
+     * - resId  : ID nhà hàng cần thống kê.
+     * - period : Khoảng thời gian thống kê
+     *            (today, week, month, year,...).
+     *
+     * Trả về:
+     * - Tổng doanh thu.
+     * - Số hóa đơn.
+     * - Các dữ liệu thống kê phục vụ Dashboard.
+     */
     @GET("api/orders/stats/restaurant/{resId}")
     Call<Map<String, Object>> getDashboardStats(
             @Path("resId") int resId,
