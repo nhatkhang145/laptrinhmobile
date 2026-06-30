@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background">
@@ -41,12 +42,12 @@
                     android:textColor="@color/text_primary"
                     android:textSize="18sp" />
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_gravity="end"
-                    android:src="@drawable/ic_user"
-                    app:shapeAppearanceOverlay="@style/RoundedSquare"
+                    android:src="@drawable/logo"
+                    android:scaleType="fitCenter"
                     android:contentDescription="User profile" />
 
             </androidx.appcompat.widget.Toolbar>
@@ -75,6 +76,7 @@
                         android:contentDescription="Search" />
 
                     <EditText
+                        android:id="@+id/etSearch"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_marginStart="8dp"
@@ -85,6 +87,16 @@
                         android:inputType="text"
                         android:importantForAutofill="no" />
                 </LinearLayout>
+
+                <!-- Areas Filter (Dynamic Layout) -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvAreaList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/item_category_tab" />
 
                 <!-- Stats -->
                 <LinearLayout

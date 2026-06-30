@@ -231,11 +231,12 @@ public class QuanLyCaActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("XÁC NHẬN ĐÓNG CA LÀM");
         
-        String msg = "Thời gian mở: " + startTimeStr + "\n\n"
+        String closeTimeStr = new SimpleDateFormat("HH:mm (dd/MM/yyyy)", Locale.getDefault()).format(new java.util.Date());
+        
+        String msg = "Thời gian mở: " + startTimeStr + "\n"
+                + "Thời gian đóng: " + closeTimeStr + "\n\n"
                 + "Quỹ đầu ca: " + formatter.format(currentFund) + "đ\n"
-                + "Doanh thu hệ thống ghi nhận: " + formatter.format(totalRevenueToClose) + "đ\n"
-                + "---------------------------------\n"
-                + "TỔNG TIỀN MẶT KẾT THÚC: " + formatter.format(currentFund + totalRevenueToClose) + "đ\n\n"
+                + "TỔNG DOANH THU TRONG CA: " + formatter.format(totalRevenueToClose) + "đ\n\n"
                 + "Bạn có chắc chắn muốn kết thúc phiên làm việc này không?";
                 
         builder.setMessage(msg);

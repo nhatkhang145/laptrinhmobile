@@ -17,20 +17,9 @@
         android:orientation="horizontal"
         android:padding="12dp">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/ivTableIcon"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:background="@drawable/bg_ic_circle_gray"
-            android:padding="12dp"
-            android:src="@drawable/ic_store"
-            app:shapeAppearanceOverlay="@style/RoundedSquare"
-            app:tint="@color/text_primary" />
-
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -41,16 +30,16 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/tvTableId"
+                    android:id="@+id/tvAreaName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
-                    android:text="B01"
+                    android:text="Burger"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp" />
 
                 <TextView
-                    android:id="@+id/tvTableStatus"
+                    android:id="@+id/tvAreaStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
@@ -69,21 +58,15 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/tvTableInfo"
+                android:id="@+id/tvAreaInfo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="Tầng 1 • 4 chỗ ngồi"
+                android:text="45 món • Các loại burger bò, gà..."
                 android:textColor="@color/text_secondary"
-                android:textSize="13sp" />
-
-            <TextView
-                android:id="@+id/tvDateCreated"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ngày tạo: 12/10/2023"
-                android:textColor="@color/text_hint"
-                android:textSize="11sp" />
+                android:textSize="13sp"
+                android:maxLines="2"
+                android:ellipsize="end" />
         </LinearLayout>
 
         <LinearLayout
@@ -92,16 +75,16 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/ivTableEdit"
+                android:id="@+id/ivAreaEdit"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginEnd="14dp"
                 android:src="@android:drawable/ic_menu_edit"
                 app:tint="@color/text_secondary"
-                android:contentDescription="Edit" />
+                android:contentDescription="Sửa" />
 
             <ImageView
-                android:id="@+id/ivTableDelete"
+                android:id="@+id/ivAreaDelete"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:src="@android:drawable/ic_menu_delete"

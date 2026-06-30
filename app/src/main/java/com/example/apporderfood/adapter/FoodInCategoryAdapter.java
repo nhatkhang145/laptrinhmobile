@@ -20,15 +20,9 @@ import java.util.Locale;
 public class FoodInCategoryAdapter extends RecyclerView.Adapter<FoodInCategoryAdapter.ViewHolder> {
 
     private List<MenuItem> items;
-    private OnRemoveClickListener listener;
 
-    public interface OnRemoveClickListener {
-        void onRemoveClick(MenuItem item);
-    }
-
-    public FoodInCategoryAdapter(List<MenuItem> items, OnRemoveClickListener listener) {
+    public FoodInCategoryAdapter(List<MenuItem> items) {
         this.items = items;
-        this.listener = listener;
     }
 
     public void setItems(List<MenuItem> items) {
@@ -76,11 +70,6 @@ public class FoodInCategoryAdapter extends RecyclerView.Adapter<FoodInCategoryAd
         } else {
             holder.ivFoodImage.setImageResource(R.drawable.bg_food_image);
         }
-
-        // Nút xóa khỏi danh mục
-        holder.btnRemoveFromCategory.setOnClickListener(v -> {
-            if (listener != null) listener.onRemoveClick(item);
-        });
     }
 
     @Override
@@ -91,7 +80,6 @@ public class FoodInCategoryAdapter extends RecyclerView.Adapter<FoodInCategoryAd
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ShapeableImageView ivFoodImage;
         TextView tvFoodName, tvFoodPrice, tvFoodStatus;
-        com.google.android.material.button.MaterialButton btnRemoveFromCategory;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -99,7 +87,6 @@ public class FoodInCategoryAdapter extends RecyclerView.Adapter<FoodInCategoryAd
             tvFoodName = itemView.findViewById(R.id.tvFoodName);
             tvFoodPrice = itemView.findViewById(R.id.tvFoodPrice);
             tvFoodStatus = itemView.findViewById(R.id.tvFoodStatus);
-            btnRemoveFromCategory = itemView.findViewById(R.id.btnRemoveFromCategory);
         }
     }
 }

@@ -11,13 +11,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.apporderfood.R;
 import com.example.apporderfood.api.RetrofitClient;
 import com.example.apporderfood.api.ZappyApiService;
 import com.example.apporderfood.model.User;
 import com.google.android.material.button.MaterialButton;
+import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome;
 import com.mikepenz.iconics.view.IconicsImageView;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +36,7 @@ import retrofit2.Response;
 
 public class ThemNhanVienActivity extends AppCompatActivity {
 
-    private IconicsImageView btnBack;
+    private IconicsImageView btnBack, ivTogglePassword;
     private EditText etFullName, etPhone, etUsername, etPassword;
     private FrameLayout flRoleDropdown;
     private TextView tvSelectedRole;
@@ -38,11 +46,18 @@ public class ThemNhanVienActivity extends AppCompatActivity {
 
     private int currentResId ;
     private int selectedRoleId = 0;
+    private boolean isPasswordVisible = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_them_nhan_vien);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
         SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
         currentResId = prefs.getInt("RES_ID", -1);
         if (currentResId == -1) {
@@ -68,6 +83,7 @@ public class ThemNhanVienActivity extends AppCompatActivity {
         etPhone = findViewById(R.id.etPhone);
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
+        ivTogglePassword = findViewById(R.id.ivTogglePassword);
 
         flRoleDropdown = findViewById(R.id.flRoleDropdown);
         tvSelectedRole = findViewById(R.id.tvSelectedRole);
@@ -87,6 +103,29 @@ public class ThemNhanVienActivity extends AppCompatActivity {
 
         // Nút Xác nhận thêm
         btnConfirm.setOnClickListener(v -> handleAddStaff());
+        
+        // Toggle password
+        ivTogglePassword.setOnClickListener(v -> togglePasswordVisibility());
+    }
+
+    private void togglePasswordVisibility() {
+        isPasswordVisible = !isPasswordVisible;
+        int cursorPos = etPassword.getSelectionEnd();
+        
+        if (isPasswordVisible) {
+            etPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+            ivTogglePassword.setImageDrawable(new IconicsDrawable(this, FontAwesome.Icon.faw_eye));
+        } else {
+            etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+            ivTogglePassword.setImageDrawable(new IconicsDrawable(this, FontAwesome.Icon.faw_eye_slash));
+        }
+        
+        etPassword.setSelection(Math.min(cursorPos, etPassword.getText().length()));
+        
+        ivTogglePassword.animate().scaleX(0.8f).scaleY(0.8f).setDuration(80)
+                .withEndAction(() ->
+                        ivTogglePassword.animate().scaleX(1f).scaleY(1f).setDuration(100).start())
+                .start();
     }
 
     private void showRoleMenu() {
@@ -105,13 +144,13 @@ public class ThemNhanVienActivity extends AppCompatActivity {
 
     private void handleAddStaff() {
         String fullName = etFullName.getText().toString().trim();
-        String phone = etPhone.getText().toString().trim();
+        String email = etPhone.getText().toString().trim();
         String username = etUsername.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
         // Validate cơ bản
-        if (username.isEmpty() || password.isEmpty() || phone.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập đầy đủ Username, Password và SĐT!", Toast.LENGTH_SHORT).show();
+        if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
+            Toast.makeText(this, "Vui lòng nhập đầy đủ Username, Password và Email!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -121,11 +160,7 @@ public class ThemNhanVienActivity extends AppCompatActivity {
         data.put("username", username);
         data.put("password", password);
         data.put("role", selectedRoleId);
-
-        // Vì Backend hiện tại bắt buộc phải có email, ta dùng tạm SĐT để truyền vào
-        data.put("email", phone);
-
-        // Truyền thêm fullname, Backend có thể lưu nếu sau này cập nhật
+        data.put("email", email);
         data.put("fullname", fullName);
 
         // Khóa nút để tránh bấm 2 lần

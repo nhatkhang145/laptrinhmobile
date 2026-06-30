@@ -31,8 +31,10 @@ public class TienIchActivity extends AppCompatActivity {
     private LinearLayout menuLogout;
     private LinearLayout menuQuanLyMonAn;
     private LinearLayout menuQuanLyBan;
+    private LinearLayout menuQuanLyKhuVuc;
     private LinearLayout menuQuanLyDanhMuc;
     private LinearLayout menuQuanLyHoaDon;
+    private LinearLayout menuQuanLyHuyMon;
     private LinearLayout menuQuanLyCaLam;
     private LinearLayout navOrder;
     private LinearLayout navSoDo;
@@ -64,8 +66,10 @@ public class TienIchActivity extends AppCompatActivity {
         menuLogout         = findViewById(R.id.menuLogout);
         menuQuanLyMonAn    = findViewById(R.id.menuQuanLyMonAn);
         menuQuanLyBan      = findViewById(R.id.menuQuanLyBan);
+        menuQuanLyKhuVuc   = findViewById(R.id.menuQuanLyKhuVuc);
         menuQuanLyDanhMuc  = findViewById(R.id.menuQuanLyDanhMuc);
         menuQuanLyHoaDon   = findViewById(R.id.menuQuanLyHoaDon);
+        menuQuanLyHuyMon   = findViewById(R.id.menuQuanLyHuyMon);
         menuQuanLyCaLam    = findViewById(R.id.menuQuanLyCaLam);
         navOrder           = findViewById(R.id.navOrder);
         navSoDo            = findViewById(R.id.navSoDo);
@@ -86,7 +90,7 @@ public class TienIchActivity extends AppCompatActivity {
             tvUserName.setText("Chưa cập nhật tên");
         }
 
-        if (role == 0) { // Nhan vien
+        if (role != 1) { // An voi nhung ai khong phai Admin (role 0 va 2)
             View tvAdminSectionTitle = findViewById(R.id.tvAdminSectionTitle);
             View adminMenuCard = findViewById(R.id.adminMenuCard);
             if (tvAdminSectionTitle != null) tvAdminSectionTitle.setVisibility(View.GONE);
@@ -111,6 +115,13 @@ public class TienIchActivity extends AppCompatActivity {
             startActivity(new Intent(this, TableManageActivity.class));
         });
 
+        if (menuQuanLyKhuVuc != null) {
+            menuQuanLyKhuVuc.setOnClickListener(v -> {
+                animatePress(v);
+                startActivity(new Intent(this, AreaManageActivity.class));
+            });
+        }
+
         menuQuanLyDanhMuc.setOnClickListener(v -> {
             animatePress(v);
             startActivity(new Intent(this, CategoryManageActivity.class));
@@ -120,6 +131,13 @@ public class TienIchActivity extends AppCompatActivity {
             menuQuanLyHoaDon.setOnClickListener(v -> {
                 animatePress(v);
                 startActivity(new Intent(this, InvoiceManageActivity.class));
+            });
+        }
+        
+        if (menuQuanLyHuyMon != null) {
+            menuQuanLyHuyMon.setOnClickListener(v -> {
+                animatePress(v);
+                startActivity(new Intent(this, CancelManageActivity.class));
             });
         }
         

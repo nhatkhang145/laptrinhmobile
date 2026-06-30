@@ -2,6 +2,7 @@ package com.zappy.controller;
 
 import com.zappy.entity.Shift;
 import com.zappy.repository.ShiftRepository;
+import com.zappy.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,9 @@ public class ShiftController {
     @Autowired
     private ShiftRepository shiftRepository;
 
+    @Autowired
+    private OrderRepository orderRepository;
+
     // Lấy danh sách tất cả các ca (Lịch sử)
     @GetMapping("/restaurant/{resId}")
     public ResponseEntity<List<Shift>> getAllShifts(@PathVariable Long resId) {
@@ -29,7 +33,14 @@ public class ShiftController {
     public ResponseEntity<?> getActiveShift(@PathVariable Long resId) {
         Optional<Shift> activeShift = shiftRepository.findByRestaurantIdAndStatus(resId, "OPEN");
         if (activeShift.isPresent()) {
-            return ResponseEntity.ok(activeShift.get());
+            Shift shift = activeShift.get();
+            java.math.BigDecimal revenue = orderRepository.getRevenue(resId.intValue(), shift.getStartTime(), LocalDateTime.now());
+            if (revenue != null) {
+                shift.setTotalRevenue(revenue.doubleValue());
+            } else {
+                shift.setTotalRevenue(0.0);
+            }
+            return ResponseEntity.ok(shift);
         } else {
             return ResponseEntity.notFound().build();
         }

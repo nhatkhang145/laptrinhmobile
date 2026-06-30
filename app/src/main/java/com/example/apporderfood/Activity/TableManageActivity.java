@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,13 +16,19 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.apporderfood.R;
+import com.example.apporderfood.adapter.AreaFilterAdapter;
 import com.example.apporderfood.adapter.TableManageAdapter;
 import com.example.apporderfood.api.RetrofitClient;
 import com.example.apporderfood.api.ZappyApiService;
+import com.example.apporderfood.model.Area;
 import com.example.apporderfood.model.TableModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -40,6 +49,12 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
     private ProgressBar pbLoading;
     private TextView tvEmptyState;
     private TextView tvTotalTables, tvActiveTables, tvLockedTables;
+    private EditText etSearch;
+    private RecyclerView rvAreaList;
+
+    private AreaFilterAdapter areaAdapter;
+    private Integer currentFilterAreaId = null;
+    private String currentKeyword = "";
 
     private int resId = -1;
 
@@ -56,7 +71,13 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_quan_ly_ban);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
+            return insets;
+        });
 
         // Lấy resId của nhà hàng hiện tại
         SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
@@ -64,6 +85,7 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
 
         initViews();
         setupRecyclerView();
+        loadAreasForFilter();
         loadTables();
         setupListeners();
         setupBottomNav();
@@ -78,11 +100,16 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
         tvTotalTables = findViewById(R.id.tvTotalTables);
         tvActiveTables = findViewById(R.id.tvActiveTables);
         tvLockedTables = findViewById(R.id.tvLockedTables);
+        etSearch = findViewById(R.id.etSearch);
+        rvAreaList = findViewById(R.id.rvAreaList);
     }
 
     private void setupRecyclerView() {
         if (rvTableList != null) {
             rvTableList.setLayoutManager(new LinearLayoutManager(this));
+        }
+        if (rvAreaList != null) {
+            rvAreaList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         }
     }
 
@@ -124,6 +151,38 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
         });
     }
 
+    private void loadAreasForFilter() {
+        if (resId == -1) return;
+        ZappyApiService api = RetrofitClient.getApiService();
+        api.getAreas(resId).enqueue(new Callback<List<Area>>() {
+            @Override
+            public void onResponse(Call<List<Area>> call, Response<List<Area>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Area> filterList = new java.util.ArrayList<>();
+                    Area allArea = new Area();
+                    allArea.setId(null);
+                    allArea.setAreaName("Tất cả");
+                    filterList.add(allArea);
+                    filterList.addAll(response.body());
+
+                    areaAdapter = new AreaFilterAdapter(filterList, area -> {
+                        currentFilterAreaId = area.getId();
+                        if (adapter != null) {
+                            adapter.filter(currentKeyword, currentFilterAreaId);
+                            updateStats(adapter.getTableList());
+                        }
+                    });
+                    if (rvAreaList != null) rvAreaList.setAdapter(areaAdapter);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Area>> call, Throwable t) {
+                Toast.makeText(TableManageActivity.this, "Không thể tải danh sách khu vực", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void updateStats(List<TableModel> list) {
         int total = list.size();
         int active = 0;
@@ -136,7 +195,7 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
         }
         if (tvTotalTables != null) tvTotalTables.setText(String.valueOf(total));
         if (tvActiveTables != null) tvActiveTables.setText(String.valueOf(active));
-        if (tvLockedTables != null) tvLockedTables.setText(String.format(Locale.getDefault(), "%02d", locked));
+        if (tvLockedTables != null) tvLockedTables.setText(String.valueOf(locked));
     }
 
     /** Cập nhật stats sau khi toggle status mà không cần reload API ngay lập tức */
@@ -158,6 +217,20 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
                 addTableLauncher.launch(intent);
             });
         }
+
+        if (etSearch != null) {
+            etSearch.addTextChangedListener(new TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    currentKeyword = s.toString();
+                    if (adapter != null) {
+                        adapter.filter(currentKeyword, currentFilterAreaId);
+                        updateStats(adapter.getTableList());
+                    }
+                }
+                @Override public void afterTextChanged(Editable s) {}
+            });
+        }
     }
 
     @Override
@@ -174,6 +247,12 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
 
         boolean currentlyActive = item.getStatus() == null || "HOẠT ĐỘNG".equals(item.getStatus());
         String newStatus = currentlyActive ? "ĐANG KHÓA" : "HOẠT ĐỘNG";
+
+        // Ngăn chặn khóa bàn nếu đang có khách
+        if ("ĐANG KHÓA".equals(newStatus) && item.isOccupied()) {
+            Toast.makeText(this, "Bàn đang có hóa đơn/khách, không thể khóa!", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         ZappyApiService api = RetrofitClient.getApiService();
         Map<String, Object> body = new HashMap<>();

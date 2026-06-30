@@ -4,6 +4,7 @@ import com.zappy.entity.Area;
 import com.zappy.entity.Restaurant;
 import com.zappy.repository.AreaRepository;
 import com.zappy.repository.RestaurantRepository;
+import com.zappy.repository.TableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ public class AreaController {
 
     @Autowired private AreaRepository areaRepo;
     @Autowired private RestaurantRepository restaurantRepo;
+    @Autowired private TableRepository tableRepo;
 
     @GetMapping("/restaurant/{resId}")
     public List<Area> getByRestaurant(@PathVariable Integer resId) {
@@ -60,5 +62,23 @@ public class AreaController {
         if (!areaRepo.existsById(id)) return ResponseEntity.notFound().build();
         areaRepo.deleteById(id);
         return ResponseEntity.ok(Map.of("message", "Da xoa khu vuc!"));
+    }
+
+    @PutMapping("/{id}/toggle-status")
+    public ResponseEntity<?> toggleStatus(@PathVariable Integer id) {
+        return areaRepo.findById(id).map(a -> {
+            boolean currentStatus = a.getIsActive() != null ? a.getIsActive() : true;
+            
+            // Neu dang chuan bi an khu vuc, kiem tra xem co ban nao dang co khach khong
+            if (currentStatus) {
+                if (tableRepo.existsByAreaIdAndIsOccupiedTrue(id)) {
+                    return ResponseEntity.badRequest().body(Map.of("message", "Không thể ẩn khu vực đang có bàn có khách!"));
+                }
+            }
+            
+            a.setIsActive(!currentStatus);
+            areaRepo.save(a);
+            return ResponseEntity.ok(Map.of("isActive", a.getIsActive()));
+        }).orElse(ResponseEntity.notFound().build());
     }
 }
