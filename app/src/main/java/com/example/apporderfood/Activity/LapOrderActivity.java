@@ -66,6 +66,10 @@ public class LapOrderActivity extends AppCompatActivity {
     private int currentUserId = -1;
     private int currentUserRole = 0;
 
+    /**
+     * HÀM KHỞI TẠO (Chạy đầu tiên khi mở Activity)
+     * Nhận dữ liệu bàn, lấy session người dùng, nạp giao diện và kiểm tra quyền gọi món.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,6 +162,10 @@ public class LapOrderActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * HIỂN THỊ THÔNG BÁO LỖI VÀ ĐÓNG MÀN HÌNH
+     * Dùng khi nhân viên không có quyền gọi món hoặc có lỗi nghiêm trọng.
+     */
     private void showErrorAndExit(String message) {
         new android.app.AlertDialog.Builder(this)
                 .setTitle("Cảnh báo")
@@ -167,6 +175,10 @@ public class LapOrderActivity extends AppCompatActivity {
                 .show();
     }
 
+    /**
+     * KHỞI TẠO CÁC THÀNH PHẦN GIAO DIỆN (Ánh xạ ID)
+     * Đặt tên cho màn hình dựa theo tên bàn được truyền sang.
+     */
     private void initViews() {
         btnHuyBo = findViewById(R.id.btnHuyBo);
         btnDongY = findViewById(R.id.btnDongY);
@@ -184,8 +196,15 @@ public class LapOrderActivity extends AppCompatActivity {
         }
     }
 
+    // BIẾN QUAN TRỌNG: Giỏ hàng tạm thời (Session Cart) lưu trên RAM.
+    // Dùng static để có thể truy cập từ Adapter và XacNhanOrderActivity mà không cần gửi dữ liệu phức tạp.
+    // Key: ID món ăn | Value: Thông tin món (CartItem bao gồm số lượng, ghi chú)
     public static Map<Integer, CartItem> cartMap = new HashMap<>();
 
+    /**
+     * THIẾT LẬP RECYCLER VIEW DANH SÁCH MÓN ĂN
+     * Truyền biến cartMap vào Adapter để Adapter biết món nào đang được chọn.
+     */
     private void setupRecyclerView() {
         adapter = new MenuItemLapOrderAdapter(this, new ArrayList<>(), cartMap, updatedCart -> {
             cartMap = updatedCart;
@@ -194,6 +213,10 @@ public class LapOrderActivity extends AppCompatActivity {
         rvMenuItems.setAdapter(adapter);
     }
 
+    /**
+     * TẢI DANH MỤC MÓN ĂN (Categories)
+     * Gọi API lấy danh sách loại món, nếu thành công thì tạo các Tab tương ứng.
+     */
     private void loadCategories() {
         if (resId == -1)
             return;
@@ -214,6 +237,10 @@ public class LapOrderActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * THIẾT LẬP CÁC TAB DANH MỤC (Tất cả, Đồ ăn, Nước uống,...)
+     * Bắt sự kiện khi nhân viên bấm sang Tab khác thì tải lại danh sách món của Tab đó.
+     */
     private void setupTabs() {
         tabLayoutCategories.removeAllTabs();
 
@@ -249,6 +276,10 @@ public class LapOrderActivity extends AppCompatActivity {
         loadMenuItems("");
     }
 
+    /**
+     * TẢI THỰC ĐƠN MÓN ĂN DỰA THEO DANH MỤC VÀ TỪ KHÓA
+     * @param keyword Từ khóa tìm kiếm (có thể rỗng)
+     */
     private void loadMenuItems(String keyword) {
         if (resId == -1)
             return;
@@ -279,6 +310,10 @@ public class LapOrderActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * THIẾT LẬP Ô TÌM KIẾM MÓN ĂN (Debounce Search)
+     * Chờ 400ms sau khi ngừng gõ mới gọi API để tránh làm quá tải Server.
+     */
     private void setupSearch() {
         android.os.Handler searchHandler = new android.os.Handler(android.os.Looper.getMainLooper());
         Runnable[] searchRunnable = {null};
@@ -304,6 +339,9 @@ public class LapOrderActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * LẮNG NGHE CÁC NÚT BẤM (Hủy bỏ, Đồng ý, Back)
+     */
     private void setupClickListeners() {
         btnHuyBo.setOnClickListener(v -> finish());
 
@@ -319,6 +357,12 @@ public class LapOrderActivity extends AppCompatActivity {
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
 
+    /**
+     * HÀM TẠO ORDER MỚI
+     * - Được gọi khi bấm nút "ĐỒNG Ý".
+     * - Nhiệm vụ: Gọi API mở bàn (tạo Order mới), chuyển trạng thái bàn sang "Có Khách".
+     * - Chưa gửi món xuống bếp ở bước này, món vẫn chỉ nằm trong biến cartMap.
+     */
     private void createOrderThenAddItems() {
         if (tableId == -1) {
             btnDongY.setEnabled(true);
@@ -344,7 +388,9 @@ public class LapOrderActivity extends AppCompatActivity {
                     Object id = response.body().get("id");
                     if (id == null) id = response.body().get("orderId");
                     if (id != null) {
+                        // Lấy ID của Order vừa được tạo
                         orderId = ((Double) id).intValue();
+                        // Mở màn hình Xác Nhận Order
                         addItemsToOrder();
                     } else {
                         Toast.makeText(LapOrderActivity.this, "Lỗi: Không nhận được mã đơn!", Toast.LENGTH_SHORT).show();
@@ -370,6 +416,10 @@ public class LapOrderActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * HÀM DỰ PHÒNG: LẤY ORDER HIỆN TẠI CỦA BÀN
+     * Dùng trong trường hợp API openTable báo lỗi 400 (Bàn đã được mở trước đó).
+     */
     private void fetchActiveOrderThenAddItems() {
         RetrofitClient.getApiService().getActiveOrder(tableId).enqueue(new Callback<Map>() {
             @Override
@@ -398,6 +448,10 @@ public class LapOrderActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * HÀM CHUYỂN SANG MÀN HÌNH XÁC NHẬN ORDER
+     * Chuyển Order ID và thông tin Bàn sang màn hình XacNhanOrderActivity.
+     */
     private void addItemsToOrder() {
         btnDongY.setEnabled(true);
         Intent intent = new Intent(LapOrderActivity.this, XacNhanOrderActivity.class);
@@ -407,6 +461,10 @@ public class LapOrderActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * HÀM DỌN DẸP KHI ĐÓNG MÀN HÌNH
+     * Xóa tham chiếu instance để tránh memory leak.
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();

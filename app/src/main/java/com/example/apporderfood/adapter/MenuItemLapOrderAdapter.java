@@ -28,13 +28,22 @@ public class MenuItemLapOrderAdapter extends RecyclerView.Adapter<MenuItemLapOrd
 
     private Context context;
     private List<MenuItem> menuItems;
+    // Giỏ hàng tạm thời, key là ID món ăn, value là thông tin số lượng và ghi chú
     private Map<Integer, CartItem> cartMap = new HashMap<>();
     private OnCartChangeListener listener;
 
+    // Interface để gửi sự kiện mỗi khi giỏ hàng có sự thay đổi (thêm/bớt món)
     public interface OnCartChangeListener {
         void onCartUpdated(Map<Integer, CartItem> updatedCart);
     }
 
+    /**
+     * HÀM KHỞI TẠO ADAPTER
+     * @param context Ngữ cảnh của ứng dụng
+     * @param menuItems Danh sách món ăn ban đầu
+     * @param cartMap Giỏ hàng tạm truyền từ Activity sang
+     * @param listener Bộ lắng nghe khi giỏ hàng thay đổi
+     */
     public MenuItemLapOrderAdapter(Context context, List<MenuItem> menuItems, Map<Integer, CartItem> cartMap, OnCartChangeListener listener) {
         this.context = context;
         this.menuItems = menuItems;
@@ -42,16 +51,26 @@ public class MenuItemLapOrderAdapter extends RecyclerView.Adapter<MenuItemLapOrd
         this.listener = listener;
     }
 
+    /**
+     * NẠP DỮ LIỆU DANH SÁCH MÓN ĂN TỪ API
+     * Dùng khi chuyển Tab hoặc khi gõ tìm kiếm, sau đó gọi notifyDataSetChanged() để vẽ lại.
+     */
     public void setMenuItems(List<MenuItem> items) {
         this.menuItems = items;
         notifyDataSetChanged();
     }
 
+    /**
+     * CẬP NHẬT LẠI GIỎ HÀNG TẠM TỪ ACTIVITY
+     */
     public void setCartMap(Map<Integer, CartItem> cartMap) {
         this.cartMap = cartMap != null ? cartMap : new HashMap<>();
         notifyDataSetChanged();
     }
 
+    /**
+     * TẠO GIAO DIỆN (NẠP XML) CHO TỪNG DÒNG MÓN ĂN
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -59,6 +78,10 @@ public class MenuItemLapOrderAdapter extends RecyclerView.Adapter<MenuItemLapOrd
         return new ViewHolder(view);
     }
 
+    /**
+     * ĐỔ DỮ LIỆU VÀO GIAO DIỆN CỦA TỪNG MÓN ĂN
+     * Bao gồm: hiển thị tên, giá, ảnh, trạng thái giỏ hàng và gắn sự kiện click.
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         MenuItem item = menuItems.get(position);
@@ -87,24 +110,27 @@ public class MenuItemLapOrderAdapter extends RecyclerView.Adapter<MenuItemLapOrd
             holder.ivFoodImage.setImageResource(0);
         }
 
-        // Cart state logic
+        // Kiểm tra xem món ăn này có đang nằm trong giỏ hàng tạm (cartMap) hay không
         CartItem cartItem = cartMap.get(item.getId());
         int qty = cartItem != null ? cartItem.getQuantity() : 0;
 
+        // Nếu số lượng > 0 (đã chọn), ẩn nút "Thêm", hiện cụm nút [+ 1 -]
         if (qty > 0) {
             holder.btnAddItem.setVisibility(View.GONE);
             holder.llQuantityControl.setVisibility(View.VISIBLE);
             holder.tvQuantity.setText(String.valueOf(qty));
         } else {
+            // Nếu chưa chọn, chỉ hiện nút "Thêm"
             holder.btnAddItem.setVisibility(View.VISIBLE);
             holder.llQuantityControl.setVisibility(View.GONE);
         }
 
-        // Click listeners
+        // Xử lý sự kiện bấm nút Thêm/Tăng/Giảm số lượng món
         holder.btnAddItem.setOnClickListener(v -> updateQuantity(item, 1));
         holder.btnPlus.setOnClickListener(v -> updateQuantity(item, qty + 1));
         holder.btnMinus.setOnClickListener(v -> updateQuantity(item, qty - 1));
 
+        // Xử lý sự kiện bấm nút Thêm ghi chú cho món ăn
         holder.btnNote.setOnClickListener(v -> {
             CartItem current = cartMap.get(item.getId());
             String existingNote = current != null && current.getNote() != null ? current.getNote() : "";
@@ -142,30 +168,48 @@ public class MenuItemLapOrderAdapter extends RecyclerView.Adapter<MenuItemLapOrd
         });
     }
 
+    /**
+     * Hàm cập nhật số lượng món ăn trong giỏ hàng tạm
+     * @param item món ăn cần cập nhật
+     * @param newQty số lượng mới
+     */
     private void updateQuantity(MenuItem item, int newQty) {
         if (newQty > 0) {
             CartItem cartItem = cartMap.get(item.getId());
             if (cartItem == null) {
+                // Nếu món chưa có trong giỏ, tạo mới và đưa vào cartMap
                 cartItem = new CartItem(item, newQty, "");
                 cartMap.put(item.getId(), cartItem);
             } else {
+                // Nếu đã có, chỉ việc cập nhật số lượng
                 cartItem.setQuantity(newQty);
             }
         } else {
+            // Nếu số lượng giảm về 0, xóa món khỏi giỏ hàng
             cartMap.remove(item.getId());
         }
         
+        // Cập nhật lại giao diện ngay lập tức
         notifyDataSetChanged();
+        
+        // Gửi thông báo ra Activity (LapOrderActivity) để biết giỏ hàng đã thay đổi
         if (listener != null) {
             listener.onCartUpdated(cartMap);
         }
     }
 
+    /**
+     * TRẢ VỀ TỔNG SỐ LƯỢNG MÓN ĂN CÓ TRONG DANH SÁCH
+     */
     @Override
     public int getItemCount() {
         return menuItems == null ? 0 : menuItems.size();
     }
 
+    /**
+     * LỚP VIEWHOLDER: CHỨA CÁC THÀNH PHẦN GIAO DIỆN CỦA 1 MÓN ĂN
+     * Ánh xạ (findViewById) các thành phần giao diện để onBindViewHolder sử dụng.
+     */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ShapeableImageView ivFoodImage;
         TextView tvFoodName, tvFoodDesc, tvFoodPrice, tvQuantity;

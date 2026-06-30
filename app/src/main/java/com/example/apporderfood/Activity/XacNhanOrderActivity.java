@@ -34,18 +34,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * XacNhanOrderActivity - Màn hình xem danh sách món đã gọi & Gửi đơn bếp
- * Layout: activity_xac_nhan_order.xml
- * Flow:
- * - Nhận ORDER_ID từ LapOrderActivity
- * - Gọi API GET /api/orders/{orderId}/details để tải danh sách món
- * - Hiển thị trong RecyclerView với tổng tiền ở bottom bar
- * - Nút "Thêm món" -> quay lại LapOrderActivity
- * - Nút "GỬI BẾP" -> Gọi API PUT /api/orders/{id}/send -> sang
- * ChiTietBanActivity
- * - Nút Back -> về SoDobanActivity
- */
 public class XacNhanOrderActivity extends AppCompatActivity {
 
     private View btnBack;
@@ -121,19 +109,30 @@ public class XacNhanOrderActivity extends AppCompatActivity {
         rvOrderDetails.setNestedScrollingEnabled(false);
     }
 
+    /**
+     * HÀM XÓA/HUỶ MÓN ĂN
+     * 
+     * @param detail Món ăn cần xoá
+     */
     private void cancelItem(OrderDetail detail) {
+        // TRƯỜNG HỢP 1: Món chưa gửi bếp (ID = null vì món chỉ đang nằm trong
+        // RAM/cartMap)
         if (detail.getId() == null) {
             if (detail.getMenuItem() != null && LapOrderActivity.cartMap.containsKey(detail.getMenuItem().getId())) {
+                // Xoá trực tiếp khỏi biến static cartMap mà không cần gọi API
                 LapOrderActivity.cartMap.remove(detail.getMenuItem().getId());
                 Toast.makeText(XacNhanOrderActivity.this, "Đã xóa món khỏi giỏ!", Toast.LENGTH_SHORT).show();
+                // Tải lại danh sách hiển thị
                 loadOrderDetails();
             }
             return;
         }
 
+        // TRƯỜNG HỢP 2: Món đã gửi bếp (ID != null), yêu cầu nhập lý do huỷ và gọi API
+        // huỷ
         android.widget.EditText input = new android.widget.EditText(this);
         input.setHint("Nhập lý do huỷ món...");
-        
+
         android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
         layout.setOrientation(android.widget.LinearLayout.VERTICAL);
         layout.setPadding(50, 20, 50, 0);
@@ -171,6 +170,10 @@ public class XacNhanOrderActivity extends AppCompatActivity {
                 .show();
     }
 
+    /**
+     * HÀM TẢI DANH SÁCH MÓN ĂN ĐỂ HIỂN THỊ LÊN MÀN HÌNH XÁC NHẬN
+     * Bao gồm: Món đã có trong DB + Món vừa chọn thêm trong Giỏ hàng RAM (cartMap)
+     */
     private void loadOrderDetails() {
         if (orderId == -1) {
             Toast.makeText(this, "Không tìm thấy đơn hàng!", Toast.LENGTH_SHORT).show();
@@ -181,6 +184,7 @@ public class XacNhanOrderActivity extends AppCompatActivity {
         rvOrderDetails.setVisibility(View.GONE);
 
         ZappyApiService api = RetrofitClient.getApiService();
+        // Lấy các món đã lưu trong Database của Order này
         api.getOrderDetails(orderId).enqueue(new Callback<List<OrderDetail>>() {
             @Override
             public void onResponse(Call<List<OrderDetail>> call, Response<List<OrderDetail>> response) {
@@ -189,17 +193,21 @@ public class XacNhanOrderActivity extends AppCompatActivity {
 
                 if (response.isSuccessful() && response.body() != null) {
                     List<OrderDetail> details = response.body();
-                    
+
+                    // GỘP CÁC MÓN TRONG RAM VÀO DANH SÁCH HIỂN THỊ
                     for (CartItem ci : LapOrderActivity.cartMap.values()) {
                         OrderDetail localItem = new OrderDetail();
+                        // Cực kỳ quan trọng: Set ID = null để Adapter biết đây là món mới, chưa lưu DB
                         localItem.setId(null);
                         localItem.setMenuItem(ci.getMenuItem());
                         localItem.setQuantity(ci.getQuantity());
                         localItem.setNote(ci.getNote());
                         BigDecimal price = ci.getMenuItem().getPrice();
-                        localItem.setPriceAtSale(price); 
+                        localItem.setPriceAtSale(price);
+                        // Set Status = 0 (Chưa gửi)
                         localItem.setStatus(0);
-                        
+
+                        // Đẩy lên đầu danh sách
                         details.add(0, localItem);
                     }
 
@@ -292,14 +300,21 @@ public class XacNhanOrderActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * HÀM XỬ LÝ KHI BẤM NÚT "GỬI BẾP"
+     */
     private void sendOrder() {
-        if (orderId == -1) return;
+        if (orderId == -1)
+            return;
         btnGui.setEnabled(false);
         btnGui.setAlpha(0.45f);
         ZappyApiService api = RetrofitClient.getApiService();
 
+        // Nếu trong giỏ hàng tạm có món, ta cần phải lưu vào DB trước khi gọi lệnh gửi
+        // bếp
         if (!LapOrderActivity.cartMap.isEmpty()) {
             List<Map<String, Object>> batchData = new ArrayList<>();
+            // Duyệt qua cartMap để đóng gói dữ liệu thành danh sách JSON
             for (CartItem ci : LapOrderActivity.cartMap.values()) {
                 Map<String, Object> item = new java.util.HashMap<>();
                 item.put("itemId", ci.getMenuItem().getId());
@@ -307,6 +322,7 @@ public class XacNhanOrderActivity extends AppCompatActivity {
                 item.put("note", ci.getNote() != null ? ci.getNote() : "");
                 batchData.add(item);
             }
+            // Gọi API lưu hàng loạt món vào DB (Batch Insert)
             api.addBatchItems(orderId, batchData).enqueue(new Callback<Map<String, String>>() {
                 @Override
                 public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
@@ -315,9 +331,11 @@ public class XacNhanOrderActivity extends AppCompatActivity {
                     } else {
                         btnGui.setEnabled(true);
                         btnGui.setAlpha(1.0f);
-                        Toast.makeText(XacNhanOrderActivity.this, "Lỗi thêm món trước khi gửi!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(XacNhanOrderActivity.this, "Lỗi thêm món trước khi gửi!", Toast.LENGTH_SHORT)
+                                .show();
                     }
                 }
+
                 @Override
                 public void onFailure(Call<Map<String, String>> call, Throwable t) {
                     btnGui.setEnabled(true);
@@ -330,25 +348,30 @@ public class XacNhanOrderActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * HÀM CHỐT "GỬI BẾP" VÀ ĐỔI TRẠNG THÁI MÓN TRONG DB
+     */
     private void executeSendOrderAPI(ZappyApiService api) {
         api.sendOrder(orderId).enqueue(new Callback<java.util.Map>() {
             @Override
             public void onResponse(Call<java.util.Map> call, Response<java.util.Map> response) {
                 if (response.isSuccessful()) {
-                        Toast.makeText(XacNhanOrderActivity.this,
-                                "Đã gửi lên bếp thành công!", Toast.LENGTH_SHORT).show();
-                        LapOrderActivity.cartMap.clear();
-                        if (LapOrderActivity.instance != null) {
-                            LapOrderActivity.instance.finish();
-                        }
+                    Toast.makeText(XacNhanOrderActivity.this,
+                            "Đã gửi lên bếp thành công!", Toast.LENGTH_SHORT).show();
 
-                        Intent intent = new Intent(XacNhanOrderActivity.this, ChiTietBanActivity.class);
-                        intent.putExtra("ORDER_ID", orderId);
-                        intent.putExtra("TABLE_ID", tableId);
-                        intent.putExtra("TABLE_NAME", tableName);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                        startActivity(intent);
-                        finish();
+                    // CỰC KỲ QUAN TRỌNG: Dọn sạch giỏ hàng tạm trên RAM sau khi gửi thành công
+                    LapOrderActivity.cartMap.clear();
+                    if (LapOrderActivity.instance != null) {
+                        LapOrderActivity.instance.finish();
+                    }
+
+                    Intent intent = new Intent(XacNhanOrderActivity.this, ChiTietBanActivity.class);
+                    intent.putExtra("ORDER_ID", orderId);
+                    intent.putExtra("TABLE_ID", tableId);
+                    intent.putExtra("TABLE_NAME", tableName);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(intent);
+                    finish();
                 } else {
                     btnGui.setEnabled(true);
                     btnGui.setAlpha(1.0f);

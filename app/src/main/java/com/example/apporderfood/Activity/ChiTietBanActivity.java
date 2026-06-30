@@ -29,23 +29,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.apporderfood.adapter.OrderDetailAdapter;
 import com.example.apporderfood.model.OrderDetail;
 
-/**
- * ChiTietBanActivity - Chi tiết đơn đang phục vụ tại bàn
- * Layout: activity_chi_tiet_ban.xml
- * Flow:
- *  - Hiển thị danh sách Order_Details theo orderId
- *  - Nút "Thêm món" -> LapOrderActivity (NV thêm thêm món mới, status=0)
- *  - Nút "Tính tiền" -> HoaDonActivity (Thanh toán, đóng hóa đơn)
- *  - Nút Hủy món (chỉ Quản lý) -> Gọi API cancelItem (status -> 2)
- *  - Nút Back -> DanhSachOrderActivity
- */
 public class ChiTietBanActivity extends AppCompatActivity {
 
     private View btnBack;
     private View btnThemMon;
     private View btnTinhTien;
     private View btnGuiBep;
-    
+
     private TextView tvTitle;
     private TextView tvBadgeCount;
     private TextView tvTotalAmount;
@@ -53,10 +43,14 @@ public class ChiTietBanActivity extends AppCompatActivity {
     private OrderDetailAdapter adapter;
     private final DecimalFormat formatter = new DecimalFormat("#,###");
 
-    private int orderId   = -1;
-    private int tableId   = -1;
+    private int orderId = -1;
+    private int tableId = -1;
     private String tableName = "";
 
+    /**
+     * HÀM KHỞI TẠO (Chạy đầu tiên khi mở màn hình)
+     * Nhận ID của Bàn và ID của Order từ màn hình trước truyền sang.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,22 +62,26 @@ public class ChiTietBanActivity extends AppCompatActivity {
             return insets;
         });
 
-        orderId   = getIntent().getIntExtra("ORDER_ID", -1);
-        tableId   = getIntent().getIntExtra("TABLE_ID", -1);
+        orderId = getIntent().getIntExtra("ORDER_ID", -1);
+        tableId = getIntent().getIntExtra("TABLE_ID", -1);
         tableName = getIntent().getStringExtra("TABLE_NAME") != null
-                ? getIntent().getStringExtra("TABLE_NAME") : "Bàn";
+                ? getIntent().getStringExtra("TABLE_NAME")
+                : "Bàn";
 
         initViews();
         setupRecyclerView();
         setupClickListeners();
     }
 
+    /**
+     * ÁNH XẠ GIAO DIỆN VÀ THIẾT LẬP TIÊU ĐỀ
+     */
     private void initViews() {
-        btnBack     = findViewById(R.id.btnBack);
-        btnThemMon  = findViewById(R.id.btnAddItem); // changed to btnAddItem based on xml id
+        btnBack = findViewById(R.id.btnBack);
+        btnThemMon = findViewById(R.id.btnAddItem);
         btnTinhTien = findViewById(R.id.btnTinhTien);
         btnGuiBep = findViewById(R.id.btnGuiBep);
-        
+
         tvTitle = findViewById(R.id.tvTitle);
         tvBadgeCount = findViewById(R.id.tvBadgeCount);
         tvTotalAmount = findViewById(R.id.tvTotalAmount);
@@ -93,18 +91,22 @@ public class ChiTietBanActivity extends AppCompatActivity {
             tvTitle.setText(tableName + " • Đang phục vụ");
         }
 
-        // We use btnAddItem from the XML instead of btnThemMon since XML has id btnAddItem
         if (btnThemMon == null) {
             btnThemMon = findViewById(R.id.btnThemMon);
         }
     }
 
+    /**
+     * THIẾT LẬP DANH SÁCH (RecyclerView)
+     * Kiểm tra quyền của người dùng để quyết định có cho phép hiển thị nút Tính
+     * Tiền hay không.
+     */
     private void setupRecyclerView() {
         android.content.SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
         int userRole = prefs.getInt("ROLE", 0);
         boolean isAdmin = userRole == 1;
         boolean canCheckout = userRole == 1 || userRole == 2;
-        
+
         if (!canCheckout && btnTinhTien != null) {
             btnTinhTien.setVisibility(View.GONE);
         }
@@ -115,47 +117,58 @@ public class ChiTietBanActivity extends AppCompatActivity {
         rvOrderDetails.setNestedScrollingEnabled(false);
     }
 
+    /**
+     * HÀM HỦY MÓN ĂN (Dành cho Quản lý)
+     * Yêu cầu nhập lý do hủy và gọi API báo xuống bếp.
+     */
     private void cancelItem(OrderDetail detail) {
-        if (detail.getId() == null) return;
-        
+        if (detail.getId() == null)
+            return;
+
         android.widget.EditText input = new android.widget.EditText(this);
         input.setHint("Nhập lý do huỷ món...");
-        
+
         android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
         layout.setOrientation(android.widget.LinearLayout.VERTICAL);
         layout.setPadding(50, 20, 50, 0);
         layout.addView(input);
 
         new androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("Xác nhận hủy món")
-            .setMessage("Hủy món " + (detail.getMenuItem() != null ? detail.getMenuItem().getItemName() : "") + "?")
-            .setView(layout)
-            .setPositiveButton("Hủy món", (dialog, which) -> {
-                String reason = input.getText().toString().trim();
-                ZappyApiService api = RetrofitClient.getApiService();
-                
-                api.cancelItem(detail.getId(), reason, new java.util.HashMap<>()).enqueue(new Callback<Map>() {
-                    @Override
-                    public void onResponse(Call<Map> call, Response<Map> response) {
-                        if (response.isSuccessful()) {
-                            Toast.makeText(ChiTietBanActivity.this, "Đã hủy món!", Toast.LENGTH_SHORT).show();
-                            loadOrderDetails();
-                        } else {
-                            Toast.makeText(ChiTietBanActivity.this, "Lỗi hủy món", Toast.LENGTH_SHORT).show();
+                .setTitle("Xác nhận hủy món")
+                .setMessage("Hủy món " + (detail.getMenuItem() != null ? detail.getMenuItem().getItemName() : "") + "?")
+                .setView(layout)
+                .setPositiveButton("Hủy món", (dialog, which) -> {
+                    String reason = input.getText().toString().trim();
+                    ZappyApiService api = RetrofitClient.getApiService();
+
+                    api.cancelItem(detail.getId(), reason, new java.util.HashMap<>()).enqueue(new Callback<Map>() {
+                        @Override
+                        public void onResponse(Call<Map> call, Response<Map> response) {
+                            if (response.isSuccessful()) {
+                                Toast.makeText(ChiTietBanActivity.this, "Đã hủy món!", Toast.LENGTH_SHORT).show();
+                                loadOrderDetails();
+                            } else {
+                                Toast.makeText(ChiTietBanActivity.this, "Lỗi hủy món", Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-                    @Override
-                    public void onFailure(Call<Map> call, Throwable t) {
-                        Toast.makeText(ChiTietBanActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            })
-            .setNegativeButton("Đóng", null)
-            .show();
+
+                        @Override
+                        public void onFailure(Call<Map> call, Throwable t) {
+                            Toast.makeText(ChiTietBanActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                })
+                .setNegativeButton("Đóng", null)
+                .show();
     }
 
+    /**
+     * TẢI DANH SÁCH MÓN ĂN CỦA BÀN
+     * Lấy dữ liệu từ Database thông qua API.
+     */
     private void loadOrderDetails() {
-        if (orderId == -1) return;
+        if (orderId == -1)
+            return;
         ZappyApiService api = RetrofitClient.getApiService();
         api.getOrderDetails(orderId).enqueue(new Callback<List<OrderDetail>>() {
             @Override
@@ -167,11 +180,17 @@ public class ChiTietBanActivity extends AppCompatActivity {
                     updateGuiButton(details);
                 }
             }
+
             @Override
-            public void onFailure(Call<List<OrderDetail>> call, Throwable t) {}
+            public void onFailure(Call<List<OrderDetail>> call, Throwable t) {
+            }
         });
     }
 
+    /**
+     * TÍNH TỔNG TIỀN HÓA ĐƠN
+     * Bỏ qua các món đã bị hủy (Status = 2).
+     */
     private void updateSummary(List<OrderDetail> details) {
         BigDecimal total = BigDecimal.ZERO;
         for (OrderDetail d : details) {
@@ -183,8 +202,13 @@ public class ChiTietBanActivity extends AppCompatActivity {
         tvBadgeCount.setText(details.size() + " MÓN");
     }
 
+    /**
+     * CẬP NHẬT NÚT GỬI BẾP
+     * Sáng lên khi có món mới thêm (Status = 0) chưa được gửi.
+     */
     private void updateGuiButton(List<OrderDetail> details) {
-        if (btnGuiBep == null) return;
+        if (btnGuiBep == null)
+            return;
         boolean hasPending = false;
         for (OrderDetail d : details) {
             if (d.getStatus() != null && d.getStatus() == 0) {
@@ -200,12 +224,19 @@ public class ChiTietBanActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * TẢI LẠI DỮ LIỆU MỖI KHI MỞ LẠI MÀN HÌNH
+     * Chống lỗi hiển thị sai trạng thái món khi vừa từ màn hình Thêm món quay về.
+     */
     @Override
     protected void onResume() {
         super.onResume();
         loadOrderDetails();
     }
 
+    /**
+     * CÀI ĐẶT SỰ KIỆN CHO CÁC NÚT BẤM VÀ ĐIỀU HƯỚNG
+     */
     private void setupClickListeners() {
 
         // Back -> Về trang trước đó (Danh sách order hoặc Sơ đồ bàn)
@@ -234,8 +265,13 @@ public class ChiTietBanActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * HÀM BẤM NÚT GỬI BẾP TRỰC TIẾP TỪ MÀN HÌNH NÀY
+     * Dùng khi có các món vừa được thêm nhanh nhưng chưa gửi.
+     */
     private void guiBep() {
-        if (orderId == -1) return;
+        if (orderId == -1)
+            return;
         ZappyApiService api = RetrofitClient.getApiService();
         api.sendOrder(orderId).enqueue(new Callback<Map>() {
             @Override
