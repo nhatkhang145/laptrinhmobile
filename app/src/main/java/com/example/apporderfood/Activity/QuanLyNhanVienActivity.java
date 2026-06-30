@@ -47,13 +47,8 @@ public class QuanLyNhanVienActivity extends AppCompatActivity {
     private LinearLayout navOrder;
     private LinearLayout navSoDo;
     private LinearLayout navTienIch;
-
     // Dùng để tránh gọi loadStaffData() 2 lần khi Activity vừa mới mở
-    // (vì onCreate() đã gọi 1 lần, onResume() cũng sẽ gọi theo sau)
     private boolean isFirstLoad = true;
-
-
-    // Giả sử lấy resId từ SharedPreferences sau khi Login, tạm fix = 1 để test
     private int currentResId ;
 
     @Override
@@ -70,7 +65,7 @@ public class QuanLyNhanVienActivity extends AppCompatActivity {
         if (currentResId == -1) {
             Toast.makeText(this, "Không tìm thấy thông tin nhà hàng. Vui lòng đăng nhập lại!", Toast.LENGTH_SHORT).show();
 
-            // Thoát ra màn hình đăng nhập cho an toàn
+            // Thoát ra màn hình đăng nhập
             Intent intent = new Intent(this, DangNhapActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -102,7 +97,6 @@ public class QuanLyNhanVienActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btnBack);
         etSearch = findViewById(R.id.etSearch);
 
-        // Tạm thời bỏ qua ánh xạ cứng các số liệu online/offline vì Backend chưa hỗ trợ trường này
         rvStaff = findViewById(R.id.rvStaff);
         swipeRefresh = findViewById(R.id.swipeRefresh);
         btnAddStaff = findViewById(R.id.btnAddStaff);
@@ -138,7 +132,7 @@ public class QuanLyNhanVienActivity extends AppCompatActivity {
     private void setupListeners() {
         btnBack.setOnClickListener(v -> finish());
 
-        // Kéo từ trên xuống để tải lại danh sách (Swipe to Refresh)
+        // Kéo từ trên xuống để tải lại danh sách
         swipeRefresh.setOnRefreshListener(this::loadStaffData);
 
         if(etSearch != null) {
@@ -179,7 +173,6 @@ public class QuanLyNhanVienActivity extends AppCompatActivity {
 
         // Mở màn hình Thêm Nhân Viên
         btnAddStaff.setOnClickListener(v -> {
-            // TODO: Bổ sung Intent nhảy sang ThemNhanVienActivity
             Intent intent = new Intent(QuanLyNhanVienActivity.this, ThemNhanVienActivity.class);
             startActivity(intent);
         });

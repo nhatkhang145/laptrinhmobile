@@ -66,7 +66,7 @@ public class ChiTietNhanVienActivity extends AppCompatActivity {
     private void loadDataToUI() {
         // Đổ dữ liệu vào UI
         if (currentUser.getFullname() != null) etFullName.setText(currentUser.getFullname());
-        if (currentUser.getEmail() != null) etEmail.setText(currentUser.getEmail()); // SĐT lưu trong email
+        if (currentUser.getEmail() != null) etEmail.setText(currentUser.getEmail());
         etUsername.setText(currentUser.getUsername());
 
         // Xử lý Role
@@ -75,7 +75,7 @@ public class ChiTietNhanVienActivity extends AppCompatActivity {
             if (selectedRoleId == 1) {
                 tvSelectedRole.setText("Quản lý");
                 tvRoleTag.setText("QUẢN LÝ");
-                tvRoleTag.setBackgroundResource(R.drawable.bg_status_badge); // Cần tạo bg màu riêng nếu muốn
+                tvRoleTag.setBackgroundResource(R.drawable.bg_status_badge);
             } else if (selectedRoleId == 3) {
                 tvSelectedRole.setText("Thu ngân");
                 tvRoleTag.setText("THU NGÂN");
@@ -89,11 +89,11 @@ public class ChiTietNhanVienActivity extends AppCompatActivity {
     private void setupListeners() {
         btnBack.setOnClickListener(v -> finish());
 
-        // Nút mở menu Role (Tương tự Thêm nhân viên)
+        // Nút mở menu Role
         flRoleDropdown.setOnClickListener(v -> {
             PopupMenu popupMenu = new PopupMenu(this, flRoleDropdown);
             popupMenu.getMenu().add(0, 1, 0, "Quản lý");
-            popupMenu.getMenu().add(0, 3, 1, "Thu ngân");
+            popupMenu.getMenu().add(0, 2, 1, "Thu ngân");
             popupMenu.getMenu().add(0, 0, 2, "Nhân viên");
 
             popupMenu.setOnMenuItemClickListener(item -> {

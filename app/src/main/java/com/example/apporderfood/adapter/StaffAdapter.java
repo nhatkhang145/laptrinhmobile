@@ -122,13 +122,13 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
         Boolean isOnline = user.getIsOnline();
         if (isActive != null && !isActive) {
             holder.tvStatusDetail.setText("Bị khóa");
-            holder.tvStatusDetail.setTextColor(Color.parseColor("#EF4444")); // Đỏ nguy hiểm
+            holder.tvStatusDetail.setTextColor(Color.parseColor("#EF4444"));
             holder.viewStatusDot.setBackgroundResource(R.drawable.bg_icon_red); // Chấm đỏ
         }
         else {
             if (isOnline != null && isOnline) {
                 holder.tvStatusDetail.setText("Trực tuyến");
-                holder.tvStatusDetail.setTextColor(Color.parseColor("#10B981")); // Xanh lá
+                holder.tvStatusDetail.setTextColor(Color.parseColor("#10B981"));
                 holder.viewStatusDot.setBackgroundResource(R.drawable.bg_online_dot);
             } else {
                 holder.tvStatusDetail.setText("Ngoại tuyến");
@@ -152,7 +152,7 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
             holder.btnLock.setColorFilter(Color.parseColor("#10B981"));
         }
 
-        // 2. Bắt sự kiện bấm nút ổ khóa
+        // 2.  kiện bấm nút ổ khóa
         holder.btnLock.setOnClickListener(v -> {
             String actionName = isCurrentlyActive ? "khóa" : "mở khóa";
 
