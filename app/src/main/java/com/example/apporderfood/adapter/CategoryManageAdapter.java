@@ -27,16 +27,9 @@ public class CategoryManageAdapter extends RecyclerView.Adapter<CategoryManageAd
      * Cần được cài đặt (implement) bởi Activity chứa adapter.
      */
     public interface OnCategoryItemClickListener {
-        void onEditClick(Category item);      // Xử lý sự kiện khi nhấn nút Chỉnh sửa
-        void onDeleteClick(Category item);    // Xử lý sự kiện khi nhấn nút Xóa
-        void onStatusToggleClick(Category item, int position); // Xử lý sự kiện khi nhấn đổi trạng thái
-        void onItemClick(Category item);      // Xử lý sự kiện khi nhấn vào item (xem chi tiết)
         void onEditClick(Category item);
-
         void onDeleteClick(Category item);
-
         void onStatusToggleClick(Category item, int position);
-
         void onItemClick(Category item);
     }
 

@@ -99,7 +99,7 @@ public class UserController {
         User user = new User();
         user.setRestaurant(restaurant);
         user.setUsername(username);
-        user.setPassword(password); // TODO: nen hash bang BCrypt
+        user.setPassword(password);
         user.setRole(role != null ? role : 0);
         user.setEmail(email);
         user.setFullname(fullname);
@@ -119,7 +119,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("message", "Mat khau cu khong dung!"));
             }
-            user.setPassword(newPassword); // TODO: hash
+            user.setPassword(newPassword);
             userRepo.save(user);
             return ResponseEntity.ok(Map.of("message", "Doi mat khau thanh cong!"));
         }).orElse(ResponseEntity.notFound().build());

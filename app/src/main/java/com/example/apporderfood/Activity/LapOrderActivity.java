@@ -95,18 +95,32 @@ public class LapOrderActivity extends AppCompatActivity {
 
         checkShiftPermission();
     }
-
+    /**
+     * Kiểm tra xem nhân viên hiện tại có được phép gọi món hay không.
+     *
+     * Quy tắc:
+     * - Nếu đang có ca làm việc:
+     *      + Nhân viên nằm trong danh sách employeeIds => được phép gọi món.
+     *      + Nếu không nằm trong ca và không phải Admin => từ chối.
+     *      + Admin (role = 1) luôn được phép.
+     * - Nếu chưa có ca làm việc:
+     *      + Nhân viên thường => báo lỗi.
+     *      + Admin vẫn được phép tiếp tục.
+     */
     private void checkShiftPermission() {
+        // Gọi API lấy ca làm việc đang hoạt động của nhà hàng
         apiService.getActiveShift(resId).enqueue(new retrofit2.Callback<java.util.Map<String, Object>>() {
             @Override
             public void onResponse(retrofit2.Call<java.util.Map<String, Object>> call, retrofit2.Response<java.util.Map<String, Object>> response) {
+                // Có ca làm việc đang mở
                 if (response.isSuccessful() && response.body() != null) {
                     java.util.Map<String, Object> shift = response.body();
+                    // Lấy chuỗi employeeIds
                     String employeeIds = "";
                     if (shift.get("employeeIds") != null) {
                         employeeIds = (String) shift.get("employeeIds");
                     }
-                    
+                    // Kiểm tra nhân viên hiện tại có nằm trong ca hay không
                     boolean isInShift = false;
                     String[] ids = employeeIds.split(",");
                     for (String idStr : ids) {
@@ -115,20 +129,22 @@ public class LapOrderActivity extends AppCompatActivity {
                                 isInShift = true;
                                 break;
                             }
-                        } catch (NumberFormatException ignored) {}
+                        } catch (NumberFormatException ignored) {}// Bỏ qua nếu employeeIds chứa dữ liệu không hợp lệ
                     }
-                    
+                    // Không thuộc ca và không phải Admin -> từ chối gọi món
                     if (!isInShift && currentUserRole != 1) {
                         showErrorAndExit("Bạn không nằm trong ca làm việc hiện tại, không thể gọi món!");
                     } else {
+                        // Được phép gọi món -> tải danh mục món ăn
                         loadCategories();
                     }
                 } else {
+                    // Không có ca làm việc nào đang mở
                     if (currentUserRole != 1) {
+                        // Nhân viên thường không được gọi món khi chưa mở ca
                         showErrorAndExit("Chưa mở ca làm việc! Vui lòng liên hệ Quản lý để mở ca.");
                     } else {
-                        // Admin can order even without shift? 
-                        // The prompt says "trừ admin ra", so admin is allowed
+                        // Admin vẫn được phép truy cập
                         loadCategories();
                     }
                 }
@@ -136,6 +152,7 @@ public class LapOrderActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(retrofit2.Call<java.util.Map<String, Object>> call, Throwable t) {
+                // Lỗi kết nối hoặc gọi API thất bại
                 showErrorAndExit("Lỗi kiểm tra ca làm việc: " + t.getMessage());
             }
         });
