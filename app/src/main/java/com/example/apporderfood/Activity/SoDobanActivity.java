@@ -50,6 +50,7 @@ public class SoDobanActivity extends AppCompatActivity {
     private List<TableModel> tableList = new ArrayList<>();
     private int restaurantId = -1;
 
+    // Phương thức khởi tạo của Activity, thiết lập giao diện và tải khu vực
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +79,7 @@ public class SoDobanActivity extends AppCompatActivity {
         }
     }
 
+    // Ánh xạ các view
     private void initViews() {
         navOrder = findViewById(R.id.navOrder);
         navSoDo = findViewById(R.id.navSoDo);
@@ -90,6 +92,7 @@ public class SoDobanActivity extends AppCompatActivity {
         tvOccupiedCount = findViewById(R.id.tvOccupiedCount);
     }
 
+    // Thiết lập danh sách bàn và sự kiện click
     private void setupRecyclerView() {
         tableAdapter = new TableAdapter(this, tableList, table -> {
             if ("ĐANG KHÓA".equals(table.getStatus()) || "BẢO TRÌ".equals(table.getStatus())) {
@@ -105,6 +108,7 @@ public class SoDobanActivity extends AppCompatActivity {
         rvTables.setAdapter(tableAdapter);
     }
 
+    // Gọi API lấy danh sách khu vực
     private void loadAreas() {
         apiService.getAreas(restaurantId).enqueue(new Callback<List<Area>>() {
             @Override
@@ -124,6 +128,7 @@ public class SoDobanActivity extends AppCompatActivity {
         });
     }
 
+    // Thiết lập các tab khu vực
     private void setupTabs() {
         tabLayoutAreas.removeAllTabs();
         for (Area area : areaList) {
@@ -157,6 +162,7 @@ public class SoDobanActivity extends AppCompatActivity {
         }
     }
 
+    // Gọi API tải danh sách bàn theo khu vực
     private void loadTablesByArea(int areaId) {
         apiService.getTablesByArea(areaId).enqueue(new Callback<List<TableModel>>() {
             @Override
@@ -180,6 +186,7 @@ public class SoDobanActivity extends AppCompatActivity {
         });
     }
 
+    // Đếm số lượng bàn trống và bàn có khách
     private void updateTableCounts() {
         int empty = 0;
         int occupied = 0;
@@ -200,6 +207,7 @@ public class SoDobanActivity extends AppCompatActivity {
         }
     }
 
+    // Cài đặt sự kiện chuyển trang ở bottom bar
     private void setupClickListeners() {
         // ---- Bottom Navigation ----
         navOrder.setOnClickListener(v -> {
@@ -216,6 +224,7 @@ public class SoDobanActivity extends AppCompatActivity {
         });
     }
 
+    // Chuyển sang màn hình gọi món cho bàn trống
     private void openLapOrder(String tableName, int tableId) {
         Intent intent = new Intent(this, LapOrderActivity.class);
         intent.putExtra("TABLE_NAME", tableName);
@@ -223,10 +232,23 @@ public class SoDobanActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // Chuyển sang màn hình thông tin của bàn có khách
     private void openThongTinBan(String tableName, int tableId) {
         Intent intent = new Intent(this, ThongTinBanActivity.class);
         intent.putExtra("TABLE_NAME", tableName);
         intent.putExtra("TABLE_ID", tableId);
         startActivity(intent);
+    }
+
+    // Làm mới danh sách bàn khi quay lại màn hình
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (tabLayoutAreas != null && areaList != null && !areaList.isEmpty()) {
+            int position = tabLayoutAreas.getSelectedTabPosition();
+            if (position >= 0 && position < areaList.size()) {
+                loadTablesByArea(areaList.get(position).getId());
+            }
+        }
     }
 }
