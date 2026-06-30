@@ -11,6 +11,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.apporderfood.R;
 import com.example.apporderfood.adapter.FoodManageAdapter;
@@ -92,7 +96,14 @@ public class FoodManageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_quan_ly_mon_an);
+        
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         // Lấy resId từ SharedPreferences (đã lưu sau khi đăng nhập)
         SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
@@ -466,17 +477,14 @@ public class FoodManageActivity extends AppCompatActivity {
     private void setupStatusToggle(View view) {
         View available = view.findViewById(R.id.tv_status_available);
         View soldOut   = view.findViewById(R.id.tv_status_sold_out);
-        View paused    = view.findViewById(R.id.tv_status_paused);
 
         isAvailable = true;
 
         View.OnClickListener listener = v -> {
             available.setBackground(null);
             soldOut.setBackground(null);
-            paused.setBackground(null);
             ((android.widget.TextView) available).setTextColor(getColor(R.color.text_secondary));
             ((android.widget.TextView) soldOut).setTextColor(getColor(R.color.text_secondary));
-            ((android.widget.TextView) paused).setTextColor(getColor(R.color.text_secondary));
 
             v.setBackgroundResource(R.drawable.bg_tab_active_dark);
             ((android.widget.TextView) v).setTextColor(getColor(R.color.white));
@@ -490,7 +498,6 @@ public class FoodManageActivity extends AppCompatActivity {
 
         available.setOnClickListener(listener);
         soldOut.setOnClickListener(listener);
-        paused.setOnClickListener(listener);
     }
 
     private void setupBottomNav() {

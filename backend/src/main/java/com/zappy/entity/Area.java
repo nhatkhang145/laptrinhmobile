@@ -29,5 +29,8 @@ public class Area {
 
     @Column(name = "area_name", nullable = false)
     private String areaName;
+
+    @Column(name = "is_active", nullable = false, columnDefinition = "boolean default true")
+    private Boolean isActive = true;
 }
 

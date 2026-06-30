@@ -60,7 +60,7 @@ public class QuanLyCaActivity extends AppCompatActivity {
     private double currentTotalRevenue = 0;
     private final DecimalFormat formatter = new DecimalFormat("#,###");
 
-    private List<Map<String, Object>> allUsers = new java.util.ArrayList<>();
+    private List<com.example.apporderfood.model.User> allUsers = new java.util.ArrayList<>();
     private boolean[] selectedUserItems;
 
     private ZappyApiService apiService;
@@ -231,11 +231,12 @@ public class QuanLyCaActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("XÁC NHẬN ĐÓNG CA LÀM");
         
-        String msg = "Thời gian mở: " + startTimeStr + "\n\n"
+        String closeTimeStr = new SimpleDateFormat("HH:mm (dd/MM/yyyy)", Locale.getDefault()).format(new java.util.Date());
+        
+        String msg = "Thời gian mở: " + startTimeStr + "\n"
+                + "Thời gian đóng: " + closeTimeStr + "\n\n"
                 + "Quỹ đầu ca: " + formatter.format(currentFund) + "đ\n"
-                + "Doanh thu hệ thống ghi nhận: " + formatter.format(totalRevenueToClose) + "đ\n"
-                + "---------------------------------\n"
-                + "TỔNG TIỀN MẶT KẾT THÚC: " + formatter.format(currentFund + totalRevenueToClose) + "đ\n\n"
+                + "TỔNG DOANH THU TRONG CA: " + formatter.format(totalRevenueToClose) + "đ\n\n"
                 + "Bạn có chắc chắn muốn kết thúc phiên làm việc này không?";
                 
         builder.setMessage(msg);
@@ -302,9 +303,9 @@ public class QuanLyCaActivity extends AppCompatActivity {
     }
 
     private void loadUsers() {
-        apiService.getUsersByRestaurant(resId).enqueue(new Callback<List<Map<String, Object>>>() {
+        apiService.getUsersByRestaurant(resId).enqueue(new Callback<List<com.example.apporderfood.model.User>>() {
             @Override
-            public void onResponse(Call<List<Map<String, Object>>> call, Response<List<Map<String, Object>>> response) {
+            public void onResponse(Call<List<com.example.apporderfood.model.User>> call, Response<List<com.example.apporderfood.model.User>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     allUsers = response.body();
                     selectedUserItems = new boolean[allUsers.size()];
@@ -312,7 +313,7 @@ public class QuanLyCaActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<List<Map<String, Object>>> call, Throwable t) {
+            public void onFailure(Call<List<com.example.apporderfood.model.User>> call, Throwable t) {
                 Toast.makeText(QuanLyCaActivity.this, "Không thể tải danh sách nhân viên", Toast.LENGTH_SHORT).show();
             }
         });
@@ -326,8 +327,8 @@ public class QuanLyCaActivity extends AppCompatActivity {
 
         String[] userNames = new String[allUsers.size()];
         for (int i = 0; i < allUsers.size(); i++) {
-            userNames[i] = (String) allUsers.get(i).get("username");
-            int userId = ((Number) allUsers.get(i).get("id")).intValue();
+            userNames[i] = allUsers.get(i).getUsername();
+            int userId = allUsers.get(i).getId();
             
             // Khôi phục trạng thái đã chọn từ selectedEmployeeIds
             selectedUserItems[i] = false;
@@ -361,7 +362,7 @@ public class QuanLyCaActivity extends AppCompatActivity {
                         ids.append(",");
                     }
                     names.append(userNames[i]);
-                    ids.append(((Number) allUsers.get(i).get("id")).intValue());
+                    ids.append(allUsers.get(i).getId());
                 }
             }
             

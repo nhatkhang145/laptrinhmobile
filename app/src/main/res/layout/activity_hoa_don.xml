@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/surface">
@@ -31,6 +32,7 @@
             app:iiv_size="20dp" />
 
         <TextView
+            android:id="@+id/tvHeaderTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -89,11 +91,12 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tvInvoiceNumber"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:gravity="center"
-                android:text="Số: #2607001904"
+                android:text="Số: #..."
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
 

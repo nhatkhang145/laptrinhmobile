@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical">
+
+    <!-- Top App Bar -->
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/surface"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <com.mikepenz.iconics.view.IconicsImageView
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="8dp"
+            app:iiv_color="@color/text_primary"
+            app:iiv_icon="faw-arrow-left"
+            app:iiv_size="20dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Quản lý món huỷ"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider" />
+
+    <!-- Filter Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="@color/surface"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:id="@+id/btnFromDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bg_search_bar"
+            android:padding="10dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                app:iiv_icon="faw-calendar-alt"
+                app:iiv_color="@color/text_secondary"
+                android:layout_marginEnd="8dp"/>
+            <TextView
+                android:id="@+id/tvFromDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Từ ngày"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"/>
+        </LinearLayout>
+        
+        <View
+            android:layout_width="12dp"
+            android:layout_height="1dp"/>
+
+        <LinearLayout
+            android:id="@+id/btnToDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bg_search_bar"
+            android:padding="10dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                app:iiv_icon="faw-calendar-alt"
+                app:iiv_color="@color/text_secondary"
+                android:layout_marginEnd="8dp"/>
+            <TextView
+                android:id="@+id/tvToDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đến ngày"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Main Content Area -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background">
+
+        <LinearLayout
+            android:id="@+id/layoutEmpty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                app:iiv_color="@color/divider"
+                app:iiv_icon="faw-box-open" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Không có món huỷ nào\ntrong thời gian này"
+                android:textAlignment="center"
+                android:textColor="@color/text_secondary"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/pbLoading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvCancelList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:padding="8dp" />
+            
+    </RelativeLayout>
+</LinearLayout>

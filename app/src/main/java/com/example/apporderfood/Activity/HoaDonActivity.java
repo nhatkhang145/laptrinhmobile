@@ -6,6 +6,10 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.apporderfood.R;
 import com.example.apporderfood.api.RetrofitClient;
@@ -62,7 +66,13 @@ public class HoaDonActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_hoa_don);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         orderId   = getIntent().getIntExtra("ORDER_ID", -1);
         tableName = getIntent().getStringExtra("TABLE_NAME") != null
@@ -83,6 +93,23 @@ public class HoaDonActivity extends AppCompatActivity {
         rvInvoiceItems = findViewById(R.id.rvInvoiceItems);
         
         tvTableName.setText(tableName);
+        
+        TextView tvInvoiceNumber = findViewById(R.id.tvInvoiceNumber);
+        if (tvInvoiceNumber != null && orderId != -1) {
+            tvInvoiceNumber.setText("Số: #" + orderId);
+        }
+        
+        TextView tvHeaderTitle = findViewById(R.id.tvHeaderTitle);
+        View bottomBarLayout = findViewById(R.id.bottomBarLayout);
+        boolean isViewOnly = getIntent().getBooleanExtra("IS_VIEW_ONLY", false);
+        if (isViewOnly) {
+            if (bottomBarLayout != null) {
+                bottomBarLayout.setVisibility(View.GONE);
+            }
+            if (tvHeaderTitle != null) {
+                tvHeaderTitle.setText("Chi tiết hóa đơn");
+            }
+        }
         
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy (HH:mm)", new Locale("vi", "VN"));
         tvInvoiceDate.setText(sdf.format(new Date()));

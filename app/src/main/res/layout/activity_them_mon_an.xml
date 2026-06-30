@@ -222,17 +222,6 @@
                 android:clickable="true"
                 android:focusable="true" />
 
-            <TextView
-                android:id="@+id/tv_status_paused"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="Tạm ngưng"
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp"
-                android:clickable="true"
-                android:focusable="true" />
         </LinearLayout>
 
         <LinearLayout

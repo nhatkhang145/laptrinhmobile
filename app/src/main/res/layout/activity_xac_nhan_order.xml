@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
@@ -141,35 +142,77 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <!-- GỬI BẾP button -->
+        <!-- Bottom Action Bar -->
         <LinearLayout
-            android:id="@+id/btnGui"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:background="@drawable/bg_btn_primary"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <com.mikepenz.iconics.view.IconicsImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:layout_marginEnd="10dp"
-                app:iiv_color="@color/surface"
-                app:iiv_icon="faw-utensils"
-                app:iiv_size="20dp" />
+            <!-- GỬI BẾP button -->
+            <LinearLayout
+                android:id="@+id/btnGui"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_btn_primary"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:layout_marginEnd="4dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:letterSpacing="0.08"
-                android:text="GỬI BẾP"
-                android:textColor="@color/surface"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                <com.mikepenz.iconics.view.IconicsImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginEnd="8dp"
+                    app:iiv_color="@color/surface"
+                    app:iiv_icon="faw-utensils"
+                    app:iiv_size="20dp" />
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.08"
+                    android:text="GỬI BẾP"
+                    android:textColor="@color/surface"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- TÍNH TIỀN button -->
+            <LinearLayout
+                android:id="@+id/btnTinhTien"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_btn_primary"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:layout_marginStart="4dp">
+
+                <com.mikepenz.iconics.view.IconicsImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginEnd="8dp"
+                    app:iiv_color="@color/surface"
+                    app:iiv_icon="faw-money-bill-alt"
+                    app:iiv_size="20dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.08"
+                    android:text="TÍNH TIỀN"
+                    android:textColor="@color/surface"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>

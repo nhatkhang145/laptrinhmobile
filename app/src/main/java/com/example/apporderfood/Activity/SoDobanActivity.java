@@ -92,6 +92,10 @@ public class SoDobanActivity extends AppCompatActivity {
 
     private void setupRecyclerView() {
         tableAdapter = new TableAdapter(this, tableList, table -> {
+            if ("ĐANG KHÓA".equals(table.getStatus()) || "BẢO TRÌ".equals(table.getStatus())) {
+                Toast.makeText(SoDobanActivity.this, "Bàn đang " + table.getStatus().toLowerCase() + ", không thể thao tác!", Toast.LENGTH_SHORT).show();
+                return;
+            }
             if (table.isOccupied()) {
                 openThongTinBan(table.getTableName(), table.getId());
             } else {

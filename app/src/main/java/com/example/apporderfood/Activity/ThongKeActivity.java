@@ -1,144 +1,222 @@
 package com.example.apporderfood.Activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.LinearLayout;
+
+import com.google.android.material.card.MaterialCardView;
+import com.example.apporderfood.Activity.InvoiceManageActivity;
+import com.example.apporderfood.Activity.CancelManageActivity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.util.Pair;
 
 import com.example.apporderfood.R;
+import com.example.apporderfood.api.RetrofitClient;
+import com.example.apporderfood.api.ZappyApiService;
 import com.mikepenz.iconics.view.IconicsImageView;
+import com.google.android.material.datepicker.MaterialDatePicker;
+
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ThongKeActivity extends AppCompatActivity {
 
-    // Views tiêu đề và điều hướng
     private IconicsImageView btnBack;
-    private TextView tvTotalRevenue, tvGrowth, tvTotalOrders, tvCancelledItems, tvUnpaidTables;
-    
-    // Tabs bộ lọc
-    private TextView tabToday, tabWeek, tabMonth;
-    
-    // Bottom Navigation Custom
+    private TextView tvTotalRevenue, tvTotalOrders, tvAverageValue, tvDateRange, tvTotalCancelledItems;
+    private MaterialCardView cardTotalOrders, cardTotalCancelledItems;
+    private LinearLayout btnPickDate;
     private View navOrder, navSoDo, navTienIch;
+
+    private ZappyApiService apiService;
+    private int currentResId = -1;
+    private SimpleDateFormat displayFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+    private SimpleDateFormat apiFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+    
+    private String currentFromDate = "";
+    private String currentToDate = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_thong_ke);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
+        apiService = RetrofitClient.getApiService();
+        SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
+        currentResId = prefs.getInt("RES_ID", -1);
 
         initViews();
         setupListeners();
-        
+
         // Mặc định load dữ liệu "Hôm nay"
-        loadDataForTab("Hôm nay");
+        Calendar calendar = Calendar.getInstance();
+        Date today = calendar.getTime();
+        String displayDate = displayFormat.format(today);
+        tvDateRange.setText(displayDate);
+        fetchPaidOrders(apiFormat.format(today), apiFormat.format(today));
     }
 
     private void initViews() {
         btnBack = findViewById(R.id.btnBack);
-        
-        // Các TextView hiển thị dữ liệu động
+
         tvTotalRevenue = findViewById(R.id.tvTotalRevenue);
-        tvGrowth = findViewById(R.id.tvGrowth);
         tvTotalOrders = findViewById(R.id.tvTotalOrders);
-        tvCancelledItems = findViewById(R.id.tvCancelledItems);
-        tvUnpaidTables = findViewById(R.id.tvUnpaidTables);
+        tvAverageValue = findViewById(R.id.tvAverageValue);
+        
+        btnPickDate = findViewById(R.id.btnPickDate);
+        tvDateRange = findViewById(R.id.tvDateRange);
+        cardTotalOrders = findViewById(R.id.cardTotalOrders);
+        tvTotalCancelledItems = findViewById(R.id.tvTotalCancelledItems);
+        cardTotalCancelledItems = findViewById(R.id.cardTotalCancelledItems);
 
-        // Bộ lọc thời gian (Tabs)
-        tabToday = findViewById(R.id.tabToday);
-        tabWeek = findViewById(R.id.tabWeek);
-        tabMonth = findViewById(R.id.tabMonth);
-
-        // Bottom Navigation Custom (LinearLayouts)
         navOrder = findViewById(R.id.navOrder);
         navSoDo = findViewById(R.id.navSoDo);
         navTienIch = findViewById(R.id.navTienIch);
     }
 
     private void setupListeners() {
-        // Nút quay lại
         btnBack.setOnClickListener(v -> finish());
 
-        // Xử lý chuyển đổi Tab "Hôm nay"
-        tabToday.setOnClickListener(v -> {
-            updateTabUI(tabToday);
-            loadDataForTab("Hôm nay");
+        btnPickDate.setOnClickListener(v -> showDateRangePicker());
+        
+        cardTotalOrders.setOnClickListener(v -> {
+            Intent intent = new Intent(ThongKeActivity.this, InvoiceManageActivity.class);
+            if (currentFromDate != null) intent.putExtra("FROM_DATE", currentFromDate);
+            if (currentToDate != null) intent.putExtra("TO_DATE", currentToDate);
+            startActivity(intent);
         });
 
-        // Xử lý chuyển đổi Tab "Tuần này"
-        tabWeek.setOnClickListener(v -> {
-            updateTabUI(tabWeek);
-            loadDataForTab("Tuần này");
+        cardTotalCancelledItems.setOnClickListener(v -> {
+            Intent intent = new Intent(ThongKeActivity.this, CancelManageActivity.class);
+            if (!currentFromDate.isEmpty()) intent.putExtra("FROM_DATE", currentFromDate);
+            if (!currentToDate.isEmpty()) intent.putExtra("TO_DATE", currentToDate);
+            startActivity(intent);
         });
 
-        // Xử lý chuyển đổi Tab "Tháng này"
-        tabMonth.setOnClickListener(v -> {
-            updateTabUI(tabMonth);
-            loadDataForTab("Tháng này");
-        });
-
-        // Bottom Navigation Listeners
         navOrder.setOnClickListener(v -> {
-            startActivity(new Intent(this, DanhSachOrderActivity.class));
+            startActivity(new Intent(ThongKeActivity.this, DanhSachOrderActivity.class));
             overridePendingTransition(0, 0);
         });
         navSoDo.setOnClickListener(v -> {
-            startActivity(new Intent(this, SoDobanActivity.class));
+            startActivity(new Intent(ThongKeActivity.this, SoDobanActivity.class));
             overridePendingTransition(0, 0);
         });
         navTienIch.setOnClickListener(v -> {
-            startActivity(new Intent(this, TienIchActivity.class));
+            startActivity(new Intent(ThongKeActivity.this, TienIchActivity.class));
             overridePendingTransition(0, 0);
             finish();
         });
     }
 
-    /**
-     * Cập nhật giao diện (Màu sắc, Font chữ) khi người dùng chuyển Tab
-     */
-    private void updateTabUI(TextView selectedTab) {
-        // Reset tất cả tab về trạng thái không được chọn
-        TextView[] tabs = {tabToday, tabWeek, tabMonth};
-        for (TextView tab : tabs) {
-            tab.setBackground(null);
-            tab.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-            tab.setTypeface(null, Typeface.NORMAL);
-        }
+    private void showDateRangePicker() {
+        MaterialDatePicker<Pair<Long, Long>> dateRangePicker =
+                MaterialDatePicker.Builder.dateRangePicker()
+                        .setTitleText("Chọn khoảng thời gian")
+                        .build();
 
-        // Làm nổi bật tab được chọn
-        selectedTab.setBackgroundResource(R.drawable.bg_btn_primary);
-        selectedTab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white)));
-        selectedTab.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
-        selectedTab.setTypeface(null, Typeface.BOLD);
+        dateRangePicker.addOnPositiveButtonClickListener(selection -> {
+            Long startDate = selection.first;
+            Long endDate = selection.second;
+            
+            if (startDate != null && endDate != null) {
+                Date start = new Date(startDate);
+                Date end = new Date(endDate);
+                
+                String displayText = displayFormat.format(start);
+                if (!displayFormat.format(start).equals(displayFormat.format(end))) {
+                    displayText += " - " + displayFormat.format(end);
+                }
+                tvDateRange.setText(displayText);
+                
+                fetchPaidOrders(apiFormat.format(start), apiFormat.format(end));
+            }
+        });
+        dateRangePicker.show(getSupportFragmentManager(), "DATE_PICKER");
     }
 
-    /**
-     * Giả lập việc tải dữ liệu từ Database/Firebase dựa trên thời gian
-     */
-    private void loadDataForTab(String timeRange) {
-        // Sử dụng string format đã thiết lập trong strings.xml để đồng bộ
-        if (timeRange.equals("Hôm nay")) {
-            tvTotalRevenue.setText(String.format(getString(R.string.format_tien_te), "15.250.000"));
-            tvTotalOrders.setText(String.format(getString(R.string.format_don_hang), 45));
-            tvCancelledItems.setText(String.format(getString(R.string.format_mon), 3));
-            tvUnpaidTables.setText(String.format(getString(R.string.format_ban), 5));
-            tvGrowth.setText("+12.5% so với hôm qua");
-        } else if (timeRange.equals("Tuần này")) {
-            tvTotalRevenue.setText(String.format(getString(R.string.format_tien_te), "102.800.000"));
-            tvTotalOrders.setText(String.format(getString(R.string.format_don_hang), 312));
-            tvCancelledItems.setText(String.format(getString(R.string.format_mon), 12));
-            tvUnpaidTables.setText(String.format(getString(R.string.format_ban), 2));
-            tvGrowth.setText("+5.2% so với kỳ trước");
-        } else {
-            tvTotalRevenue.setText(String.format(getString(R.string.format_tien_te), "450.320.000"));
-            tvTotalOrders.setText(String.format(getString(R.string.format_don_hang), 1250));
-            tvCancelledItems.setText(String.format(getString(R.string.format_mon), 24));
-            tvUnpaidTables.setText(String.format(getString(R.string.format_ban), 0));
-            tvGrowth.setText("+15.8% so với tháng trước");
-        }
+    private void fetchPaidOrders(String fromDate, String toDate) {
+        if (currentResId == -1) return;
+        
+        this.currentFromDate = fromDate;
+        this.currentToDate = toDate;
+
+        tvTotalRevenue.setText("Đang tính...");
+        DecimalFormat numberFormat = new DecimalFormat("#,###");
+
+        apiService.getPaidOrdersByRestaurant(currentResId, fromDate, toDate).enqueue(new Callback<List<Map<String, Object>>>() {
+            @Override
+            public void onResponse(Call<List<Map<String, Object>>> call, Response<List<Map<String, Object>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Map<String, Object>> orders = response.body();
+                    double totalRevenue = 0;
+                    int totalOrders = orders.size();
+
+                    for (Map<String, Object> order : orders) {
+                        if (order.get("totalAmount") != null) {
+                            totalRevenue += ((Number) order.get("totalAmount")).doubleValue();
+                        }
+                    }
+
+                    double avgValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+                    tvTotalRevenue.setText(numberFormat.format(totalRevenue) + " đ");
+                    tvTotalOrders.setText(totalOrders + " đơn");
+                    tvAverageValue.setText(numberFormat.format(avgValue) + " đ");
+
+                } else {
+                    Toast.makeText(ThongKeActivity.this, "Không thể tải dữ liệu", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Map<String, Object>>> call, Throwable t) {
+                Toast.makeText(ThongKeActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        tvTotalCancelledItems.setText("...");
+        apiService.getCancelledOrdersByRestaurant(currentResId, fromDate, toDate).enqueue(new Callback<List<Map<String, Object>>>() {
+            @Override
+            public void onResponse(Call<List<Map<String, Object>>> call, Response<List<Map<String, Object>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    tvTotalCancelledItems.setText(response.body().size() + " món");
+                } else {
+                    tvTotalCancelledItems.setText("0 món");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Map<String, Object>>> call, Throwable t) {
+                tvTotalCancelledItems.setText("0 món");
+            }
+        });
     }
 }

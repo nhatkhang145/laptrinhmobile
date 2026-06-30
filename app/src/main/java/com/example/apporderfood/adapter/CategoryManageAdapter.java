@@ -19,6 +19,7 @@ import java.util.List;
 public class CategoryManageAdapter extends RecyclerView.Adapter<CategoryManageAdapter.CategoryViewHolder> {
 
     private List<Category> categoryList;
+    private List<Category> fullList;
     private OnCategoryItemClickListener listener;
 
     /**
@@ -30,11 +31,35 @@ public class CategoryManageAdapter extends RecyclerView.Adapter<CategoryManageAd
         void onDeleteClick(Category item);    // Xử lý sự kiện khi nhấn nút Xóa
         void onStatusToggleClick(Category item, int position); // Xử lý sự kiện khi nhấn đổi trạng thái
         void onItemClick(Category item);      // Xử lý sự kiện khi nhấn vào item (xem chi tiết)
+        void onEditClick(Category item);
+
+        void onDeleteClick(Category item);
+
+        void onStatusToggleClick(Category item, int position);
+
+        void onItemClick(Category item);
     }
 
     public CategoryManageAdapter(List<Category> categoryList, OnCategoryItemClickListener listener) {
         this.categoryList = categoryList;
+        this.fullList = categoryList;
         this.listener = listener;
+    }
+
+    public void filter(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            categoryList = fullList;
+        } else {
+            String q = query.toLowerCase().trim();
+            java.util.List<Category> filtered = new java.util.ArrayList<>();
+            for (Category c : fullList) {
+                if (c.getCatName() != null && c.getCatName().toLowerCase().contains(q)) {
+                    filtered.add(c);
+                }
+            }
+            categoryList = filtered;
+        }
+        notifyDataSetChanged();
     }
 
     public void removeItem(Category item) {
@@ -47,7 +72,8 @@ public class CategoryManageAdapter extends RecyclerView.Adapter<CategoryManageAd
 
     /** Cập nhật status local và refresh item UI ngay lập tức */
     public void updateItemStatus(int position, int newStatus) {
-        if (position < 0 || position >= categoryList.size()) return;
+        if (position < 0 || position >= categoryList.size())
+            return;
         categoryList.get(position).setStatus(newStatus);
         notifyItemChanged(position);
     }
@@ -75,25 +101,30 @@ public class CategoryManageAdapter extends RecyclerView.Adapter<CategoryManageAd
         // Hiển thị số lượng món ăn và mô tả nếu có
         int count = item.getItemCount() != null ? item.getItemCount() : 0;
         String desc = item.getDescription() != null && !item.getDescription().isEmpty()
-                ? " • " + item.getDescription() : "";
+                ? " • " + item.getDescription()
+                : "";
         holder.tvCategoryInfo.setText(count + " món" + desc);
 
         // Đăng ký các sự kiện onClick thông qua listener
         // Nhấn badge trạng thái → toggle ngay
         holder.tvCategoryStatus.setOnClickListener(v -> {
-            if (listener != null) listener.onStatusToggleClick(item, holder.getAdapterPosition());
+            if (listener != null)
+                listener.onStatusToggleClick(item, holder.getAdapterPosition());
         });
 
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) listener.onItemClick(item);
+            if (listener != null)
+                listener.onItemClick(item);
         });
 
         holder.ivCategoryEdit.setOnClickListener(v -> {
-            if (listener != null) listener.onEditClick(item);
+            if (listener != null)
+                listener.onEditClick(item);
         });
 
         holder.ivCategoryDelete.setOnClickListener(v -> {
-            if (listener != null) listener.onDeleteClick(item);
+            if (listener != null)
+                listener.onDeleteClick(item);
         });
     }
 
@@ -120,10 +151,10 @@ public class CategoryManageAdapter extends RecyclerView.Adapter<CategoryManageAd
 
         public CategoryViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvCategoryName   = itemView.findViewById(R.id.tvCategoryName);
+            tvCategoryName = itemView.findViewById(R.id.tvCategoryName);
             tvCategoryStatus = itemView.findViewById(R.id.tvCategoryStatus);
-            tvCategoryInfo   = itemView.findViewById(R.id.tvCategoryInfo);
-            ivCategoryEdit   = itemView.findViewById(R.id.ivCategoryEdit);
+            tvCategoryInfo = itemView.findViewById(R.id.tvCategoryInfo);
+            ivCategoryEdit = itemView.findViewById(R.id.ivCategoryEdit);
             ivCategoryDelete = itemView.findViewById(R.id.ivCategoryDelete);
         }
     }

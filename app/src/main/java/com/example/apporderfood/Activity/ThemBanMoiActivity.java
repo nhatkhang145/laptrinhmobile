@@ -20,6 +20,11 @@ import com.example.apporderfood.model.Area;
 import com.example.apporderfood.model.TableModel;
 import com.google.android.material.button.MaterialButton;
 import androidx.core.content.ContextCompat;
+import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import android.widget.LinearLayout;
 
 import java.util.HashMap;
 import java.util.List;
@@ -42,13 +47,14 @@ public class ThemBanMoiActivity extends AppCompatActivity {
     private MaterialButton btnConfirm;
     private EditText edtTableName, edtTableSeats;
     private TextView tvTitle, tvSelectedArea;
-    private TextView chipTang1, chipTang2, chipSanVuon;
+    private LinearLayout llAreaChips;
     private TextView tvStatusToggle;
     private boolean isToggleOn = true; // mặc định: bật (màu)
 
     private String selectedAreaName = "";
     private Integer selectedAreaId = null;  // ID thực của khu vực
     private boolean isEditMode = false;
+    private boolean areaExplicitlyChanged = false; // Chỉ đổi khu vực khi user bấm chip
     private TableModel editingTable = null;
 
     // Danh sách khu vực từ API
@@ -59,7 +65,14 @@ public class ThemBanMoiActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_them_ban_moi);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
         resId = prefs.getInt("RES_ID", -1);
@@ -88,9 +101,7 @@ public class ThemBanMoiActivity extends AppCompatActivity {
         edtTableName = findViewById(R.id.edt_table_name);
         edtTableSeats = findViewById(R.id.edt_table_seats);
         tvSelectedArea = findViewById(R.id.tv_selected_area);
-        chipTang1 = findViewById(R.id.chip_tang1);
-        chipTang2 = findViewById(R.id.chip_tang2);
-        chipSanVuon = findViewById(R.id.chip_san_vuon);
+        llAreaChips = findViewById(R.id.ll_area_chips);
         tvStatusToggle = findViewById(R.id.tvStatusToggle);
     }
 
@@ -125,17 +136,51 @@ public class ThemBanMoiActivity extends AppCompatActivity {
      * Cập nhật các chip theo tên khu vực thực từ server
      */
     private void updateChipsWithAreas() {
-        if (areaList == null || areaList.isEmpty()) return;
+        if (areaList == null || areaList.isEmpty() || llAreaChips == null) return;
+        llAreaChips.removeAllViews();
 
-        // Gán tên từ server vào 3 chip đầu tiên
-        if (areaList.size() > 0 && chipTang1 != null) {
-            chipTang1.setText(areaList.get(0).getAreaName());
-        }
-        if (areaList.size() > 1 && chipTang2 != null) {
-            chipTang2.setText(areaList.get(1).getAreaName());
-        }
-        if (areaList.size() > 2 && chipSanVuon != null) {
-            chipSanVuon.setText(areaList.get(2).getAreaName());
+        for (int i = 0; i < areaList.size(); i++) {
+            Area area = areaList.get(i);
+            TextView chip = new TextView(this);
+            
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            if (i > 0) {
+                params.setMarginStart((int) (8 * getResources().getDisplayMetrics().density));
+            }
+            chip.setLayoutParams(params);
+            
+            chip.setText(area.getAreaName());
+            chip.setTextSize(12);
+            chip.setPadding(
+                    (int) (16 * getResources().getDisplayMetrics().density),
+                    (int) (8 * getResources().getDisplayMetrics().density),
+                    (int) (16 * getResources().getDisplayMetrics().density),
+                    (int) (8 * getResources().getDisplayMetrics().density)
+            );
+            
+            // So sánh bằng ID để tránh nhầm khu vực trùng tên
+            boolean isSelected = selectedAreaId != null && selectedAreaId.equals(area.getId());
+            if (isSelected) {
+                chip.setBackgroundResource(R.drawable.bg_tab_active_dark);
+                chip.setTextColor(ContextCompat.getColor(this, R.color.white));
+            } else {
+                chip.setBackgroundResource(R.drawable.bg_tab_inactive);
+                chip.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+            }
+            
+            chip.setClickable(true);
+            chip.setFocusable(true);
+            
+            chip.setOnClickListener(v -> {
+                selectArea(area.getAreaName(), area.getId());
+                areaExplicitlyChanged = true; // đánh dấu user đã tự chọn khu vực
+                updateChipsWithAreas();
+            });
+            
+            llAreaChips.addView(chip);
         }
     }
 
@@ -189,18 +234,6 @@ public class ThemBanMoiActivity extends AppCompatActivity {
     private void setupListeners() {
         btnBack.setOnClickListener(v -> finish());
 
-        View.OnClickListener areaClickListener = v -> {
-            updateChipSelection((TextView) v);
-            selectedAreaName = ((TextView) v).getText().toString();
-            selectedAreaId = findAreaIdByName(selectedAreaName);
-            tvSelectedArea.setText(selectedAreaName);
-            tvSelectedArea.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
-        };
-
-        chipTang1.setOnClickListener(areaClickListener);
-        chipTang2.setOnClickListener(areaClickListener);
-        chipSanVuon.setOnClickListener(areaClickListener);
-
         // Toggle visual: bật = màu primary, tắt = trắng có viền
         if (tvStatusToggle != null) {
             tvStatusToggle.setOnClickListener(v -> {
@@ -212,18 +245,11 @@ public class ThemBanMoiActivity extends AppCompatActivity {
         btnConfirm.setOnClickListener(v -> validateAndSave());
     }
 
-    private void updateChipSelection(TextView selectedChip) {
-        resetChips();
-        selectedChip.setBackgroundResource(R.drawable.bg_tab_active_dark);
-        selectedChip.setTextColor(ContextCompat.getColor(this, R.color.white));
-    }
-
-    private void resetChips() {
-        TextView[] chips = {chipTang1, chipTang2, chipSanVuon};
-        for (TextView chip : chips) {
-            chip.setBackgroundResource(R.drawable.bg_tab_inactive);
-            chip.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-        }
+    private void selectArea(String name, Integer id) {
+        selectedAreaName = name;
+        selectedAreaId = id;
+        tvSelectedArea.setText(selectedAreaName);
+        tvSelectedArea.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
     }
 
     /**
@@ -284,9 +310,13 @@ public class ThemBanMoiActivity extends AppCompatActivity {
     }
 
     private void createTable(int areaId, String tableName) {
+        String seatsStr = edtTableSeats.getText().toString().trim();
+        int seats = seatsStr.isEmpty() ? 0 : Integer.parseInt(seatsStr);
+
         Map<String, Object> body = new HashMap<>();
         body.put("areaId", areaId);
         body.put("tableName", tableName);
+        body.put("seats", seats);
         body.put("status", isToggleOn ? "HOẠT ĐỘNG" : "ĐANG KHÓA");
 
         ZappyApiService api = RetrofitClient.getApiService();
@@ -318,9 +348,17 @@ public class ThemBanMoiActivity extends AppCompatActivity {
     }
 
     private void updateTable(int tableId, String tableName) {
+        String seatsStr = edtTableSeats.getText().toString().trim();
+        int seats = seatsStr.isEmpty() ? 0 : Integer.parseInt(seatsStr);
+
         Map<String, Object> body = new HashMap<>();
         body.put("tableName", tableName);
+        body.put("seats", seats);
         body.put("status", isToggleOn ? "HOẠT ĐỘNG" : "ĐANG KHÓA");
+        // Chỉ đổi khu vực khi user bấm chip - tránh đổi nhầm do trùng tên
+        if (areaExplicitlyChanged && selectedAreaId != null) {
+            body.put("areaId", selectedAreaId);
+        }
 
         ZappyApiService api = RetrofitClient.getApiService();
         api.updateTable(tableId, body).enqueue(new Callback<TableModel>() {

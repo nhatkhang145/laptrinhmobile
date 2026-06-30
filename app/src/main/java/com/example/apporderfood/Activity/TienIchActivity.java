@@ -17,6 +17,13 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.apporderfood.R;
+import com.example.apporderfood.api.RetrofitClient;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import com.example.apporderfood.api.RetrofitClient;
+import java.util.Map;
 
 public class TienIchActivity extends AppCompatActivity {
 
@@ -24,14 +31,17 @@ public class TienIchActivity extends AppCompatActivity {
     private LinearLayout menuLogout;
     private LinearLayout menuQuanLyMonAn;
     private LinearLayout menuQuanLyBan;
+    private LinearLayout menuQuanLyKhuVuc;
     private LinearLayout menuQuanLyDanhMuc;
     private LinearLayout menuQuanLyHoaDon;
+    private LinearLayout menuQuanLyHuyMon;
     private LinearLayout menuQuanLyCaLam;
     private LinearLayout navOrder;
     private LinearLayout navSoDo;
     private LinearLayout navTienIch;
     private TextView tvUserName;
-    private LinearLayout menuQuanLyNhanVien;
+    private LinearLayout menuQuanLyNhanVien,menuThongKe;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,27 +66,35 @@ public class TienIchActivity extends AppCompatActivity {
         menuLogout         = findViewById(R.id.menuLogout);
         menuQuanLyMonAn    = findViewById(R.id.menuQuanLyMonAn);
         menuQuanLyBan      = findViewById(R.id.menuQuanLyBan);
+        menuQuanLyKhuVuc   = findViewById(R.id.menuQuanLyKhuVuc);
         menuQuanLyDanhMuc  = findViewById(R.id.menuQuanLyDanhMuc);
         menuQuanLyHoaDon   = findViewById(R.id.menuQuanLyHoaDon);
+        menuQuanLyHuyMon   = findViewById(R.id.menuQuanLyHuyMon);
         menuQuanLyCaLam    = findViewById(R.id.menuQuanLyCaLam);
         navOrder           = findViewById(R.id.navOrder);
         navSoDo            = findViewById(R.id.navSoDo);
         navTienIch         = findViewById(R.id.navTienIch);
         tvUserName         = findViewById(R.id.tvUserName);
         menuQuanLyNhanVien = findViewById(R.id.menuQuanLyNhanVien);
+        menuThongKe= findViewById(R.id.menuThongKe);
     }
 
     private void loadUserInfo() {
         SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
         String fullname = prefs.getString("FULLNAME", "");
-        String username = prefs.getString("USERNAME", "");
+        int role = prefs.getInt("ROLE", 0);
         
-        if (!fullname.isEmpty()) {
+        if (fullname != null && !fullname.trim().isEmpty()) {
             tvUserName.setText(fullname);
-        } else if (!username.isEmpty()) {
-            tvUserName.setText(username);
         } else {
-            tvUserName.setText("Chưa xác định");
+            tvUserName.setText("Chưa cập nhật tên");
+        }
+
+        if (role != 1) { // An voi nhung ai khong phai Admin (role 0 va 2)
+            View tvAdminSectionTitle = findViewById(R.id.tvAdminSectionTitle);
+            View adminMenuCard = findViewById(R.id.adminMenuCard);
+            if (tvAdminSectionTitle != null) tvAdminSectionTitle.setVisibility(View.GONE);
+            if (adminMenuCard != null) adminMenuCard.setVisibility(View.GONE);
         }
     }
 
@@ -97,6 +115,13 @@ public class TienIchActivity extends AppCompatActivity {
             startActivity(new Intent(this, TableManageActivity.class));
         });
 
+        if (menuQuanLyKhuVuc != null) {
+            menuQuanLyKhuVuc.setOnClickListener(v -> {
+                animatePress(v);
+                startActivity(new Intent(this, AreaManageActivity.class));
+            });
+        }
+
         menuQuanLyDanhMuc.setOnClickListener(v -> {
             animatePress(v);
             startActivity(new Intent(this, CategoryManageActivity.class));
@@ -106,6 +131,13 @@ public class TienIchActivity extends AppCompatActivity {
             menuQuanLyHoaDon.setOnClickListener(v -> {
                 animatePress(v);
                 startActivity(new Intent(this, InvoiceManageActivity.class));
+            });
+        }
+        
+        if (menuQuanLyHuyMon != null) {
+            menuQuanLyHuyMon.setOnClickListener(v -> {
+                animatePress(v);
+                startActivity(new Intent(this, CancelManageActivity.class));
             });
         }
         
@@ -138,10 +170,14 @@ public class TienIchActivity extends AppCompatActivity {
 
         navTienIch.setOnClickListener(v -> { });
 
-//        menuQuanLyNhanVien.setOnClickListener(v -> {
-//            animatePress(v);
-//            startActivity(new Intent(this, QuanLyNhanVienActivity.class));
-//        });
+        menuQuanLyNhanVien.setOnClickListener(v -> {
+            animatePress(v);
+            startActivity(new Intent(this, QuanLyNhanVienActivity.class));
+        });
+        menuThongKe.setOnClickListener(v ->{
+            animatePress(v);
+            startActivity(new Intent(this, ThongKeActivity.class));
+        });
     }
 
     private void animateEntrance() {
@@ -185,6 +221,7 @@ public class TienIchActivity extends AppCompatActivity {
                 .setTitle("Đăng xuất")
                 .setMessage("Bạn có chắc muốn đăng xuất khỏi tài khoản không?")
                 .setPositiveButton("Đăng xuất", (dialog, which) -> {
+                    updateOfflineStatus();
                     Toast.makeText(this, "Đã đăng xuất", Toast.LENGTH_SHORT).show();
                     getSharedPreferences("ZappySession", MODE_PRIVATE).edit().clear().apply();
                     Intent intent = new Intent(TienIchActivity.this, DangNhapActivity.class);
@@ -194,5 +231,18 @@ public class TienIchActivity extends AppCompatActivity {
                 })
                 .setNegativeButton("Hủy", null)
                 .show();
+    }
+    private void updateOfflineStatus() {
+
+        int userId = getSharedPreferences("ZappySession", MODE_PRIVATE).getInt("USER_ID", -1);
+        if (userId == -1) {
+            return;
+        }
+        RetrofitClient.getApiService().logoutUser(userId).enqueue(new Callback<Map<String, String>>() {
+                    @Override
+                    public void onResponse(Call<Map<String, String>> call,Response<Map<String, String>> response) {}
+                    @Override
+                    public void onFailure(Call<Map<String, String>> call,Throwable t) {}
+                });
     }
 }

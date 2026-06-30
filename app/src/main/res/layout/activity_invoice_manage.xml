@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
@@ -40,6 +41,84 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider" />
+
+    <!-- Filter Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="@color/surface"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:id="@+id/btnFromDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bg_search_bar"
+            android:padding="10dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                app:iiv_icon="faw-calendar-alt"
+                app:iiv_color="@color/text_secondary"
+                android:layout_marginEnd="8dp"/>
+            <TextView
+                android:id="@+id/tvFromDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Từ ngày"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"/>
+        </LinearLayout>
+        
+        <View
+            android:layout_width="12dp"
+            android:layout_height="1dp"/>
+
+        <LinearLayout
+            android:id="@+id/btnToDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bg_search_bar"
+            android:padding="10dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                app:iiv_icon="faw-calendar-alt"
+                app:iiv_color="@color/text_secondary"
+                android:layout_marginEnd="8dp"/>
+            <TextView
+                android:id="@+id/tvToDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đến ngày"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <com.mikepenz.iconics.view.IconicsImageView
+            android:id="@+id/btnClearFilter"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="12dp"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:iiv_icon="faw-times-circle"
+            app:iiv_color="@color/text_secondary"
+            android:visibility="gone"/>
     </LinearLayout>
 
     <View

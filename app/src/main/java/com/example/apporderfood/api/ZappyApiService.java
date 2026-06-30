@@ -19,6 +19,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * ZappyApiService - Dinh nghia tat ca API endpoint cua Zappy Backend
@@ -64,6 +65,15 @@ public interface ZappyApiService {
 
     @POST("api/areas")
     Call<Area> createArea(@Body Map<String, Object> data);
+
+    @PUT("api/areas/{id}")
+    Call<Area> updateArea(@Path("id") Integer id, @Body Map<String, Object> data);
+
+    @DELETE("api/areas/{id}")
+    Call<Map> deleteArea(@Path("id") Integer id);
+
+    @PUT("api/areas/{id}/toggle-status")
+    Call<Map> toggleAreaStatus(@Path("id") Integer id);
 
     // ==========================================
     // TABLES (Ban an) - is_occupied = red/green
@@ -163,7 +173,18 @@ public interface ZappyApiService {
     Call<List<Map<String, Object>>> getActiveOrdersByRestaurant(@Path("resId") int resId);
 
     @GET("api/orders/restaurant/{resId}/paid")
-    Call<List<Map<String, Object>>> getPaidOrdersByRestaurant(@Path("resId") int resId);
+    Call<List<Map<String, Object>>> getPaidOrdersByRestaurant(
+            @Path("resId") int resId,
+            @Query("fromDate") String fromDate,
+            @Query("toDate") String toDate
+    );
+
+    @GET("api/orders/restaurant/{resId}/cancelled")
+    Call<List<Map<String, Object>>> getCancelledOrdersByRestaurant(
+            @Path("resId") int resId,
+            @Query("fromDate") String fromDate,
+            @Query("toDate") String toDate
+    );
 
     /** Nhan vien gui mon -> status=1 (KHOA, nhan vien khong sua/xoa duoc) */
     @PUT("api/orders/{orderId}/send")
@@ -172,7 +193,8 @@ public interface ZappyApiService {
     /** QUAN LY huy mon da gui (status 1 -> 2) */
     @PUT("api/orders/details/{detailId}/cancel")
     Call<Map> cancelItem(@Path("detailId") Integer detailId,
-            @Body Map<String, Integer> data);
+            @Query("cancelReason") String cancelReason,
+            @Body Map<String, Integer> dummyData);
 
     /** Thanh toan: tinh tong, dong hoa don, ban -> trong */
     @POST("api/orders/{orderId}/checkout")
@@ -201,7 +223,7 @@ public interface ZappyApiService {
     // USER (NHÂN VIÊN)
     // ==========================================
     @GET("api/users/restaurant/{resId}")
-    Call<List<Map<String, Object>>> getUsersByRestaurant(@Path("resId") int resId);
+    Call<List<com.example.apporderfood.model.User>> getUsersByRestaurant(@Path("resId") int resId);
 
     // ==========================================
     // SHIFT (CA LÀM VIỆC)
@@ -221,4 +243,23 @@ public interface ZappyApiService {
 
     @PUT("api/shifts/{id}/close")
     Call<Map<String, Object>> closeShift(@Path("id") int shiftId, @Body Map<String, Object> shiftData);
+    // ==========================================
+    // THỐNG KÊ (STATS)
+    // ==========================================
+    @GET("api/orders/stats/restaurant/{resId}")
+    Call<Map<String, Object>> getDashboardStats(
+            @Path("resId") int resId,
+            @retrofit2.http.Query("period") String period
+    );
+    //=======================
+    // LogOut
+    //=========================
+    @PUT("api/users/{id}/logout")
+    Call<Map<String, String>> logoutUser(@Path("id") Integer id);
+
+    //=======================
+    // Khóa tài khoản
+    //=========================
+    @PUT("api/users/{id}/toggle-lock")
+    Call<Map<String, Boolean>> toggleLockUser(@Path("id") Integer id);
 }

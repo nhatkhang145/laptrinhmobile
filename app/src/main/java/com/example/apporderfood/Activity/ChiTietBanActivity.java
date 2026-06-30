@@ -6,6 +6,10 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.apporderfood.R;
 import com.example.apporderfood.api.RetrofitClient;
@@ -40,6 +44,7 @@ public class ChiTietBanActivity extends AppCompatActivity {
     private View btnBack;
     private View btnThemMon;
     private View btnTinhTien;
+    private View btnGuiBep;
     
     private TextView tvTitle;
     private TextView tvBadgeCount;
@@ -55,7 +60,13 @@ public class ChiTietBanActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_chi_tiet_ban);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         orderId   = getIntent().getIntExtra("ORDER_ID", -1);
         tableId   = getIntent().getIntExtra("TABLE_ID", -1);
@@ -71,6 +82,7 @@ public class ChiTietBanActivity extends AppCompatActivity {
         btnBack     = findViewById(R.id.btnBack);
         btnThemMon  = findViewById(R.id.btnAddItem); // changed to btnAddItem based on xml id
         btnTinhTien = findViewById(R.id.btnTinhTien);
+        btnGuiBep = findViewById(R.id.btnGuiBep);
         
         tvTitle = findViewById(R.id.tvTitle);
         tvBadgeCount = findViewById(R.id.tvBadgeCount);
@@ -89,7 +101,13 @@ public class ChiTietBanActivity extends AppCompatActivity {
 
     private void setupRecyclerView() {
         android.content.SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
-        boolean isAdmin = prefs.getInt("ROLE", 0) == 1;
+        int userRole = prefs.getInt("ROLE", 0);
+        boolean isAdmin = userRole == 1;
+        boolean canCheckout = userRole == 1 || userRole == 2;
+        
+        if (!canCheckout && btnTinhTien != null) {
+            btnTinhTien.setVisibility(View.GONE);
+        }
 
         adapter = new OrderDetailAdapter(this, new java.util.ArrayList<>(), isAdmin, this::cancelItem);
         rvOrderDetails.setLayoutManager(new LinearLayoutManager(this));
@@ -99,13 +117,24 @@ public class ChiTietBanActivity extends AppCompatActivity {
 
     private void cancelItem(OrderDetail detail) {
         if (detail.getId() == null) return;
+        
+        android.widget.EditText input = new android.widget.EditText(this);
+        input.setHint("Nhập lý do huỷ món...");
+        
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.setPadding(50, 20, 50, 0);
+        layout.addView(input);
+
         new androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle("Xác nhận hủy món")
             .setMessage("Hủy món " + (detail.getMenuItem() != null ? detail.getMenuItem().getItemName() : "") + "?")
+            .setView(layout)
             .setPositiveButton("Hủy món", (dialog, which) -> {
+                String reason = input.getText().toString().trim();
                 ZappyApiService api = RetrofitClient.getApiService();
-                Map<String, Integer> data = new java.util.HashMap<>();
-                api.cancelItem(detail.getId(), data).enqueue(new Callback<Map>() {
+                
+                api.cancelItem(detail.getId(), reason, new java.util.HashMap<>()).enqueue(new Callback<Map>() {
                     @Override
                     public void onResponse(Call<Map> call, Response<Map> response) {
                         if (response.isSuccessful()) {
@@ -135,6 +164,7 @@ public class ChiTietBanActivity extends AppCompatActivity {
                     List<OrderDetail> details = response.body();
                     adapter.setItems(details);
                     updateSummary(details);
+                    updateGuiButton(details);
                 }
             }
             @Override
@@ -153,6 +183,23 @@ public class ChiTietBanActivity extends AppCompatActivity {
         tvBadgeCount.setText(details.size() + " MÓN");
     }
 
+    private void updateGuiButton(List<OrderDetail> details) {
+        if (btnGuiBep == null) return;
+        boolean hasPending = false;
+        for (OrderDetail d : details) {
+            if (d.getStatus() != null && d.getStatus() == 0) {
+                hasPending = true;
+                break;
+            }
+        }
+        btnGuiBep.setEnabled(hasPending);
+        if (hasPending) {
+            btnGuiBep.setBackgroundResource(R.drawable.bg_btn_primary);
+        } else {
+            btnGuiBep.setBackgroundResource(R.drawable.bg_btn_disabled);
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -161,9 +208,8 @@ public class ChiTietBanActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
 
-        // Back -> Về danh sách order
+        // Back -> Về trang trước đó (Danh sách order hoặc Sơ đồ bàn)
         btnBack.setOnClickListener(v -> {
-            startActivity(new Intent(this, DanhSachOrderActivity.class));
             finish();
         });
 
@@ -181,6 +227,31 @@ public class ChiTietBanActivity extends AppCompatActivity {
             intent.putExtra("ORDER_ID", orderId);
             intent.putExtra("TABLE_NAME", tableName);
             startActivity(intent);
+        });
+
+        if (btnGuiBep != null) {
+            btnGuiBep.setOnClickListener(v -> guiBep());
+        }
+    }
+
+    private void guiBep() {
+        if (orderId == -1) return;
+        ZappyApiService api = RetrofitClient.getApiService();
+        api.sendOrder(orderId).enqueue(new Callback<Map>() {
+            @Override
+            public void onResponse(Call<Map> call, Response<Map> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(ChiTietBanActivity.this, "Đã gửi bếp thành công!", Toast.LENGTH_SHORT).show();
+                    loadOrderDetails();
+                } else {
+                    Toast.makeText(ChiTietBanActivity.this, "Lỗi gửi bếp", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Map> call, Throwable t) {
+                Toast.makeText(ChiTietBanActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }
