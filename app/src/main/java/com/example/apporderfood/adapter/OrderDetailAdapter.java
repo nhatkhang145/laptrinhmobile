@@ -32,6 +32,13 @@ public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.
     private final boolean isAdmin;
     private OnCancelItemListener cancelListener;
 
+    /**
+     * HÀM KHỞI TẠO ADAPTER
+     * @param context Context màn hình
+     * @param items Danh sách các món ăn chi tiết
+     * @param isAdmin Cờ báo xem người dùng có phải là Quản lý không (để hiện nút Hủy món)
+     * @param cancelListener Lắng nghe sự kiện bấm nút Xóa/Hủy
+     */
     public OrderDetailAdapter(Context context, List<OrderDetail> items, boolean isAdmin, OnCancelItemListener cancelListener) {
         this.context = context;
         this.items = items;
@@ -39,11 +46,18 @@ public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.
         this.cancelListener = cancelListener;
     }
 
+    /**
+     * CẬP NHẬT LẠI DANH SÁCH MÓN ĂN VÀ VẼ LẠI GIAO DIỆN
+     */
     public void setItems(List<OrderDetail> items) {
         this.items = items;
         notifyDataSetChanged();
     }
 
+    /**
+     * TẠO GIAO DIỆN MỚI CHO 1 DÒNG MÓN ĂN
+     * Nạp layout từ file item_order_detail.xml
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -51,6 +65,11 @@ public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.
         return new ViewHolder(view);
     }
 
+    /**
+     * ĐỔ DỮ LIỆU CỦA 1 MÓN ĂN LÊN GIAO DIỆN (Tên, Giá, Trạng thái...)
+     * Xử lý giao diện cho món bị gạch ngang khi Status = 2 (Đã hủy).
+     * Phân quyền hiển thị nút Xóa/Hủy món.
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         OrderDetail detail = items.get(position);
@@ -129,11 +148,17 @@ public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.
         }
     }
 
+    /**
+     * TRẢ VỀ TỔNG SỐ LƯỢNG MÓN ĐANG HIỂN THỊ
+     */
     @Override
     public int getItemCount() {
         return items == null ? 0 : items.size();
     }
 
+    /**
+     * LỚP VIEWHOLDER: ÁNH XẠ GIAO DIỆN XML
+     */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvQtyBadge, tvItemName, tvUnitPrice, tvNote, tvSubTotal, btnCancel;
         LinearLayout llNote;
