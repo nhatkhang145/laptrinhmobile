@@ -31,7 +31,16 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
+/**
+ * Màn hình Quản lý ca làm việc.
+ *
+ * Chức năng:
+ * - Kiểm tra ca làm việc hiện tại.
+ * - Mở ca mới.
+ * - Đóng ca làm việc.
+ * - Chọn hoặc cập nhật nhân viên tham gia ca.
+ * - Hiển thị thông tin ca đang hoạt động.
+ */
 public class QuanLyCaActivity extends AppCompatActivity {
 
     private IconicsImageView btnBack;
@@ -126,7 +135,17 @@ public class QuanLyCaActivity extends AppCompatActivity {
         tvTotalRevenue = findViewById(R.id.tvTotalRevenue);
         btnCloseShift = findViewById(R.id.btnCloseShift);
     }
-
+    /**
+     * Kiểm tra nhà hàng hiện có ca làm việc đang mở hay không.
+     *
+     * Nếu có:
+     * - Lấy thông tin ca.
+     * - Lưu dữ liệu vào các biến trạng thái.
+     * - Cập nhật giao diện.
+     *
+     * Nếu không:
+     * - Hiển thị giao diện mở ca.
+     */
     private void loadShiftState() {
         progressBar.setVisibility(View.VISIBLE);
         layoutOpenShift.setVisibility(View.GONE);
@@ -135,11 +154,14 @@ public class QuanLyCaActivity extends AppCompatActivity {
         apiService.getActiveShift(resId).enqueue(new Callback<Map<String, Object>>() {
             @Override
             public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
+                // Ẩn giao diện trong lúc tải dữ liệu
                 progressBar.setVisibility(View.GONE);
+                // Gọi API lấy ca đang hoạt động
                 if (response.isSuccessful() && response.body() != null) {
                     Map<String, Object> shift = response.body();
+                    // Có ca đang mở
                     isShiftOpen = true;
-                    
+                    // Lưu thông tin ca hiện tại
                     if (shift.get("id") != null) {
                         currentShiftId = ((Number) shift.get("id")).intValue();
                     }
@@ -155,12 +177,13 @@ public class QuanLyCaActivity extends AppCompatActivity {
                     if (shift.get("totalRevenue") != null) {
                         currentTotalRevenue = ((Number) shift.get("totalRevenue")).doubleValue();
                     }
-                    
-                    // Parse date
-                    startTimeStr = parseDate(shift.get("startTime"));
 
+                    // Chuyển thời gian mở ca sang định dạng hiển thị
+                    startTimeStr = parseDate(shift.get("startTime"));
+                    // Cập nhật giao diện theo trạng thái ca
                     updateUI();
                 } else {
+                    // Không có ca đang mở
                     isShiftOpen = false;
                     updateUI();
                 }
@@ -175,19 +198,28 @@ public class QuanLyCaActivity extends AppCompatActivity {
             }
         });
     }
-
+    /**
+     * Xử lý mở ca làm việc.
+     *
+     * Kiểm tra:
+     * - Đã nhập tiền đầu ca.
+     * - Đã chọn nhân viên.
+     *
+     * Sau đó gửi yêu cầu mở ca lên server.
+     */
     private void handleOpenShift() {
         String fundStr = edtStartingFund.getText().toString().trim();
+        // Kiểm tra tiền quỹ đầu ca
         if (fundStr.isEmpty()) {
             Toast.makeText(this, "Vui lòng nhập tiền quỹ đầu ca", Toast.LENGTH_SHORT).show();
             return;
         }
-        
+        // Kiểm tra đã chọn nhân viên chưa
         if (selectedEmployeeNames.isEmpty()) {
             Toast.makeText(this, "Vui lòng chọn nhân viên cho ca làm", Toast.LENGTH_SHORT).show();
             return;
         }
-
+        // Tạo dữ liệu gửi lên API mở ca
         double fund;
         try {
             fund = Double.parseDouble(fundStr);
@@ -195,23 +227,25 @@ public class QuanLyCaActivity extends AppCompatActivity {
             Toast.makeText(this, "Tiền quỹ không hợp lệ", Toast.LENGTH_SHORT).show();
             return;
         }
-
+        // Ẩn giao diện trong lúc tải dữ liệu
         progressBar.setVisibility(View.VISIBLE);
-        
+        // Tạo dữ liệu gửi lên API mở ca
         Map<String, Object> requestData = new HashMap<>();
         requestData.put("restaurantId", resId);
         requestData.put("startingFund", fund);
         requestData.put("employeeNames", selectedEmployeeNames);
         requestData.put("employeeIds", selectedEmployeeIds);
-
+        // Gọi API mở ca
         apiService.openShift(requestData).enqueue(new Callback<Map<String, Object>>() {
             @Override
             public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
                 progressBar.setVisibility(View.GONE);
                 if (response.isSuccessful() && response.body() != null) {
+                    // Mở ca thành công -> tải lại thông tin ca
                     Toast.makeText(QuanLyCaActivity.this, "Mở ca làm việc thành công!", Toast.LENGTH_SHORT).show();
-                    loadShiftState(); // Reload to get actual data
+                    loadShiftState();
                 } else {
+                    // Có lỗi xảy ra hoặc đã có ca đang mở
                     Toast.makeText(QuanLyCaActivity.this, "Có lỗi xảy ra hoặc đã có ca đang mở", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -223,11 +257,19 @@ public class QuanLyCaActivity extends AppCompatActivity {
             }
         });
     }
-
+    /**
+     * Hiển thị hộp thoại xác nhận đóng ca.
+     *
+     * Hiển thị:
+     * - Thời gian mở.
+     * - Thời gian đóng.
+     * - Quỹ đầu ca.
+     * - Tổng doanh thu.
+     */
     private void showCloseShiftDialog() {
-        // Tính tổng doanh thu
+        // Lấy doanh thu hiện tại của ca
         double totalRevenueToClose = currentTotalRevenue;
-
+        // Hiển thị thông tin trước khi xác nhận đóng ca
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("XÁC NHẬN ĐÓNG CA LÀM");
         
@@ -249,19 +291,27 @@ public class QuanLyCaActivity extends AppCompatActivity {
         
         builder.show();
     }
-
+    /**
+     * Gửi yêu cầu đóng ca làm việc.
+     *
+     * Sau khi đóng thành công:
+     * - Xóa dữ liệu ca hiện tại.
+     * - Hiển thị lại giao diện mở ca.
+     */
     private void closeShiftApi(double totalRevenue) {
         if (currentShiftId == -1) return;
         
         progressBar.setVisibility(View.VISIBLE);
+        // Gửi tổng doanh thu khi đóng ca
         Map<String, Object> requestData = new HashMap<>();
         requestData.put("totalRevenue", totalRevenue);
-
+        //Goị api đóng ca
         apiService.closeShift(currentShiftId, requestData).enqueue(new Callback<Map<String, Object>>() {
             @Override
             public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
                 progressBar.setVisibility(View.GONE);
                 if (response.isSuccessful()) {
+                    // Đóng ca thành công -> xóa dữ liệu ca hiện tại (set dữ liệu về mặc định).
                     Toast.makeText(QuanLyCaActivity.this, "Đã đóng ca làm việc", Toast.LENGTH_SHORT).show();
                     isShiftOpen = false;
                     currentFund = 0;
@@ -271,6 +321,7 @@ public class QuanLyCaActivity extends AppCompatActivity {
                     currentShiftId = -1;
                     updateUI();
                 } else {
+                    //không thành công
                     Toast.makeText(QuanLyCaActivity.this, "Lỗi khi đóng ca", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -282,8 +333,17 @@ public class QuanLyCaActivity extends AppCompatActivity {
             }
         });
     }
-
+    /**
+     * Cập nhật giao diện theo trạng thái ca.
+     *
+     * Nếu ca đang mở:
+     * - Hiển thị thông tin ca.
+     *
+     * Nếu chưa mở ca:
+     * - Hiển thị màn hình mở ca.
+     */
     private void updateUI() {
+        // Hiển thị giao diện ca đang hoạt động
         if (isShiftOpen) {
             layoutOpenShift.setVisibility(View.GONE);
             layoutActiveShift.setVisibility(View.VISIBLE);
@@ -295,13 +355,20 @@ public class QuanLyCaActivity extends AppCompatActivity {
             // Tạm thời chưa có API đếm số Hóa đơn, để ẩn
             tvOrderCount.setText("---");
             tvTotalRevenue.setText(formatter.format(currentTotalRevenue) + "đ");
-        } else {
+        }
+        // Hiển thị giao diện mở ca
+        else {
             layoutOpenShift.setVisibility(View.VISIBLE);
             layoutActiveShift.setVisibility(View.GONE);
             tvSelectedEmployees.setText(selectedEmployeeNames.isEmpty() ? "Chưa chọn nhân viên" : selectedEmployeeNames);
         }
     }
-
+    /**
+     * Tải danh sách nhân viên của nhà hàng.
+     *
+     * Danh sách này được sử dụng khi chọn
+     * nhân viên tham gia ca làm việc.
+     */
     private void loadUsers() {
         apiService.getUsersByRestaurant(resId).enqueue(new Callback<List<com.example.apporderfood.model.User>>() {
             @Override
@@ -318,24 +385,38 @@ public class QuanLyCaActivity extends AppCompatActivity {
             }
         });
     }
-
+    /**
+     * Hiển thị hộp thoại chọn nhân viên cho ca.
+     *
+     * Nếu ca đã mở:
+     * - Cập nhật danh sách nhân viên của ca.
+     *
+     * Nếu chưa mở:
+     * - Chỉ lưu danh sách để mở ca sau.
+     */
     private void showSelectEmployeeDialog() {
+        // Kiểm tra đã có danh sách nhân viên hay chưa
         if (allUsers == null || allUsers.isEmpty()) {
             Toast.makeText(this, "Chưa có danh sách nhân viên", Toast.LENGTH_SHORT).show();
             return;
         }
-
+        //lấy user ra
         String[] userNames = new String[allUsers.size()];
         for (int i = 0; i < allUsers.size(); i++) {
+            // Lấy tên và id của từng nhân viên
             userNames[i] = allUsers.get(i).getUsername();
             int userId = allUsers.get(i).getId();
             
             // Khôi phục trạng thái đã chọn từ selectedEmployeeIds
             selectedUserItems[i] = false;
+            // Nếu ca đã có danh sách nhân viên thì khôi phục trạng thái đã chọn
             if (selectedEmployeeIds != null && !selectedEmployeeIds.isEmpty()) {
+                // Tách chuỗi id nhân viên thành từng phần
                 String[] ids = selectedEmployeeIds.split(",");
                 for (String idStr : ids) {
                     try {
+                        // Nếu id của nhân viên hiện tại nằm trong danh sách thì đánh dấu là đã được chọn
+
                         if (Integer.parseInt(idStr.trim()) == userId) {
                             selectedUserItems[i] = true;
                             break;
@@ -344,13 +425,14 @@ public class QuanLyCaActivity extends AppCompatActivity {
                 }
             }
         }
-
+        // Tạo hộp thoại chọn nhiều nhân viên
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Chọn nhân viên ca này");
+        // Hiển thị danh sách nhân viên cùng trạng thái đã chọn
         builder.setMultiChoiceItems(userNames, selectedUserItems, (dialog, which, isChecked) -> {
             selectedUserItems[which] = isChecked;
         });
-
+        // Xử lý khi người dùng xác nhận danh sách nhân viên
         builder.setPositiveButton("XÁC NHẬN", (dialog, which) -> {
             StringBuilder names = new StringBuilder();
             StringBuilder ids = new StringBuilder();
@@ -402,7 +484,11 @@ public class QuanLyCaActivity extends AppCompatActivity {
         builder.setNegativeButton("HỦY", (dialog, which) -> dialog.dismiss());
         builder.show();
     }
-
+    /**
+     * Chuyển dữ liệu thời gian từ API
+     * sang định dạng HH:mm (dd/MM/yyyy)
+     * để hiển thị trên giao diện.
+     */
     private String parseDate(Object dateObj) {
         if (dateObj == null) return "N/A";
         if (dateObj instanceof String) {

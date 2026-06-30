@@ -33,7 +33,15 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
+/**
+ * Màn hình thêm nhân viên mới.
+ *
+ * Chức năng:
+ * - Nhập thông tin nhân viên.
+ * - Chọn vai trò.
+ * - Hiển thị/ẩn mật khẩu.
+ * - Gửi yêu cầu tạo tài khoản lên server.
+ */
 public class ThemNhanVienActivity extends AppCompatActivity {
 
     private IconicsImageView btnBack, ivTogglePassword;
@@ -62,7 +70,6 @@ public class ThemNhanVienActivity extends AppCompatActivity {
         currentResId = prefs.getInt("RES_ID", -1);
         if (currentResId == -1) {
             Toast.makeText(this, "Không tìm thấy thông tin nhà hàng. Vui lòng đăng nhập lại!", Toast.LENGTH_SHORT).show();
-
             // Thoát ra màn hình đăng nhập
             Intent intent = new Intent(this, DangNhapActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -70,10 +77,8 @@ public class ThemNhanVienActivity extends AppCompatActivity {
             finish();
             return;
         }
-
         initViews();
         setupListeners();
-
         apiService = RetrofitClient.getApiService();
     }
 
@@ -84,76 +89,97 @@ public class ThemNhanVienActivity extends AppCompatActivity {
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         ivTogglePassword = findViewById(R.id.ivTogglePassword);
-
         flRoleDropdown = findViewById(R.id.flRoleDropdown);
         tvSelectedRole = findViewById(R.id.tvSelectedRole);
-
         btnConfirm = findViewById(R.id.btnConfirm);
-
         // Gán text mặc định ban đầu
         tvSelectedRole.setText("Nhân viên");
     }
-
+    /**
+     * Khởi tạo các sự kiện cho giao diện.
+     *
+     * Bao gồm:
+     * - Quay lại màn hình trước.
+     * - Chọn vai trò.
+     * - Hiển thị/ẩn mật khẩu.
+     * - Thêm nhân viên.
+     */
     private void setupListeners() {
         // Nút quay lại
         btnBack.setOnClickListener(v -> finish());
-
         // Mở menu chọn quyền
         flRoleDropdown.setOnClickListener(v -> showRoleMenu());
-
         // Nút Xác nhận thêm
         btnConfirm.setOnClickListener(v -> handleAddStaff());
-        
-        // Toggle password
+        // Ẩn mật khẩu
         ivTogglePassword.setOnClickListener(v -> togglePasswordVisibility());
     }
-
+    /**
+     * Chuyển đổi giữa chế độ hiển thị và ẩn mật khẩu.
+     *
+     * Đồng thời thay đổi biểu tượng con mắt
+     * và giữ nguyên vị trí con trỏ nhập liệu.
+     */
     private void togglePasswordVisibility() {
+        // Đảo trạng thái hiển thị mật khẩu
         isPasswordVisible = !isPasswordVisible;
+        // Lưu vị trí con trỏ hiện tại
         int cursorPos = etPassword.getSelectionEnd();
-        
+        // Hiển thị mật khẩu
         if (isPasswordVisible) {
             etPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
             ivTogglePassword.setImageDrawable(new IconicsDrawable(this, FontAwesome.Icon.faw_eye));
-        } else {
+        }
+        // Ẩn mật khẩu
+        else {
             etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
             ivTogglePassword.setImageDrawable(new IconicsDrawable(this, FontAwesome.Icon.faw_eye_slash));
         }
-        
         etPassword.setSelection(Math.min(cursorPos, etPassword.getText().length()));
-        
-        ivTogglePassword.animate().scaleX(0.8f).scaleY(0.8f).setDuration(80)
-                .withEndAction(() ->
-                        ivTogglePassword.animate().scaleX(1f).scaleY(1f).setDuration(100).start())
-                .start();
+        ivTogglePassword.animate().scaleX(0.8f).scaleY(0.8f).setDuration(80).withEndAction(() -> ivTogglePassword.animate().scaleX(1f).scaleY(1f).setDuration(100).start()).start();
     }
-
+    /**
+     * Hiển thị menu chọn vai trò nhân viên.
+     *
+     * Các vai trò:
+     * - Quản lý
+     * - Nhân viên
+     * - Thu ngân
+     */
     private void showRoleMenu() {
+        // Tạo menu chọn vai trò
         PopupMenu popupMenu = new PopupMenu(this, flRoleDropdown);
         popupMenu.getMenu().add(0, 1, 0, "Quản lý");
         popupMenu.getMenu().add(0, 0, 1, "Nhân viên");
         popupMenu.getMenu().add(0, 2, 1, "Thu ngân");
-
         popupMenu.setOnMenuItemClickListener(item -> {
-            selectedRoleId = item.getItemId(); // 1 hoặc 0
+            // Lưu vai trò được chọn
+            selectedRoleId = item.getItemId(); // 1 hoặc 0 hoăcj 2
             tvSelectedRole.setText(item.getTitle());
             return true;
         });
+        //cập nhật giao diện
         popupMenu.show();
     }
-
+    /**
+     * Xử lý thêm nhân viên mới.
+     *
+     * Quy trình:
+     * 1. Lấy dữ liệu từ giao diện.
+     * 2. Kiểm tra dữ liệu hợp lệ.
+     * 3. Gửi dữ liệu lên server.
+     * 4. Thông báo kết quả.
+     */
     private void handleAddStaff() {
         String fullName = etFullName.getText().toString().trim();
         String email = etPhone.getText().toString().trim();
         String username = etUsername.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
-
         // Validate cơ bản
         if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
             Toast.makeText(this, "Vui lòng nhập đầy đủ Username, Password và Email!", Toast.LENGTH_SHORT).show();
             return;
         }
-
         // Tạo Map dữ liệu gửi lên API
         Map<String, Object> data = new HashMap<>();
         data.put("resId", currentResId);
@@ -162,10 +188,8 @@ public class ThemNhanVienActivity extends AppCompatActivity {
         data.put("role", selectedRoleId);
         data.put("email", email);
         data.put("fullname", fullName);
-
         // Khóa nút để tránh bấm 2 lần
         btnConfirm.setEnabled(false);
-
         apiService.createUser(data).enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
@@ -178,7 +202,6 @@ public class ThemNhanVienActivity extends AppCompatActivity {
                     Toast.makeText(ThemNhanVienActivity.this, "Tài khoản đã tồn tại hoặc lỗi Server!", Toast.LENGTH_SHORT).show();
                 }
             }
-
             @Override
             public void onFailure(Call<User> call, Throwable t) {
                 btnConfirm.setEnabled(true);

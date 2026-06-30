@@ -28,7 +28,14 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
+/**
+ * Màn hình hiển thị lịch sử các ca làm việc của nhà hàng.
+ *
+ * Chức năng:
+ * - Tải danh sách các ca làm việc từ server.
+ * - Hiển thị danh sách bằng RecyclerView.
+ * - Thông báo khi chưa có lịch sử ca.
+ */
 public class LichSuCaActivity extends AppCompatActivity {
 
     private IconicsImageView btnBack;
@@ -51,15 +58,16 @@ public class LichSuCaActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
+        // Lấy mã nhà hàng từ phiên đăng nhập
         SharedPreferences prefs = getSharedPreferences("ZappySession", Context.MODE_PRIVATE);
         resId = prefs.getInt("RES_ID", -1);
+        // Khởi tạo API
         apiService = RetrofitClient.getApiService();
 
         initViews();
         
         btnBack.setOnClickListener(v -> finish());
-
+        // Nếu xác định được nhà hàng thì tải lịch sử ca
         if (resId != -1) {
             loadHistory();
         } else {
@@ -78,7 +86,13 @@ public class LichSuCaActivity extends AppCompatActivity {
         adapter = new ShiftHistoryAdapter(this, new ArrayList<>());
         rvShiftHistory.setAdapter(adapter);
     }
-
+    /**
+     * Tải lịch sử các ca làm việc của nhà hàng.
+     *
+     * Sau khi lấy dữ liệu:
+     * - Nếu có ca thì hiển thị lên RecyclerView.
+     * - Nếu chưa có ca thì hiển thị thông báo.
+     */
     private void loadHistory() {
         progressBar.setVisibility(View.VISIBLE);
         tvEmpty.setVisibility(View.GONE);
@@ -88,7 +102,9 @@ public class LichSuCaActivity extends AppCompatActivity {
             public void onResponse(Call<List<Map<String, Object>>> call, Response<List<Map<String, Object>>> response) {
                 progressBar.setVisibility(View.GONE);
                 if (response.isSuccessful() && response.body() != null) {
+                    // Lấy danh sách các ca làm việc
                     List<Map<String, Object>> shifts = response.body();
+
                     if (shifts.isEmpty()) {
                         tvEmpty.setVisibility(View.VISIBLE);
                     } else {
