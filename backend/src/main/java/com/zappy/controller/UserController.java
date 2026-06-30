@@ -30,27 +30,24 @@ public class UserController {
 
     @Autowired
     private RestaurantRepository restaurantRepo;
-
-    // ==========================================
-    // DANG NHAP
-    // ==========================================
+    
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
-        String domain   = loginData.get("domain");    // domain nha hang
+        String domain   = loginData.get("domain");   
         String username = loginData.get("username");
         String password = loginData.get("password");
-        
-        // B1: Tim nha hang theo domain
+        // Tim nha hang theo domain, neu ko co thi cho no null
         Restaurant restaurant = restaurantRepo.findByResDomain(domain)
                 .orElse(null);
+        // Neu nha hang la null, tra ra loi.
         if (restaurant == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("message", "Khong tim thay nha hang voi domain: " + domain));
         }
-
-        // B2: Tim user trong nha hang do
+        // Tim user theo ten cua user va id cua nha hang, neu ko co thi null
         User user = userRepo.findByUsernameAndRestaurantId(username, restaurant.getId())
                 .orElse(null);
+        // Kiem tra neu user null hoac mat khau cua user ko trung voi mat khau nhan vao, bao loi.
         if (user == null || !user.getPassword().equals(password)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Sai username hoac mat khau!"));
@@ -60,10 +57,11 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("message", "Tai khoan nay da bi khoa!"));
         }
-        //set trạng thái là online khi đăng nhập
+        // Neu pass tat ca dieu kien tren, set trang thai cua user thanh online
         user.setIsOnline(true);
+        
         userRepo.save(user);
-        // B3: Dang nhap thanh cong - tra ve thong tin user
+        // Dang nhap thanh cong, tra ve thong tin cua user
         return ResponseEntity.ok(Map.of(
                 "id",         user.getId(),
                 "username",   user.getUsername(),

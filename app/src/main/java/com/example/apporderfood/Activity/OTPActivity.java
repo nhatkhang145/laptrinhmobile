@@ -40,8 +40,11 @@ public class OTPActivity extends AppCompatActivity {
         setContentView(R.layout.activity_xacthuc);
         tvCountdown = findViewById(R.id.tvCountdown);
         tvResend = findViewById(R.id.tvResend);
+        // Khởi động đếm thời gian ngay khi giao diện được tạo.
         startCountdown();
+        // Chặn nút gửi otp lại.
         setResendEnabled(false);
+        // Lấy ra email và mode từ intent.
         email = getIntent().getStringExtra("email");
         mode = getIntent().getStringExtra("mode");
         otp1 = findViewById(R.id.otp1);
@@ -50,11 +53,14 @@ public class OTPActivity extends AppCompatActivity {
         otp4 = findViewById(R.id.otp4);
         otp5 = findViewById(R.id.otp5);
         otp6 = findViewById(R.id.otp6);
+        // Gọi phương thức cài đặt các ô otp.
         setupOtpInputs();
         btnVerify = findViewById(R.id.btnVerify);
+        // Gán sự kiện cho nút gửi lại mã otp, gọi phương thức resendOtp()
         tvResend.setOnClickListener(v -> {
             resendOtp();
         });
+        // Gán sự kiện cho nút xác thực.
         btnVerify.setOnClickListener(v -> {
                     String otp = otp1.getText().toString().trim()
                             + otp2.getText().toString().trim()
@@ -62,15 +68,20 @@ public class OTPActivity extends AppCompatActivity {
                             + otp4.getText().toString().trim()
                             + otp5.getText().toString().trim()
                             + otp6.getText().toString().trim();
+                    // Lấy ra mã otp hoàn chỉnh từ từng ô otp nhận vào, sau đó kiểm tra xem có đủ 6
+                    // số otp ko, nếu ko thì báo lỗi và ko tra ra gì.
                     if (otp.length() != 6) {
                         Toast.makeText(this, "Vui lòng nhập đủ 6 số OTP", Toast.LENGTH_SHORT).show();
                         return;
                     }
+                    // Đưa email nhận được từ intent và otp vào một hashmap dữ liệu được dùng để gửi đi
+                    // cho API sau đó.
                     Map<String, String> data = new HashMap<>();
                     data.put("email", email);
                     data.put("otp", otp);
                     Call<Map<String, String>> call;
-
+                    // Kiểm tra mode nhận được từ intent, nếu là register thì gọi API xác thực mã OTP của
+                    // đăng ký, ngược lại thì gọi API của quên mật khẩu.
                     if ("register".equals(mode)) {
                         call = RetrofitClient.getApiService().verifyRegisterOtp(data);
                     } else {
@@ -79,21 +90,27 @@ public class OTPActivity extends AppCompatActivity {
 
                     call.enqueue(new Callback<Map<String, String>>() {
                         @Override
+
                         public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
+                            // Nếu có response và là response successfull, tiếp tục kiểm tra mode, nếu là
+                            // mode register, gọi phương thức tạo nhà hàng và tạo tài khoản admin.
                             if (response.isSuccessful()) {
                                 if ("register".equals(mode)) {
                                     createRestaurantThenAdmin();
+                                    // Nếu mode ko phải là mode register (tức mode quên mật khẩu), tạo intent mới chuyển tới DatLaiMatKhauActivity
+                                    // và gửi kèm email của người dùng đã nhập trước đó
                                 } else {
                                     Intent intent = new Intent(OTPActivity.this, DatLaiMatKhauActivity.class);
                                     intent.putExtra("email", email);
                                     startActivity(intent);
                                     finish();
                                 }
+                                // Nếu response ko success, hiển thị lỗi.
                             } else {
                                 Toast.makeText(OTPActivity.this, "OTP không đúng hoặc đã hết hạn", Toast.LENGTH_SHORT).show();
                             }
                         }
-
+                        // Trong trường hợp thất bại, hiển thị lỗi mạng kèm chi tiết tin nhắn lỗi.
                         @Override
                         public void onFailure(Call<Map<String, String>> call, Throwable t) {
                             Toast.makeText(OTPActivity.this, "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
@@ -102,24 +119,29 @@ public class OTPActivity extends AppCompatActivity {
                 }
         );
     }
-
+    //Phương thức tạo nhà hàng và tài khoản admin.
     private void createRestaurantThenAdmin() {
+        // Lần lượt lấy ra các dữ liệu gửi kèm cùng intent để tạo nhà hàng và tài khoản admin.
         String resName = getIntent().getStringExtra("resName");
         String resDomain = getIntent().getStringExtra("resDomain");
         String address = getIntent().getStringExtra("address");
         String username = getIntent().getStringExtra("username");
         String password = getIntent().getStringExtra("password");
         String managerName = getIntent().getStringExtra("managerName");
-
+        // Các dữ liệu dùng để tạo nhà hàng được đặt vào một HashMAp riêng sau đó sẽ được gửi cho API.
         Map<String, String> resData = new HashMap<>();
         resData.put("resName", resName);
         resData.put("resDomain", resDomain);
         resData.put("address", address);
-
+        // API tạo nhà hàng được gọi.
         RetrofitClient.getApiService().createRestaurant(resData).enqueue(new Callback<Restaurant>() {
             @Override
             public void onResponse(Call<Restaurant> call, Response<Restaurant> response) {
+                // Nếu có response và response success, body của response khác null thì sau đó phương thức
+                // sẽ tiếp tục tạo tài khoản admin.
                 if (response.isSuccessful() && response.body() != null) {
+                    // Id của nhà hàng được lấy ra, sau đó những dữ liệu cần để tạo tài khoản admin được
+                    // đưa vào một HashMap, thứ sẽ được gửi đi cho API tạo tài khoản user sau đó.
                     Integer resId = response.body().getId();
 
                     Map<String, Object> userData = new HashMap<>();
@@ -129,66 +151,83 @@ public class OTPActivity extends AppCompatActivity {
                     userData.put("role", 1);
                     userData.put("email", email);
                     userData.put("fullname", managerName);
-
+                    // API được gọi để tạo user.
                     RetrofitClient.getApiService().createUser(userData).enqueue(new Callback<User>() {
                         @Override
                         public void onResponse(Call<User> call, Response<User> response) {
+                            // Nếu có response và response success, hiển thị thông báo đăng ký thành công,
+                            // đồng thời chuyển sang màn hình đăng nhập và chấm dứt màn hình xác thực OTP này
                             if (response.isSuccessful()) {
                                 Toast.makeText(OTPActivity.this, "Đăng ký thành công", Toast.LENGTH_LONG).show();
                                 startActivity(new Intent(OTPActivity.this, DangNhapActivity.class));
                                 finish();
+                                // Nếu response không success, hiển thị thông báo lỗi.
                             } else {
                                 Toast.makeText(OTPActivity.this, "Lỗi tạo tài khoản quản lý", Toast.LENGTH_SHORT).show();
                             }
                         }
-
+                        // Trong trường hợp thất bại, hiển thị lỗi mạng.
                         @Override
                         public void onFailure(Call<User> call, Throwable t) {
                             Toast.makeText(OTPActivity.this, "Lỗi mạng tạo tài khoản: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
+                    // Nếu tạo nhà hàng không thành công, hiển thị lỗi domain đã tồn tại hoặc lỗi Server.
                 } else {
                     Toast.makeText(OTPActivity.this, "Domain đã tồn tại hoặc lỗi server", Toast.LENGTH_SHORT).show();
                 }
             }
-
+            // Nếu ko có response ở tạo nhà hàng, hiển thị lỗi mạng.
             @Override
             public void onFailure(Call<Restaurant> call, Throwable t) {
                 Toast.makeText(OTPActivity.this, "Lỗi mạng tạo nhà hàng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
-
+    // Phương thức thực hiện việc gửi lại mã OTP.
     private void resendOtp() {
+        //Nếu bộ đếm đang chạy, ngay lập tức hủy nó
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
+        //Chặn nút gửi otp lại để tránh việc ngươ dùng spam
         setResendEnabled(false);
+        //Đặt thời gian tồn tại của OTP trên giao diện về rỗng.
         tvCountdown.setText("");
+        //Đặt nội dung của nút gửi OTP lại thành "Đang gửi lại mã..."
         tvResend.setText("Đang gửi lại mã...");
+        // Đưa email vào một HashMap dùng để gửi cho API sau đó.
         Map<String, String> data = new HashMap<>();
         data.put("email", email);
         Call<Map<String, String>> call;
+        // Kiểm tra chế độ, nếu là register thì gọi phương thức gửi OTP tương ứng của register và ngược lại
         if ("register".equals(mode)) {
             call = RetrofitClient.getApiService().sendRegisterOtp(data);
         } else {
             call = RetrofitClient.getApiService().sendOtp(data);
         }
+
         call.enqueue(new Callback<Map<String, String>>() {
             @Override
             public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
+                //Nếu có response và response success, hiển thị thông báo đã gửi lại mã OTP, clear tất cả
+                //số OTP đang có trong các ô nhập vào, đặt nội dung của nút gửi lại OTP về như cũ và chạy lại
+                // Countdown.
                 if (response.isSuccessful()) {
                     Toast.makeText(OTPActivity.this, "Đã gửi lại mã OTP", Toast.LENGTH_SHORT).show();
                     clearOtpInputs();
                     tvResend.setText("Gửi lại");
                     startCountdown();
+                    // Nếu không thì hiển thị lỗi, và vẫn đặt nội dung của nút gửi lại OTP như cũ, và cho phép nút resend
+                    // có thể nhấn được.
                 } else {
                     Toast.makeText(OTPActivity.this, "Không thể gửi lại OTP", Toast.LENGTH_SHORT).show();
                     tvResend.setText("Gửi lại");
                     setResendEnabled(true);
                 }
             }
-
+            // Trong trường hợp thất bại, hiển thị thông báo lỗi mạng, đặt nội dung của nút gửi lại trở lại như cũ
+            // và enable nút gửi lại OTP.
             @Override
             public void onFailure(Call<Map<String, String>> call, Throwable t) {
                 Toast.makeText(OTPActivity.this, "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
@@ -197,7 +236,7 @@ public class OTPActivity extends AppCompatActivity {
             }
         });
     }
-
+    // Phương thức giúp reset toàn bộ các ô otp và đặt con trỏ về ô otp đầu tin
     private void clearOtpInputs() {
         otp1.setText("");
         otp2.setText("");
