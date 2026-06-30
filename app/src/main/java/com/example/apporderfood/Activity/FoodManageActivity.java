@@ -30,6 +30,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * FoodManageActivity (Màn hình Quản lý Món ăn)
+ * Nhiệm vụ chính:
+ * - Hiển thị danh sách tất cả các món ăn của nhà hàng.
+ * - Cho phép tìm kiếm món ăn theo tên và lọc theo danh mục.
+ * - Cung cấp giao diện (BottomSheet) để thêm mới hoặc chỉnh sửa món ăn (bao gồm tải ảnh lên).
+ * - Thống kê số lượng món ăn (tổng số, còn món, hết món).
+ */
 public class FoodManageActivity extends AppCompatActivity {
 
     private RecyclerView rvFoodList, rvCategoryList;
@@ -102,10 +110,13 @@ public class FoodManageActivity extends AppCompatActivity {
         rvFoodList.setLayoutManager(new LinearLayoutManager(this));
         rvCategoryList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
+        // Lấy danh sách danh mục để hiển thị lên thanh lọc ngang (Category filter)
         loadCategoriesForFilter();
 
+        // Lấy danh sách món ăn (lần đầu sẽ không có từ khóa tìm kiếm)
         loadMenuFromApi(currentKeyword);
 
+        // Xử lý sự kiện khi người dùng nhập từ khóa tìm kiếm món ăn
         android.widget.EditText etSearchFood = findViewById(R.id.etSearchFood);
         etSearchFood.addTextChangedListener(new android.text.TextWatcher() {
             private android.os.Handler handler = new android.os.Handler(android.os.Looper.getMainLooper());
@@ -132,6 +143,9 @@ public class FoodManageActivity extends AppCompatActivity {
         setupBottomNav();
     }
 
+    /**
+     * Gọi API lấy danh sách danh mục để tạo bộ lọc ngang phía trên cùng
+     */
     private void loadCategoriesForFilter() {
         if (resId == -1) return;
         ZappyApiService api = RetrofitClient.getApiService();
@@ -160,7 +174,8 @@ public class FoodManageActivity extends AppCompatActivity {
 
     /**
      * Gọi API GET /api/menu-items/restaurant/{resId}
-     * Lấy danh sách món ăn thực tế từ database
+     * Lấy danh sách món ăn từ database, có hỗ trợ tìm kiếm theo từ khóa
+     * và lọc theo danh mục đã chọn (currentFilterCatId).
      */
     private void loadMenuFromApi(String keyword) {
         if (resId == -1) {
@@ -228,6 +243,10 @@ public class FoodManageActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Gọi API lấy danh sách Danh mục và Đơn vị tính (Unit) để đổ vào Spinner
+     * bên trong form thêm/sửa món ăn.
+     */
     private void loadCategoriesAndUnits(Spinner spinnerCategory, MenuItem existingFood) {
         ZappyApiService api = RetrofitClient.getApiService();
         api.getCategories(resId).enqueue(new Callback<List<com.example.apporderfood.model.Category>>() {
@@ -266,6 +285,10 @@ public class FoodManageActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Hiển thị BottomSheet (khung trượt từ dưới lên) chứa form Thêm mới hoặc Chỉnh sửa món ăn.
+     * @param existingFood null nếu là thêm mới, ngược lại là dữ liệu món ăn cần sửa.
+     */
     private void showFoodBottomSheet(MenuItem existingFood) {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this, R.style.BottomSheetDialogTheme);
         View view = getLayoutInflater().inflate(R.layout.activity_them_mon_an, null);
@@ -300,12 +323,14 @@ public class FoodManageActivity extends AppCompatActivity {
         ivFoodPreview = view.findViewById(R.id.iv_food_preview);
         layoutUploadPlaceholder = view.findViewById(R.id.layout_upload_placeholder);
 
+        // Xử lý sự kiện nhấn vào khu vực tải ảnh để chọn ảnh từ thư viện
         layoutUploadImage.setOnClickListener(v -> {
             android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_PICK);
             intent.setType("image/*");
             imagePickerLauncher.launch(intent);
         });
 
+        // Điền dữ liệu nếu là chế độ chỉnh sửa (existingFood != null)
         selectedImageUri = null;
         if (existingFood != null && existingFood.getImageUrl() != null) {
             com.bumptech.glide.Glide.with(this).load(existingFood.getImageUrl()).into(ivFoodPreview);
@@ -336,6 +361,7 @@ public class FoodManageActivity extends AppCompatActivity {
             }
         }
 
+        // Xử lý sự kiện khi nhấn nút LƯU
         view.findViewById(R.id.btn_save).setOnClickListener(v -> {
             String name = edtFoodName.getText().toString().trim();
             String priceStr = edtPrice.getText().toString().trim();
@@ -363,6 +389,7 @@ public class FoodManageActivity extends AppCompatActivity {
             data.put("price", Double.parseDouble(priceStr));
             data.put("isAvailable", isAvailable);
 
+            // Nếu có ảnh mới được chọn, gọi API upload ảnh trước
             ZappyApiService api = RetrofitClient.getApiService();
             if (selectedImageUri != null) {
                 java.io.File file = getFileFromUri(selectedImageUri);
@@ -393,8 +420,13 @@ public class FoodManageActivity extends AppCompatActivity {
         bottomSheetDialog.show();
     }
 
+    /**
+     * Gọi API để lưu dữ liệu món ăn (thêm mới hoặc cập nhật) lên server sau khi
+     * đã chuẩn bị xong payload (dữ liệu + url ảnh nếu có).
+     */
     private void saveFoodData(ZappyApiService api, java.util.Map<String, Object> data, MenuItem existingFood, BottomSheetDialog bottomSheetDialog) {
         if (existingFood == null) {
+            // Chế độ Thêm mới
             api.createMenuItem(data).enqueue(new Callback<MenuItem>() {
                 @Override
                 public void onResponse(Call<MenuItem> call, Response<MenuItem> response) {

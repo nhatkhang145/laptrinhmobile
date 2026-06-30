@@ -29,6 +29,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * ThemBanMoiActivity (Màn hình Thêm/Sửa Bàn mới)
+ * Nhiệm vụ chính:
+ * - Hiển thị form cho phép nhập thông tin bàn: Tên bàn, Sức chứa, Khu vực, Trạng thái.
+ * - Hỗ trợ cả hai chế độ: Thêm bàn mới và Chỉnh sửa bàn đã có (dựa vào cờ IS_EDIT).
+ * - Lấy danh sách khu vực từ server để người dùng chọn (chọn qua các nút chip).
+ */
 public class ThemBanMoiActivity extends AppCompatActivity {
 
     private ImageButton btnBack;
@@ -145,6 +152,11 @@ public class ThemBanMoiActivity extends AppCompatActivity {
         return null;
     }
 
+    /**
+     * Kiểm tra chế độ khởi chạy:
+     * Nếu có truyền IS_EDIT = true qua Intent, tức là đang ở chế độ Chỉnh sửa bàn.
+     * Điền sẵn các thông tin của bàn vào form.
+     */
     private void checkEditMode() {
         Intent intent = getIntent();
         if (intent != null && intent.getBooleanExtra("IS_EDIT", false)) {
@@ -214,6 +226,9 @@ public class ThemBanMoiActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Xác thực thông tin người dùng nhập vào form và tiến hành gọi API (Thêm mới hoặc Cập nhật)
+     */
     private void validateAndSave() {
         String name = edtTableName.getText().toString().trim();
         String seatsStr = edtTableSeats.getText().toString().trim();

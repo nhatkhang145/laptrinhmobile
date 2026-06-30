@@ -10,13 +10,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.apporderfood.R;
 import java.util.List;
 
+/**
+ * FoodManageAdapter
+ * Adapter hỗ trợ hiển thị danh sách các món ăn lên RecyclerView.
+ * Cung cấp khả năng gắn kết dữ liệu từ model (FoodItem) sang View (item_food_manage.xml).
+ */
 public class FoodManageAdapter extends RecyclerView.Adapter<FoodManageAdapter.FoodViewHolder> {
 
     private List<FoodItem> foodList;
     private OnFoodItemClickListener listener;
 
+    /**
+     * Interface định nghĩa sự kiện khi người dùng nhấn vào một món ăn trong danh sách.
+     */
     public interface OnFoodItemClickListener {
-        void onFoodItemClick(FoodItem item);
+        void onFoodItemClick(FoodItem item); // Gọi khi người dùng click vào một món ăn (thường để mở form sửa)
     }
 
     public FoodManageAdapter(List<FoodItem> foodList, OnFoodItemClickListener listener) {
@@ -31,14 +39,20 @@ public class FoodManageAdapter extends RecyclerView.Adapter<FoodManageAdapter.Fo
         return new FoodViewHolder(view);
     }
 
+    /**
+     * Gắn dữ liệu (Bind data) vào các thành phần giao diện của mỗi item.
+     */
     @Override
     public void onBindViewHolder(@NonNull FoodViewHolder holder, int position) {
         FoodItem item = foodList.get(position);
+        
+        // Cập nhật thông tin text: tên món, danh mục, giá và trạng thái
         holder.tvFoodName.setText(item.getName());
         holder.tvCategory.setText(item.getCategory() + " • " + item.getTag());
         holder.tvPrice.setText(item.getPrice());
         holder.tvStatus.setText(item.getStatus());
 
+        // Cập nhật ảnh món ăn bằng thư viện Glide, nếu không có sẽ hiển thị ảnh mặc định
         if (item.getRawItem() != null && item.getRawItem().getImageUrl() != null) {
             com.bumptech.glide.Glide.with(holder.itemView.getContext())
                 .load(item.getRawItem().getImageUrl())
@@ -48,7 +62,7 @@ public class FoodManageAdapter extends RecyclerView.Adapter<FoodManageAdapter.Fo
             holder.ivFood.setImageResource(R.drawable.bg_food_image);
         }
 
-        // Update status UI
+        // Thay đổi màu sắc của nhãn Trạng thái dựa vào chuỗi "CÒN MÓN" / "HẾT MÓN"
         if ("CÒN MÓN".equals(item.getStatus())) {
             holder.tvStatus.setBackgroundResource(R.drawable.bg_status_available);
             holder.tvStatus.setTextColor(holder.itemView.getContext().getColor(android.R.color.holo_green_dark));
@@ -60,6 +74,7 @@ public class FoodManageAdapter extends RecyclerView.Adapter<FoodManageAdapter.Fo
             holder.tvStatus.setTextColor(holder.itemView.getContext().getColor(android.R.color.holo_orange_dark));
         }
 
+        // Đăng ký sự kiện click cho toàn bộ khối item
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onFoodItemClick(item);
@@ -86,7 +101,11 @@ public class FoodManageAdapter extends RecyclerView.Adapter<FoodManageAdapter.Fo
         }
     }
 
-    // Simple data class for UI display
+    /**
+     * Lớp model trung gian (Data class) dùng để lưu trữ các trường dữ liệu 
+     * đã được định dạng sẵn (chuỗi) để hiển thị lên UI, kèm theo object MenuItem gốc (rawItem)
+     * dùng khi cần truy xuất ID hay các dữ liệu khác.
+     */
     public static class FoodItem {
         private String name;
         private String category;

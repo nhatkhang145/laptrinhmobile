@@ -32,6 +32,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * CategoryManageActivity (Màn hình Quản lý Danh mục)
+ * Nhiệm vụ chính: 
+ * - Hiển thị danh sách các danh mục món ăn của nhà hàng.
+ * - Thống kê số lượng danh mục (Tổng số, đang hoạt động, tạm ẩn).
+ * - Cung cấp các thao tác: Thêm mới, Chỉnh sửa, Xóa, Bật/Tắt trạng thái hoạt động.
+ */
 public class CategoryManageActivity extends AppCompatActivity
         implements CategoryManageAdapter.OnCategoryItemClickListener {
 
@@ -58,12 +65,14 @@ public class CategoryManageActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quan_ly_danh_muc);
 
+        // Lấy mã nhà hàng (resId) từ session đã lưu khi đăng nhập
         SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
         resId = prefs.getInt("RES_ID", -1);
 
+        // Khởi tạo và thiết lập các thành phần giao diện, sự kiện
         initViews();
         setupRecyclerView();
-        loadCategories();
+        loadCategories(); // Gọi API lấy danh sách danh mục
         setupListeners();
         setupBottomNav();
     }
@@ -84,12 +93,16 @@ public class CategoryManageActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Gọi API để lấy danh sách danh mục từ server
+     */
     private void loadCategories() {
         if (resId == -1) {
             Toast.makeText(this, "Không tìm thấy thông tin nhà hàng!", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        // Hiển thị loading và ẩn các view khác trong lúc chờ dữ liệu
         if (pbLoading != null) pbLoading.setVisibility(View.VISIBLE);
         if (rvCategoryList != null) rvCategoryList.setVisibility(View.GONE);
         if (tvEmptyState != null) tvEmptyState.setVisibility(View.GONE);
@@ -126,15 +139,19 @@ public class CategoryManageActivity extends AppCompatActivity
         });
     }
 
+    /**
+     * Tính toán và hiển thị thống kê danh mục (tổng số, hoạt động, tạm ẩn)
+     */
     private void updateStats(List<Category> list) {
         int total = list.size();
         int active = 0;
         int hidden = 0;
         for (Category item : list) {
-            // ✅ Đồng nhất: null hoặc 1 = HOẠT ĐỘNG
+            // Trạng thái null hoặc 1 được coi là HOẠT ĐỘNG, ngược lại là TẠM ẨN
             if (item.getStatus() == null || item.getStatus() == 1) active++;
             else hidden++;
         }
+        // Cập nhật lên giao diện
         if (tvTotalCategories != null) tvTotalCategories.setText(String.valueOf(total));
         if (tvActiveCategories != null) tvActiveCategories.setText(String.valueOf(active));
         if (tvHiddenCategories != null) tvHiddenCategories.setText(String.format(Locale.getDefault(), "%02d", hidden));
@@ -170,11 +187,14 @@ public class CategoryManageActivity extends AppCompatActivity
         addCategoryLauncher.launch(intent);
     }
 
+    /**
+     * Xử lý sự kiện khi người dùng nhấn vào nút thay đổi trạng thái (Hoạt động/Tạm ẩn) của một danh mục
+     */
     @Override
     public void onStatusToggleClick(Category item, int position) {
         if (item.getId() == null) return;
 
-        // Đảo ngược trạng thái: null/1 → 0 (ẩn), 0 → 1 (hoạt động)
+        // Đảo ngược trạng thái: nếu đang hoạt động (null/1) -> chuyển thành ẩn (0), và ngược lại
         boolean currentlyActive = item.getStatus() == null || item.getStatus() == 1;
         int newStatus = currentlyActive ? 0 : 1;
         String newStatusLabel = currentlyActive ? "TẠM ẨN" : "HOẠT ĐỘNG";
@@ -212,6 +232,10 @@ public class CategoryManageActivity extends AppCompatActivity
         });
     }
 
+    /**
+     * Xử lý khi nhấn nút Xóa danh mục
+     * Hiển thị cảnh báo trước khi thực sự xóa
+     */
     @Override
     public void onDeleteClick(Category item) {
         new AlertDialog.Builder(this)

@@ -29,6 +29,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * ChiTietDanhMucActivity (Màn hình Chi tiết Danh mục)
+ * Nhiệm vụ chính:
+ * - Hiển thị thông tin chi tiết của một danh mục cụ thể (Tên, mô tả, trạng thái).
+ * - Hiển thị danh sách các món ăn thuộc danh mục này.
+ * - Cho phép người dùng xóa một món ăn khỏi danh mục (không xóa món ăn khỏi hệ thống).
+ */
 public class ChiTietDanhMucActivity extends AppCompatActivity {
 
     private TextView tvCategoryName, tvCategoryDesc, tvCategoryStatus;
@@ -106,6 +113,9 @@ public class ChiTietDanhMucActivity extends AppCompatActivity {
         rvFoodsInCategory.setAdapter(adapter);
     }
 
+    /**
+     * Gọi API để tải danh sách các món ăn thuộc danh mục này.
+     */
     private void loadFoods() {
         if (category.getId() == null) return;
         pbLoading.setVisibility(View.VISIBLE);
@@ -146,6 +156,9 @@ public class ChiTietDanhMucActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Thống kê số lượng món ăn trong danh mục (tổng, còn hàng, hết hàng).
+     */
     private void updateStats() {
         int total = foodList.size();
         int available = 0;
@@ -173,6 +186,10 @@ public class ChiTietDanhMucActivity extends AppCompatActivity {
                 .show();
     }
 
+    /**
+     * Gửi yêu cầu API để loại bỏ món ăn khỏi danh mục.
+     * Cập nhật `catId` của món ăn thành null.
+     */
     private void removeFoodFromCategory(MenuItem item) {
         ZappyApiService api = RetrofitClient.getApiService();
         // Gửi catId = null để bỏ danh mục

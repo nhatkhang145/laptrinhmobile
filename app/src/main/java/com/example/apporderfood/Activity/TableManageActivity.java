@@ -32,6 +32,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * TableManageActivity (Màn hình Quản lý Bàn/Khu vực)
+ * Nhiệm vụ chính:
+ * - Hiển thị danh sách tất cả các bàn trong nhà hàng.
+ * - Thống kê số lượng bàn (tổng số, đang hoạt động, đang khóa).
+ * - Cung cấp các thao tác: Thêm mới bàn, chỉnh sửa thông tin, xóa bàn,
+ *   và bật/tắt trạng thái bàn (hoạt động / đang khóa).
+ */
 public class TableManageActivity extends AppCompatActivity implements TableManageAdapter.OnTableItemClickListener {
 
     private RecyclerView rvTableList;
@@ -58,13 +66,16 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quan_ly_ban);
 
-        // Lấy resId của nhà hàng hiện tại
+        // Lấy resId của nhà hàng hiện tại từ SharedPreferences
         SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
         resId = prefs.getInt("RES_ID", -1);
 
         initViews();
         setupRecyclerView();
+        
+        // Tải danh sách bàn từ server
         loadTables();
+        
         setupListeners();
         setupBottomNav();
     }
@@ -86,6 +97,9 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
         }
     }
 
+    /**
+     * Gọi API lấy danh sách các bàn thuộc nhà hàng.
+     */
     private void loadTables() {
         if (resId == -1) return;
 
@@ -124,6 +138,9 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
         });
     }
 
+    /**
+     * Cập nhật thông số thống kê số lượng bàn.
+     */
     private void updateStats(List<TableModel> list) {
         int total = list.size();
         int active = 0;
@@ -132,8 +149,10 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
             String status = item.getStatus();
             // Bàn được coi là "hoạt động" nếu status null (default) hoặc bằng "HOẠT ĐỘNG"
             if (status == null || "HOẠT ĐỘNG".equals(status)) active++;
-            else locked++; // ĐANG KHÓA, BẢO TRÌ, hoặc bất kỳ trạng thái khác
+            else locked++; // Các trạng thái còn lại như "ĐANG KHÓA", "BẢO TRÌ"
         }
+        
+        // Hiển thị lên giao diện
         if (tvTotalTables != null) tvTotalTables.setText(String.valueOf(total));
         if (tvActiveTables != null) tvActiveTables.setText(String.valueOf(active));
         if (tvLockedTables != null) tvLockedTables.setText(String.format(Locale.getDefault(), "%02d", locked));
@@ -168,10 +187,14 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
         addTableLauncher.launch(intent);
     }
 
+    /**
+     * Xử lý khi nhấn nút bật/tắt trạng thái hoạt động của bàn.
+     */
     @Override
     public void onStatusToggleClick(TableModel item, int position) {
         if (item.getId() == null) return;
 
+        // Đảo trạng thái: HOẠT ĐỘNG <-> ĐANG KHÓA
         boolean currentlyActive = item.getStatus() == null || "HOẠT ĐỘNG".equals(item.getStatus());
         String newStatus = currentlyActive ? "ĐANG KHÓA" : "HOẠT ĐỘNG";
 
@@ -206,6 +229,9 @@ public class TableManageActivity extends AppCompatActivity implements TableManag
         });
     }
 
+    /**
+     * Hiển thị cảnh báo trước khi xóa bàn.
+     */
     @Override
     public void onDeleteClick(TableModel item) {
         if (item.getId() == null) return;
