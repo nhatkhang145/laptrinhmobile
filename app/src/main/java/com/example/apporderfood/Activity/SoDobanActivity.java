@@ -41,7 +41,7 @@ public class SoDobanActivity extends AppCompatActivity {
     private TabLayout tabLayoutAreas;
     private RecyclerView rvTables;
     private TableAdapter tableAdapter;
-    
+
     private TextView tvEmptyCount;
     private TextView tvOccupiedCount;
 

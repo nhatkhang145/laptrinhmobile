@@ -33,6 +33,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * ChiTietDanhMucActivity (Màn hình Chi tiết Danh mục)
+ * Nhiệm vụ chính:
+ * - Hiển thị thông tin chi tiết của một danh mục cụ thể (Tên, mô tả, trạng thái).
+ * - Hiển thị danh sách các món ăn thuộc danh mục này.
+ * - Cho phép người dùng xóa một món ăn khỏi danh mục (không xóa món ăn khỏi hệ thống).
+ */
 public class ChiTietDanhMucActivity extends AppCompatActivity {
 
     private TextView tvCategoryName, tvCategoryDesc, tvCategoryStatus;
@@ -117,6 +124,9 @@ public class ChiTietDanhMucActivity extends AppCompatActivity {
         rvFoodsInCategory.setAdapter(adapter);
     }
 
+    /**
+     * Gọi API để tải danh sách các món ăn thuộc danh mục này.
+     */
     private void loadFoods() {
         if (category.getId() == null) return;
         pbLoading.setVisibility(View.VISIBLE);
@@ -157,6 +167,9 @@ public class ChiTietDanhMucActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Thống kê số lượng món ăn trong danh mục (tổng, còn hàng, hết hàng).
+     */
     private void updateStats() {
         int total = foodList.size();
         int available = 0;
@@ -167,5 +180,63 @@ public class ChiTietDanhMucActivity extends AppCompatActivity {
         tvTotalFoods.setText(String.valueOf(total));
         tvAvailableFoods.setText(String.valueOf(available));
         tvOutOfStockFoods.setText(String.valueOf(outOfStock));
+    }
+
+    /**
+     * Hiển thị dialog xác nhận trước khi xóa món khỏi danh mục.
+     * Xóa = đặt catId = null thông qua updateMenuItem.
+     */
+    private void confirmRemove(MenuItem item) {
+        new AlertDialog.Builder(this)
+                .setTitle("Xóa khỏi danh mục")
+                .setMessage("Bạn có chắc muốn xóa \"" + item.getItemName()
+                        + "\" khỏi danh mục \"" + category.getCatName() + "\"?\n"
+                        + "Món ăn vẫn tồn tại trong hệ thống, chỉ bị bỏ khỏi danh mục này.")
+                .setPositiveButton("Xóa", (dialog, which) -> removeFoodFromCategory(item))
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    /**
+     * Gửi yêu cầu API để loại bỏ món ăn khỏi danh mục.
+     * Cập nhật `catId` của món ăn thành null.
+     */
+    private void removeFoodFromCategory(MenuItem item) {
+        ZappyApiService api = RetrofitClient.getApiService();
+        // Gửi catId = null để bỏ danh mục
+        Map<String, Object> data = new HashMap<>();
+        data.put("catId", null);
+        data.put("itemName", item.getItemName());
+        if (item.getPrice() != null) data.put("price", item.getPrice().doubleValue());
+        if (item.getIsAvailable() != null) data.put("isAvailable", item.getIsAvailable());
+        if (item.getUnit() != null) data.put("unitId", item.getUnit().getId());
+
+        api.updateMenuItem(item.getId(), data).enqueue(new Callback<MenuItem>() {
+            @Override
+            public void onResponse(Call<MenuItem> call, Response<MenuItem> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(ChiTietDanhMucActivity.this,
+                            "Đã xóa \"" + item.getItemName() + "\" khỏi danh mục",
+                            Toast.LENGTH_SHORT).show();
+                    // Xóa khỏi list local và cập nhật UI
+                    foodList.remove(item);
+                    adapter.setItems(new ArrayList<>(foodList));
+                    updateStats();
+                    if (foodList.isEmpty()) {
+                        llEmptyState.setVisibility(View.VISIBLE);
+                        rvFoodsInCategory.setVisibility(View.GONE);
+                    }
+                } else {
+                    Toast.makeText(ChiTietDanhMucActivity.this,
+                            "Lỗi: " + response.code(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MenuItem> call, Throwable t) {
+                Toast.makeText(ChiTietDanhMucActivity.this,
+                        "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

@@ -26,6 +26,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * ThemDanhMucActivity (Màn hình Thêm/Chỉnh sửa Danh mục)
+ * Nhiệm vụ chính:
+ * - Hiển thị form để người dùng nhập thông tin danh mục (Tên, Mô tả, Trạng thái).
+ * - Xử lý logic Thêm mới danh mục hoặc Cập nhật danh mục đã có (dựa vào cờ IS_EDIT).
+ * - Gửi dữ liệu lên server thông qua API.
+ */
 public class ThemDanhMucActivity extends AppCompatActivity {
 
     private EditText edtName, edtDesc;
@@ -60,6 +67,10 @@ public class ThemDanhMucActivity extends AppCompatActivity {
         btnSave = findViewById(R.id.btn_save);
     }
 
+    /**
+     * Kiểm tra xem màn hình này được mở để Thêm mới hay Chỉnh sửa.
+     * Dựa vào dữ liệu "IS_EDIT" truyền qua Intent.
+     */
     private void checkEditMode() {
         Intent intent = getIntent();
         if (intent != null && intent.getBooleanExtra("IS_EDIT", false)) {
@@ -67,7 +78,7 @@ public class ThemDanhMucActivity extends AppCompatActivity {
             tvTitle.setText("Chỉnh sửa danh mục");
             if (btnSave != null) btnSave.setText("CẬP NHẬT");
 
-            // Nhận Category object từ Intent
+            // Nhận Category object từ Intent (dữ liệu của danh mục cần sửa)
             Category cat = (Category) intent.getSerializableExtra("CATEGORY_DATA");
             if (cat != null) {
                 editingCategoryId = cat.getId();
@@ -126,6 +137,9 @@ public class ThemDanhMucActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Xác thực dữ liệu đầu vào và tiến hành gọi API lưu dữ liệu.
+     */
     private void validateAndSave() {
         String name = edtName.getText().toString().trim();
         if (name.isEmpty()) {
@@ -175,7 +189,7 @@ public class ThemDanhMucActivity extends AppCompatActivity {
             }
         };
 
-        // Phân nhánh: thêm mới hoặc cập nhật
+        // Phân nhánh: gọi API cập nhật nếu đang ở chế độ sửa, ngược lại gọi API thêm mới
         if (isEditMode && editingCategoryId != null) {
             api.updateCategory(editingCategoryId, body).enqueue(callback);
         } else {
