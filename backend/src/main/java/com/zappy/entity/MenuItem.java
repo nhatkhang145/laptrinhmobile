@@ -46,7 +46,7 @@ public class MenuItem {
     @Column(name = "is_available")
     private Boolean isAvailable = true;
 
-    @Column(name = "image_url")
+    @Column(name = "image_url", columnDefinition = "LONGTEXT")
     private String imageUrl;
 }
 
