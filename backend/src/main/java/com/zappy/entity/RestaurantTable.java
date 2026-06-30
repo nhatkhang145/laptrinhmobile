@@ -40,6 +40,9 @@ public class RestaurantTable {
     @Column(name = "status")
     private String status = "HOẠT ĐỘNG";
     
+    @Column(name = "seats")
+    private Integer seats;
+
     @Transient
     private Integer activeUserId;
 }

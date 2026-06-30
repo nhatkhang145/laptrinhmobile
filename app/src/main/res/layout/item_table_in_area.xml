@@ -3,6 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
     android:layout_marginBottom="12dp"
     app:cardBackgroundColor="@color/surface"
     app:cardCornerRadius="16dp"
@@ -17,20 +19,9 @@
         android:orientation="horizontal"
         android:padding="12dp">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/ivTableIcon"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:background="@drawable/bg_ic_circle_gray"
-            android:padding="12dp"
-            android:src="@drawable/ic_store"
-            app:shapeAppearanceOverlay="@style/RoundedSquare"
-            app:tint="@color/text_primary" />
-
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -41,11 +32,11 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/tvTableId"
+                    android:id="@+id/tvTableName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
-                    android:text="B01"
+                    android:text="Tên bàn"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp" />
 
@@ -60,53 +51,21 @@
                     android:paddingTop="3dp"
                     android:paddingEnd="10dp"
                     android:paddingBottom="3dp"
-                    android:text="HOẠT ĐỘNG"
+                    android:text="ĐANG TRỐNG"
                     android:textColor="#10B981"
-                    android:textSize="10sp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackgroundBorderless" />
+                    android:textSize="10sp" />
             </LinearLayout>
 
             <TextView
-                android:id="@+id/tvTableInfo"
+                android:id="@+id/tvTableSeats"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="Tầng 1 • 4 chỗ ngồi"
+                android:text="Số ghế: 4"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp" />
-
-            <TextView
-                android:id="@+id/tvDateCreated"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ngày tạo: 12/10/2023"
-                android:textColor="@color/text_hint"
-                android:textSize="11sp" />
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/ivTableEdit"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginEnd="16dp"
-                android:src="@android:drawable/ic_menu_edit"
-                app:tint="@color/text_secondary"
-                android:contentDescription="Edit" />
-
-            <ImageView
-                android:id="@+id/ivTableDelete"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@android:drawable/ic_menu_delete"
-                app:tint="#EF4444"
-                android:contentDescription="Xóa" />
-        </LinearLayout>
     </LinearLayout>
+
 </com.google.android.material.card.MaterialCardView>

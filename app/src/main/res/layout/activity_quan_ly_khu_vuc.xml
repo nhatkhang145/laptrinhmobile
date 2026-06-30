@@ -38,7 +38,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:fontFamily="sans-serif-medium"
-                    android:text="Quản lý danh mục"
+                    android:text="Quản lý khu vực"
                     android:textColor="@color/text_primary"
                     android:textSize="18sp" />
 
@@ -82,7 +82,7 @@
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
                         android:background="@android:color/transparent"
-                        android:hint="Tìm danh mục..."
+                        android:hint="Tìm khu vực..."
                         android:textSize="14sp"
                         android:inputType="text"
                         android:importantForAutofill="no" />
@@ -110,10 +110,10 @@
                             android:layout_height="24dp"
                             android:src="@drawable/ic_store"
                             app:tint="@color/text_secondary"
-                            android:contentDescription="Total categories" />
+                            android:contentDescription="Tổng số khu vực" />
 
                         <TextView
-                            android:id="@+id/tvTotalCategories"
+                            android:id="@+id/tvTotalAreas"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
@@ -145,10 +145,10 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@drawable/bg_online_dot"
-                            android:contentDescription="Active categories" />
+                            android:contentDescription="Đang hoạt động" />
 
                         <TextView
-                            android:id="@+id/tvActiveCategories"
+                            android:id="@+id/tvActiveAreas"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
@@ -181,10 +181,10 @@
                             android:layout_height="24dp"
                             android:src="@drawable/ic_visibility_hidden"
                             app:tint="@color/text_hint"
-                            android:contentDescription="Hidden categories" />
+                            android:contentDescription="Đang tạm ẩn" />
 
                         <TextView
-                            android:id="@+id/tvHiddenCategories"
+                            android:id="@+id/tvHiddenAreas"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
@@ -221,28 +221,28 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvCategoryList"
+                android:id="@+id/rvAreaList"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
                 android:padding="16dp"
-                tools:listitem="@layout/item_category_manage" />
+                tools:listitem="@layout/item_area_manage" />
 
             <!-- Empty State View -->
             <TextView
-                android:id="@+id/tvCategoryEmptyState"
+                android:id="@+id/tvAreaEmptyState"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:fontFamily="sans-serif-medium"
-                android:text="Hiện chưa có danh mục nào được tạo"
+                android:text="Hiện chưa có khu vực nào được tạo"
                 android:textColor="@color/text_secondary"
                 android:textSize="16sp"
                 android:visibility="gone" />
 
             <!-- Loading Progress Bar -->
             <ProgressBar
-                android:id="@+id/pbCategoryLoading"
+                android:id="@+id/pbAreaLoading"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -251,7 +251,7 @@
         </FrameLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_add_category"
+            android:id="@+id/fab_add_Area"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
@@ -259,7 +259,7 @@
             android:backgroundTint="@color/primary"
             android:src="@android:drawable/ic_input_add"
             app:tint="@color/white"
-            android:contentDescription="Thêm danh mục mới" />
+            android:contentDescription="Thêm khu vực mới" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

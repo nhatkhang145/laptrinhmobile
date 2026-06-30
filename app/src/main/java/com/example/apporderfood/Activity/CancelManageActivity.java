@@ -17,7 +17,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.apporderfood.R;
-import com.example.apporderfood.adapter.InvoiceManageAdapter;
+import com.example.apporderfood.adapter.CancelManageAdapter;
 import com.example.apporderfood.api.RetrofitClient;
 import com.example.apporderfood.api.ZappyApiService;
 
@@ -28,26 +28,25 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class InvoiceManageActivity extends AppCompatActivity {
+public class CancelManageActivity extends AppCompatActivity {
 
     private View btnBack;
-    private RecyclerView rvInvoices;
-    private ProgressBar progressBar;
-    private TextView tvEmpty;
+    private RecyclerView rvCancelList;
+    private ProgressBar pbLoading;
+    private View layoutEmpty;
 
-    private InvoiceManageAdapter adapter;
+    private CancelManageAdapter adapter;
     private int resId = -1;
     
     private String fromDateStr = null;
     private String toDateStr = null;
     private TextView tvFromDate, tvToDate;
-    private View btnClearFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_invoice_manage);
+        setContentView(R.layout.activity_cancel_manage);
         
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -76,9 +75,6 @@ public class InvoiceManageActivity extends AppCompatActivity {
                     if (parts.length == 3) tvToDate.setText(parts[2] + "/" + parts[1] + "/" + parts[0]);
                 }
             }
-            if (fromDateStr != null || toDateStr != null) {
-                btnClearFilter.setVisibility(View.VISIBLE);
-            }
         }
         if (fromDateStr == null || toDateStr == null) {
             java.util.Calendar calendar = java.util.Calendar.getInstance();
@@ -100,29 +96,20 @@ public class InvoiceManageActivity extends AppCompatActivity {
         
         btnBack.setOnClickListener(v -> finish());
         
-        loadInvoices();
+        loadCancelledItems();
     }
 
     private void initViews() {
         btnBack = findViewById(R.id.btnBack);
-        rvInvoices = findViewById(R.id.rvInvoices);
-        progressBar = findViewById(R.id.progressBar);
-        tvEmpty = findViewById(R.id.tvEmpty);
+        rvCancelList = findViewById(R.id.rvCancelList);
+        pbLoading = findViewById(R.id.pbLoading);
+        layoutEmpty = findViewById(R.id.layoutEmpty);
         
         tvFromDate = findViewById(R.id.tvFromDate);
         tvToDate = findViewById(R.id.tvToDate);
-        btnClearFilter = findViewById(R.id.btnClearFilter);
         
         findViewById(R.id.btnFromDate).setOnClickListener(v -> showDatePicker(true));
         findViewById(R.id.btnToDate).setOnClickListener(v -> showDatePicker(false));
-        btnClearFilter.setOnClickListener(v -> {
-            fromDateStr = null;
-            toDateStr = null;
-            tvFromDate.setText("Từ ngày");
-            tvToDate.setText("Đến ngày");
-            btnClearFilter.setVisibility(View.GONE);
-            loadInvoices();
-        });
     }
 
     private void showDatePicker(boolean isFromDate) {
@@ -137,64 +124,47 @@ public class InvoiceManageActivity extends AppCompatActivity {
                 toDateStr = dateStr + "T23:59:59";
                 tvToDate.setText(displayStr);
             }
-            btnClearFilter.setVisibility(View.VISIBLE);
-            loadInvoices();
+            loadCancelledItems();
         }, calendar.get(java.util.Calendar.YEAR), calendar.get(java.util.Calendar.MONTH), calendar.get(java.util.Calendar.DAY_OF_MONTH)).show();
     }
 
     private void setupRecyclerView() {
-        adapter = new InvoiceManageAdapter(this, invoice -> {
-            android.content.Intent intent = new android.content.Intent(InvoiceManageActivity.this, HoaDonActivity.class);
-            if (invoice.get("id") != null) {
-                intent.putExtra("ORDER_ID", ((Number) invoice.get("id")).intValue());
-            }
-            if (invoice.get("table") != null) {
-                Map<String, Object> table = (Map<String, Object>) invoice.get("table");
-                String areaName = table.get("area") != null ? (String) ((Map<String, Object>) table.get("area")).get("areaName") : "Khu vực";
-                intent.putExtra("TABLE_NAME", areaName + " - " + table.get("tableName"));
-            }
-            intent.putExtra("IS_VIEW_ONLY", true);
-            startActivity(intent);
-        });
-        rvInvoices.setLayoutManager(new LinearLayoutManager(this));
-        rvInvoices.setAdapter(adapter);
+        adapter = new CancelManageAdapter(this, new java.util.ArrayList<>());
+        rvCancelList.setLayoutManager(new LinearLayoutManager(this));
+        rvCancelList.setAdapter(adapter);
     }
 
-    private void loadInvoices() {
+    private void loadCancelledItems() {
         if (resId == -1) return;
 
-        progressBar.setVisibility(View.VISIBLE);
-        tvEmpty.setVisibility(View.GONE);
-        rvInvoices.setVisibility(View.GONE);
+        pbLoading.setVisibility(View.VISIBLE);
+        layoutEmpty.setVisibility(View.GONE);
+        rvCancelList.setVisibility(View.GONE);
 
         ZappyApiService api = RetrofitClient.getApiService();
-        api.getPaidOrdersByRestaurant(resId, fromDateStr, toDateStr).enqueue(new Callback<List<Map<String, Object>>>() {
+        api.getCancelledOrdersByRestaurant(resId, fromDateStr, toDateStr).enqueue(new Callback<List<Map<String, Object>>>() {
             @Override
             public void onResponse(Call<List<Map<String, Object>>> call, Response<List<Map<String, Object>>> response) {
-                progressBar.setVisibility(View.GONE);
+                pbLoading.setVisibility(View.GONE);
                 if (response.isSuccessful() && response.body() != null) {
-                    List<Map<String, Object>> invoices = response.body();
-                    
-                    adapter.setInvoices(invoices);
-                    
-                    if (invoices.isEmpty()) {
-                        tvEmpty.setVisibility(View.VISIBLE);
-                        rvInvoices.setVisibility(View.GONE);
+                    List<Map<String, Object>> list = response.body();
+                    if (list.isEmpty()) {
+                        layoutEmpty.setVisibility(View.VISIBLE);
                     } else {
-                        tvEmpty.setVisibility(View.GONE);
-                        rvInvoices.setVisibility(View.VISIBLE);
+                        rvCancelList.setVisibility(View.VISIBLE);
+                        adapter.updateData(list);
                     }
                 } else {
-                    Toast.makeText(InvoiceManageActivity.this, "Lỗi khi lấy danh sách hóa đơn", Toast.LENGTH_SHORT).show();
-                    tvEmpty.setVisibility(View.VISIBLE);
+                    layoutEmpty.setVisibility(View.VISIBLE);
+                    Toast.makeText(CancelManageActivity.this, "Không có dữ liệu", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<List<Map<String, Object>>> call, Throwable t) {
-                progressBar.setVisibility(View.GONE);
-                Toast.makeText(InvoiceManageActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
-                tvEmpty.setVisibility(View.VISIBLE);
+                pbLoading.setVisibility(View.GONE);
+                layoutEmpty.setVisibility(View.VISIBLE);
+                Toast.makeText(CancelManageActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -35,7 +35,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 			FROM Order o
 			WHERE o.table.area.restaurant.id = :resId
 			AND o.status = 1
-			AND o.createdAt BETWEEN :startDate AND :endDate
+			AND COALESCE(o.checkoutAt, o.createdAt) BETWEEN :startDate AND :endDate
 			""")
 			BigDecimal getRevenue(
 			        @Param("resId") Integer resId,
@@ -47,7 +47,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 			FROM Order o
 			WHERE o.table.area.restaurant.id = :resId
 			AND o.status = 1
-			AND o.createdAt BETWEEN :startDate AND :endDate
+			AND COALESCE(o.checkoutAt, o.createdAt) BETWEEN :startDate AND :endDate
 			""")
 			Long countOrders(
 			        @Param("resId") Integer resId,

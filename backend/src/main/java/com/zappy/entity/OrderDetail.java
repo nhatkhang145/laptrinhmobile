@@ -54,5 +54,11 @@ public class OrderDetail {
     // 0 = Nhap, 1 = Da gui (Khoa NV), 2 = Da huy (Chi QL)
     @Column(name = "status", nullable = false)
     private Integer status = 0;
+
+    @Column(name = "cancel_reason", columnDefinition = "TEXT")
+    private String cancelReason;
+
+    @Column(name = "updated_at")
+    private java.time.LocalDateTime updatedAt;
 }
 

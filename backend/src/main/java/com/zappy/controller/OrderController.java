@@ -236,7 +236,8 @@ public class OrderController {
     /** BUOC 5: QUAN LY huy mon da gui (status 1 -> 2) */
     @PutMapping("/details/{detailId}/cancel")
     public ResponseEntity<?> cancelItem(@PathVariable Integer detailId,
-                                        @RequestBody Map<String, Integer> data) {
+                                        @RequestParam(value = "cancelReason", required = false) String cancelReason,
+                                        @RequestBody(required = false) Map<String, Integer> data) {
         // role phai la 1 (Quan ly) - kiem tra ben phia Android hoac them JWT sau
         return detailRepo.findById(detailId).map(detail -> {
             if (detail.getStatus() == 2) {
@@ -244,9 +245,40 @@ public class OrderController {
                         .body(Map.of("message", "Món này đã bị hủy rồi!"));
             }
             detail.setStatus(2); // Huy - giu lai de doi soat cuoi thang
+            if (cancelReason != null && !cancelReason.trim().isEmpty()) {
+                detail.setCancelReason(cancelReason.trim());
+            }
+            detail.setUpdatedAt(java.time.LocalDateTime.now());
             detailRepo.save(detail);
             return ResponseEntity.ok(Map.of("message", "Đã hủy món! Giữ lại để đối soát."));
         }).orElse(ResponseEntity.notFound().build());
+    }
+    
+    /** Lay danh sach tat ca mon da huy cua nha hang */
+    @GetMapping("/restaurant/{resId}/cancelled")
+    public ResponseEntity<?> getCancelledOrdersByRestaurant(
+            @PathVariable Integer resId,
+            @RequestParam(required = false) String fromDate,
+            @RequestParam(required = false) String toDate) {
+
+        java.time.LocalDateTime from = null;
+        java.time.LocalDateTime to = null;
+        try {
+            if (fromDate != null && !fromDate.isEmpty()) from = java.time.LocalDateTime.parse(fromDate);
+            if (toDate != null && !toDate.isEmpty()) to = java.time.LocalDateTime.parse(toDate);
+        } catch (Exception e) {
+            // ignore parse errors
+        }
+
+        if (from == null) {
+            from = java.time.LocalDate.now().atStartOfDay();
+        }
+        if (to == null) {
+            to = java.time.LocalDate.now().atTime(23, 59, 59);
+        }
+
+        List<OrderDetail> cancelledItems = detailRepo.findCancelledItems(resId, from, to);
+        return ResponseEntity.ok(cancelledItems);
     }
 
     /** BUOC 6: Thanh toan -> Tinh tong, dong hoa don, giai phong ban */

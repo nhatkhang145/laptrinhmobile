@@ -61,7 +61,14 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         }
         holder.tvTableNumberIcon.setText(number);
 
-        if (table.isOccupied()) {
+        if ("ĐANG KHÓA".equals(table.getStatus()) || "BẢO TRÌ".equals(table.getStatus())) {
+            holder.cardBan.setBackgroundResource(R.drawable.bg_table_empty);
+            holder.tvTableNumberIcon.setBackgroundResource(R.drawable.bg_table_number_empty);
+            holder.tvTableNumberIcon.setTextColor(Color.parseColor("#9E9E9E")); // Gray out
+            holder.tvTableName.setTextColor(Color.parseColor("#9E9E9E"));
+            holder.tvTableStatus.setText("Đang khóa");
+            holder.tvTableStatus.setTextColor(Color.parseColor("#EF4444")); // Red
+        } else if (table.isOccupied()) {
             holder.cardBan.setBackgroundResource(R.drawable.bg_table_occupied);
             holder.tvTableNumberIcon.setBackgroundResource(R.drawable.bg_table_number_occupied);
             holder.tvTableNumberIcon.setTextColor(Color.parseColor("#B0C4DE"));

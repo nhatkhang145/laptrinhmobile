@@ -79,6 +79,9 @@ public class TableController {
         table.setArea(area);
         table.setTableName(tableName);
         table.setIsOccupied(false);
+        if (data.containsKey("seats") && data.get("seats") != null) {
+            try { table.setSeats(Integer.parseInt(data.get("seats").toString())); } catch (Exception ignored) {}
+        }
         if (data.containsKey("status") && data.get("status") != null) {
             table.setStatus(data.get("status").toString().trim());
         }
@@ -105,8 +108,17 @@ public class TableController {
         }
         return tableRepo.findById(id).map(table -> {
             table.setTableName(data.get("tableName").toString().trim());
+            if (data.containsKey("seats") && data.get("seats") != null) {
+                try { table.setSeats(Integer.parseInt(data.get("seats").toString())); } catch (Exception ignored) {}
+            }
             if (data.containsKey("status") && data.get("status") != null) {
                 table.setStatus(data.get("status").toString().trim());
+            }
+            if (data.containsKey("areaId") && data.get("areaId") != null) {
+                try {
+                    Integer newAreaId = Integer.parseInt(data.get("areaId").toString());
+                    areaRepo.findById(newAreaId).ifPresent(table::setArea);
+                } catch (Exception ignored) {}
             }
             return ResponseEntity.ok(tableRepo.save(table));
         }).orElse(ResponseEntity.notFound().build());

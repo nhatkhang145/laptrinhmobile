@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:fontFamily="sans-serif-medium"
-                android:text="Chi tiết danh mục"
+                android:text="Chi tiết khu vực"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp" />
 
@@ -51,7 +51,7 @@
         android:layout_below="@id/appbar"
         android:orientation="vertical">
 
-        <!-- Category info card -->
+        <!-- Area info card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -81,26 +81,26 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/tvCategoryName"
+                            android:id="@+id/tvAreaName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-black"
-                            android:text="Tên danh mục"
+                            android:text="Tên khu vực"
                             android:textColor="@color/text_primary"
                             android:textSize="20sp" />
 
                         <TextView
-                            android:id="@+id/tvCategoryDesc"
+                            android:id="@+id/tvAreaDesc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Mô tả danh mục"
+                            android:text="Các tên bàn"
                             android:textColor="@color/text_secondary"
                             android:textSize="13sp" />
                     </LinearLayout>
 
                     <TextView
-                        android:id="@+id/tvCategoryStatus"
+                        android:id="@+id/tvAreaStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_status_available"
@@ -132,7 +132,7 @@
                         android:padding="12dp">
 
                         <TextView
-                            android:id="@+id/tvTotalFoods"
+                            android:id="@+id/tvTotalTables"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-black"
@@ -143,7 +143,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="TỔNG MÓN"
+                            android:text="TỔNG BÀN"
                             android:textColor="@color/text_hint"
                             android:textSize="10sp"
                             tools:ignore="SmallSp" />
@@ -160,7 +160,7 @@
                         android:padding="12dp">
 
                         <TextView
-                            android:id="@+id/tvAvailableFoods"
+                            android:id="@+id/tvEmptyTables"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-black"
@@ -171,7 +171,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="CÒN MÓN"
+                            android:text="ĐANG TRỐNG"
                             android:textColor="@color/text_hint"
                             android:textSize="10sp"
                             tools:ignore="SmallSp" />
@@ -188,18 +188,18 @@
                         android:padding="12dp">
 
                         <TextView
-                            android:id="@+id/tvOutOfStockFoods"
+                            android:id="@+id/tvOccupiedTables"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-black"
                             android:text="0"
-                            android:textColor="@color/text_secondary"
+                            android:textColor="#EF4444"
                             android:textSize="22sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="HẾT MÓN"
+                            android:text="ĐANG CÓ KHÁCH"
                             android:textColor="@color/text_hint"
                             android:textSize="10sp"
                             tools:ignore="SmallSp" />
@@ -208,33 +208,29 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Section title -->
+        <!-- List Header -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:fontFamily="sans-serif-black"
-            android:text="DANH SÁCH MÓN ĂN"
+            android:text="DANH SÁCH BÀN TRONG KHU VỰC"
             android:textColor="@color/text_secondary"
             android:textSize="12sp" />
 
-        <!-- RecyclerView -->
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_height="match_parent">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvFoodsInCategory"
+                android:id="@+id/rvTablesInArea"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:padding="16dp"
-                android:paddingTop="0dp"
-                tools:listitem="@layout/item_food_in_category" />
+                android:paddingBottom="16dp" />
 
-            <!-- Loading -->
             <ProgressBar
                 android:id="@+id/pbLoading"
                 android:layout_width="wrap_content"
@@ -242,10 +238,9 @@
                 android:layout_gravity="center"
                 android:visibility="gone" />
 
-            <!-- Empty State -->
             <LinearLayout
                 android:id="@+id/llEmptyState"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
@@ -253,21 +248,20 @@
                 android:visibility="gone">
 
                 <ImageView
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:src="@android:drawable/ic_menu_search"
-                    android:contentDescription="Trống"
-                    app:tint="@color/text_hint" />
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/ic_table"
+                    app:tint="@color/divider" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Danh mục này chưa có món ăn nào"
+                    android:layout_marginTop="16dp"
+                    android:text="Khu vực này hiện chưa có bàn nào"
                     android:textColor="@color/text_secondary"
-                    android:textSize="15sp" />
+                    android:textSize="14sp" />
             </LinearLayout>
+
         </FrameLayout>
 
     </LinearLayout>

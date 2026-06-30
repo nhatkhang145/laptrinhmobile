@@ -101,9 +101,11 @@ public class ChiTietBanActivity extends AppCompatActivity {
 
     private void setupRecyclerView() {
         android.content.SharedPreferences prefs = getSharedPreferences("ZappySession", MODE_PRIVATE);
-        boolean isAdmin = prefs.getInt("ROLE", 0) == 1;
+        int userRole = prefs.getInt("ROLE", 0);
+        boolean isAdmin = userRole == 1;
+        boolean canCheckout = userRole == 1 || userRole == 2;
         
-        if (!isAdmin && btnTinhTien != null) {
+        if (!canCheckout && btnTinhTien != null) {
             btnTinhTien.setVisibility(View.GONE);
         }
 
@@ -115,13 +117,24 @@ public class ChiTietBanActivity extends AppCompatActivity {
 
     private void cancelItem(OrderDetail detail) {
         if (detail.getId() == null) return;
+        
+        android.widget.EditText input = new android.widget.EditText(this);
+        input.setHint("Nhập lý do huỷ món...");
+        
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.setPadding(50, 20, 50, 0);
+        layout.addView(input);
+
         new androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle("Xác nhận hủy món")
             .setMessage("Hủy món " + (detail.getMenuItem() != null ? detail.getMenuItem().getItemName() : "") + "?")
+            .setView(layout)
             .setPositiveButton("Hủy món", (dialog, which) -> {
+                String reason = input.getText().toString().trim();
                 ZappyApiService api = RetrofitClient.getApiService();
-                Map<String, Integer> data = new java.util.HashMap<>();
-                api.cancelItem(detail.getId(), data).enqueue(new Callback<Map>() {
+                
+                api.cancelItem(detail.getId(), reason, new java.util.HashMap<>()).enqueue(new Callback<Map>() {
                     @Override
                     public void onResponse(Call<Map> call, Response<Map> response) {
                         if (response.isSuccessful()) {
@@ -151,6 +164,7 @@ public class ChiTietBanActivity extends AppCompatActivity {
                     List<OrderDetail> details = response.body();
                     adapter.setItems(details);
                     updateSummary(details);
+                    updateGuiButton(details);
                 }
             }
             @Override
@@ -169,6 +183,23 @@ public class ChiTietBanActivity extends AppCompatActivity {
         tvBadgeCount.setText(details.size() + " MÓN");
     }
 
+    private void updateGuiButton(List<OrderDetail> details) {
+        if (btnGuiBep == null) return;
+        boolean hasPending = false;
+        for (OrderDetail d : details) {
+            if (d.getStatus() != null && d.getStatus() == 0) {
+                hasPending = true;
+                break;
+            }
+        }
+        btnGuiBep.setEnabled(hasPending);
+        if (hasPending) {
+            btnGuiBep.setBackgroundResource(R.drawable.bg_btn_primary);
+        } else {
+            btnGuiBep.setBackgroundResource(R.drawable.bg_btn_disabled);
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -177,9 +208,8 @@ public class ChiTietBanActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
 
-        // Back -> Về danh sách order
+        // Back -> Về trang trước đó (Danh sách order hoặc Sơ đồ bàn)
         btnBack.setOnClickListener(v -> {
-            startActivity(new Intent(this, DanhSachOrderActivity.class));
             finish();
         });
 

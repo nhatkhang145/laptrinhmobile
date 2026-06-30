@@ -36,7 +36,7 @@
             android:layout_weight="1"
             android:layout_marginStart="8dp"
             android:fontFamily="sans-serif-medium"
-            android:text="Quản lý hóa đơn"
+            android:text="Quản lý món huỷ"
             android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -108,51 +108,52 @@
                 android:textColor="@color/text_primary"
                 android:textSize="14sp"/>
         </LinearLayout>
-
-        <com.mikepenz.iconics.view.IconicsImageView
-            android:id="@+id/btnClearFilter"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginStart="12dp"
-            android:padding="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            app:iiv_icon="faw-times-circle"
-            app:iiv_color="@color/text_secondary"
-            android:visibility="gone"/>
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/divider" />
-
-    <!-- Content -->
+    <!-- Main Content Area -->
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/background">
+
+        <LinearLayout
+            android:id="@+id/layoutEmpty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                app:iiv_color="@color/divider"
+                app:iiv_icon="faw-box-open" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Không có món huỷ nào\ntrong thời gian này"
+                android:textAlignment="center"
+                android:textColor="@color/text_secondary"
+                android:textSize="16sp" />
+        </LinearLayout>
 
         <ProgressBar
-            android:id="@+id/progressBar"
+            android:id="@+id/pbLoading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/tvEmpty"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="Chưa có hóa đơn nào được thanh toán"
-            android:textColor="@color/text_secondary"
             android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvInvoices"
+            android:id="@+id/rvCancelList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:padding="16dp" />
+            android:padding="8dp" />
             
     </RelativeLayout>
 </LinearLayout>
