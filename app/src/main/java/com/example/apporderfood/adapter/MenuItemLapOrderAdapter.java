@@ -37,24 +37,13 @@ public class MenuItemLapOrderAdapter extends RecyclerView.Adapter<MenuItemLapOrd
         void onCartUpdated(Map<Integer, CartItem> updatedCart);
     }
 
-    /**
-     * HÀM KHỞI TẠO ADAPTER
-     * @param context Ngữ cảnh của ứng dụng
-     * @param menuItems Danh sách món ăn ban đầu
-     * @param cartMap Giỏ hàng tạm truyền từ Activity sang
-     * @param listener Bộ lắng nghe khi giỏ hàng thay đổi
-     */
     public MenuItemLapOrderAdapter(Context context, List<MenuItem> menuItems, Map<Integer, CartItem> cartMap, OnCartChangeListener listener) {
         this.context = context;
         this.menuItems = menuItems;
-        this.cartMap = cartMap != null ? cartMap : new HashMap<>();
+        this.cartMap = cartMap != null ? cartMap : new HashMap<>(); //B10 Đc truyền từ LapOrderActivity
         this.listener = listener;
     }
 
-    /**
-     * NẠP DỮ LIỆU DANH SÁCH MÓN ĂN TỪ API
-     * Dùng khi chuyển Tab hoặc khi gõ tìm kiếm, sau đó gọi notifyDataSetChanged() để vẽ lại.
-     */
     public void setMenuItems(List<MenuItem> items) {
         this.menuItems = items;
         notifyDataSetChanged();
@@ -82,6 +71,8 @@ public class MenuItemLapOrderAdapter extends RecyclerView.Adapter<MenuItemLapOrd
      * ĐỔ DỮ LIỆU VÀO GIAO DIỆN CỦA TỪNG MÓN ĂN
      * Bao gồm: hiển thị tên, giá, ảnh, trạng thái giỏ hàng và gắn sự kiện click.
      */
+
+    //B11 khi ng dùng bấm nút thêm hàm này sẽ bắt sự kện và cập nhật số lượng
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         MenuItem item = menuItems.get(position);
@@ -173,6 +164,8 @@ public class MenuItemLapOrderAdapter extends RecyclerView.Adapter<MenuItemLapOrd
      * @param item món ăn cần cập nhật
      * @param newQty số lượng mới
      */
+
+    //B12 Luồng xử lý lõi bên LapOrderActivity
     private void updateQuantity(MenuItem item, int newQty) {
         if (newQty > 0) {
             CartItem cartItem = cartMap.get(item.getId());
@@ -190,9 +183,10 @@ public class MenuItemLapOrderAdapter extends RecyclerView.Adapter<MenuItemLapOrd
         }
         
         // Cập nhật lại giao diện ngay lập tức
+        //B13 Gọi hàm này để cập nhật giao diện hiển thị số lượng đổi nút thêm thành nút tăng giảm
         notifyDataSetChanged();
         
-        // Gửi thông báo ra Activity (LapOrderActivity) để biết giỏ hàng đã thay đổi
+        // B14 Gửi thông báo ra Activity (LapOrderActivity) để biết giỏ hàng đã thay đổi
         if (listener != null) {
             listener.onCartUpdated(cartMap);
         }

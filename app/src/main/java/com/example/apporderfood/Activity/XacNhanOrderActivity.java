@@ -174,6 +174,8 @@ public class XacNhanOrderActivity extends AppCompatActivity {
      * HÀM TẢI DANH SÁCH MÓN ĂN ĐỂ HIỂN THỊ LÊN MÀN HÌNH XÁC NHẬN
      * Bao gồm: Món đã có trong DB + Món vừa chọn thêm trong Giỏ hàng RAM (cartMap)
      */
+
+    //B24 Gọi API xem bàn có món cũ không
     private void loadOrderDetails() {
         if (orderId == -1) {
             Toast.makeText(this, "Không tìm thấy đơn hàng!", Toast.LENGTH_SHORT).show();
@@ -195,6 +197,8 @@ public class XacNhanOrderActivity extends AppCompatActivity {
                     List<OrderDetail> details = response.body();
 
                     // GỘP CÁC MÓN TRONG RAM VÀO DANH SÁCH HIỂN THỊ
+
+                    //B25 Lấy danh sách món từ Ram gộp vô món cũ
                     for (CartItem ci : LapOrderActivity.cartMap.values()) {
                         OrderDetail localItem = new OrderDetail();
                         // Cực kỳ quan trọng: Set ID = null để Adapter biết đây là món mới, chưa lưu DB
@@ -288,6 +292,8 @@ public class XacNhanOrderActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        //B29 Bấm vào nút gửi để họi hàm sendOrder()
+
         btnGui.setOnClickListener(v -> sendOrder());
 
         if (btnTinhTien != null) {
@@ -303,6 +309,8 @@ public class XacNhanOrderActivity extends AppCompatActivity {
     /**
      * HÀM XỬ LÝ KHI BẤM NÚT "GỬI BẾP"
      */
+
+    //B30 Gọi hàm này khi bấm nút gửi
     private void sendOrder() {
         if (orderId == -1)
             return;
@@ -315,6 +323,7 @@ public class XacNhanOrderActivity extends AppCompatActivity {
         if (!LapOrderActivity.cartMap.isEmpty()) {
             List<Map<String, Object>> batchData = new ArrayList<>();
             // Duyệt qua cartMap để đóng gói dữ liệu thành danh sách JSON
+            //B31 Dùng vòng lặp chuyển Map thành JSON
             for (CartItem ci : LapOrderActivity.cartMap.values()) {
                 Map<String, Object> item = new java.util.HashMap<>();
                 item.put("itemId", ci.getMenuItem().getId());
@@ -322,7 +331,7 @@ public class XacNhanOrderActivity extends AppCompatActivity {
                 item.put("note", ci.getNote() != null ? ci.getNote() : "");
                 batchData.add(item);
             }
-            // Gọi API lưu hàng loạt món vào DB (Batch Insert)
+            // B32 Gọi API lưu hàng loạt món vào DB (Batch Insert)
             api.addBatchItems(orderId, batchData).enqueue(new Callback<Map<String, String>>() {
                 @Override
                 public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
@@ -351,6 +360,8 @@ public class XacNhanOrderActivity extends AppCompatActivity {
     /**
      * HÀM CHỐT "GỬI BẾP" VÀ ĐỔI TRẠNG THÁI MÓN TRONG DB
      */
+
+    //B33 Sau khi thêm thành công, gọi API sendOrder() để ổi trạng thái thành "ĐÃ GỬI"
     private void executeSendOrderAPI(ZappyApiService api) {
         api.sendOrder(orderId).enqueue(new Callback<java.util.Map>() {
             @Override
@@ -359,12 +370,13 @@ public class XacNhanOrderActivity extends AppCompatActivity {
                     Toast.makeText(XacNhanOrderActivity.this,
                             "Đã gửi lên bếp thành công!", Toast.LENGTH_SHORT).show();
 
-                    // CỰC KỲ QUAN TRỌNG: Dọn sạch giỏ hàng tạm trên RAM sau khi gửi thành công
+                    // B34 chạy lệnh để Dọn sạch giỏ hàng tạm trên RAM sau khi gửi thành công
                     LapOrderActivity.cartMap.clear();
                     if (LapOrderActivity.instance != null) {
                         LapOrderActivity.instance.finish();
                     }
 
+                    //B35 Intent chuyển sang màn hình ChiTietBan và kết thúc
                     Intent intent = new Intent(XacNhanOrderActivity.this, ChiTietBanActivity.class);
                     intent.putExtra("ORDER_ID", orderId);
                     intent.putExtra("TABLE_ID", tableId);

@@ -34,16 +34,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * LapOrderActivity - Màn hình chọn món khi ấn vào bàn TRỐNG
- * Layout: activity_lap_order.xml
- * Flow đúng:
- * 1. Nhận TABLE_ID, TABLE_NAME từ SoDobanActivity
- * 2. Tải danh mục & thực đơn (CHƯA tạo order, bàn vẫn trống)
- * 3. NV chọn món (thêm vào giỏ RAM tạm)
- * 4. Nút ĐỒNG Ý -> Gọi openTable() tạo order -> addBatchItems() -> sang XacNhanOrderActivity
- * 5. Nút HỦY BỎ -> finish() về SoDobanActivity (bàn vẫn trống vì chưa tạo order)
- */
 public class LapOrderActivity extends AppCompatActivity {
 
     private LinearLayout btnHuyBo;
@@ -66,17 +56,15 @@ public class LapOrderActivity extends AppCompatActivity {
     private int currentUserId = -1;
     private int currentUserRole = 0;
 
-    /**
-     * HÀM KHỞI TẠO (Chạy đầu tiên khi mở Activity)
-     * Nhận dữ liệu bàn, lấy session người dùng, nạp giao diện và kiểm tra quyền gọi món.
-     */
     @Override
+
+    //B1
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lap_order);
 
         // Nhận dữ liệu từ SoDobanActivity
-        tableId = getIntent().getIntExtra("TABLE_ID", -1);
+        tableId = getIntent().getIntExtra("TABLE_ID", -1); // lấy ID bàn dc truyền sang
         tableName = getIntent().getStringExtra("TABLE_NAME") != null
                 ? getIntent().getStringExtra("TABLE_NAME")
                 : "Bàn";
@@ -94,24 +82,15 @@ public class LapOrderActivity extends AppCompatActivity {
 
         instance = this;
 
-        // Xóa giỏ hàng cũ khi mở bàn mới (tránh lưu giỏ hàng của bàn khác)
+        // B2 Xóa giỏ hàng cũ khi mở bàn mới (tránh lưu giỏ hàng của bàn trước)
         cartMap.clear();
 
+        //B3 ktra quyền
         checkShiftPermission();
     }
-    /**
-     * Kiểm tra xem nhân viên hiện tại có được phép gọi món hay không.
-     *
-     * Quy tắc:
-     * - Nếu đang có ca làm việc:
-     *      + Nhân viên nằm trong danh sách employeeIds => được phép gọi món.
-     *      + Nếu không nằm trong ca và không phải Admin => từ chối.
-     *      + Admin (role = 1) luôn được phép.
-     * - Nếu chưa có ca làm việc:
-     *      + Nhân viên thường => báo lỗi.
-     *      + Admin vẫn được phép tiếp tục.
-     */
+
     private void checkShiftPermission() {
+        // B4 Xem nv có đang trong ca không
         // Gọi API lấy ca làm việc đang hoạt động của nhà hàng
         apiService.getActiveShift(resId).enqueue(new retrofit2.Callback<java.util.Map<String, Object>>() {
             @Override
@@ -139,7 +118,7 @@ public class LapOrderActivity extends AppCompatActivity {
                     if (!isInShift && currentUserRole != 1) {
                         showErrorAndExit("Bạn không nằm trong ca làm việc hiện tại, không thể gọi món!");
                     } else {
-                        // Được phép gọi món -> tải danh mục món ăn
+                        //B5 Có quyền gọi món -> tải danh mục món ăn
                         loadCategories();
                     }
                 } else {
@@ -237,9 +216,8 @@ public class LapOrderActivity extends AppCompatActivity {
         });
     }
 
-    /**
+    /** B6
      * THIẾT LẬP CÁC TAB DANH MỤC (Tất cả, Đồ ăn, Nước uống,...)
-     * Bắt sự kiện khi nhân viên bấm sang Tab khác thì tải lại danh sách món của Tab đó.
      */
     private void setupTabs() {
         tabLayoutCategories.removeAllTabs();
@@ -260,6 +238,7 @@ public class LapOrderActivity extends AppCompatActivity {
                 } else if (position - 1 < categoryList.size()) {
                     currentSelectedCatId = categoryList.get(position - 1).getId();
                 }
+                //B7 gọi lại API tải danh sách món ăn lên
                 loadMenuItems(etSearch.getText().toString());
             }
 
@@ -276,16 +255,14 @@ public class LapOrderActivity extends AppCompatActivity {
         loadMenuItems("");
     }
 
-    /**
-     * TẢI THỰC ĐƠN MÓN ĂN DỰA THEO DANH MỤC VÀ TỪ KHÓA
-     * @param keyword Từ khóa tìm kiếm (có thể rỗng)
-     */
+
     private void loadMenuItems(String keyword) {
         if (resId == -1)
             return;
 
         Call<List<MenuItem>> call;
         if (currentSelectedCatId == null) {
+            //B8 Gọi API tải danh sách món ăn
             call = apiService.getMenuByRestaurant(resId, keyword);
         } else {
             if (keyword != null && !keyword.trim().isEmpty()) {
@@ -295,10 +272,13 @@ public class LapOrderActivity extends AppCompatActivity {
             }
         }
 
+        //B9 Khi api trả về danh sách -> bắn dữ liệu sang MenuItemsAdapter để vẽ lên màn hình
         call.enqueue(new Callback<List<MenuItem>>() {
             @Override
             public void onResponse(Call<List<MenuItem>> call, Response<List<MenuItem>> response) {
                 if (response.isSuccessful() && response.body() != null) {
+
+                    //Gọi hàm cập nhật danh sách món ăn
                     adapter.setMenuItems(response.body());
                 }
             }
@@ -342,15 +322,19 @@ public class LapOrderActivity extends AppCompatActivity {
     /**
      * LẮNG NGHE CÁC NÚT BẤM (Hủy bỏ, Đồng ý, Back)
      */
+    //B16 Bấm Đồng ý -> có món thì gọi hàm createOrderThenAddItems()
     private void setupClickListeners() {
         btnHuyBo.setOnClickListener(v -> finish());
 
         btnDongY.setOnClickListener(v -> {
+            //B17 ktra chưa có món thì bị chặn lại
             if (cartMap.isEmpty()) {
                 Toast.makeText(this, "Vui lòng chọn ít nhất 1 món!", Toast.LENGTH_SHORT).show();
                 return;
             }
             btnDongY.setEnabled(false);
+
+            // Có món thì gọi hàm này
             createOrderThenAddItems();
         });
 
@@ -363,6 +347,8 @@ public class LapOrderActivity extends AppCompatActivity {
      * - Nhiệm vụ: Gọi API mở bàn (tạo Order mới), chuyển trạng thái bàn sang "Có Khách".
      * - Chưa gửi món xuống bếp ở bước này, món vẫn chỉ nằm trong biến cartMap.
      */
+
+    //Gọi hàm
     private void createOrderThenAddItems() {
         if (tableId == -1) {
             btnDongY.setEnabled(true);
@@ -381,6 +367,7 @@ public class LapOrderActivity extends AppCompatActivity {
 
         Toast.makeText(this, "Đang tạo đơn...", Toast.LENGTH_SHORT).show();
 
+        //B18 Gọi API mở bàn chính thức báo cho DB biết bàn này đổi trạng thái đã có khách
         api.openTable(data).enqueue(new Callback<Map>() {
             @Override
             public void onResponse(Call<Map> call, Response<Map> response) {
@@ -390,7 +377,7 @@ public class LapOrderActivity extends AppCompatActivity {
                     if (id != null) {
                         // Lấy ID của Order vừa được tạo
                         orderId = ((Double) id).intValue();
-                        // Mở màn hình Xác Nhận Order
+                        //B20 Khi API trả vê thaành cộng công -> gọi hàm addItemsToOrder()
                         addItemsToOrder();
                     } else {
                         Toast.makeText(LapOrderActivity.this, "Lỗi: Không nhận được mã đơn!", Toast.LENGTH_SHORT).show();
@@ -452,6 +439,8 @@ public class LapOrderActivity extends AppCompatActivity {
      * HÀM CHUYỂN SANG MÀN HÌNH XÁC NHẬN ORDER
      * Chuyển Order ID và thông tin Bàn sang màn hình XacNhanOrderActivity.
      */
+
+    //B21 Dùng Intent đống gói orderID, tableID, tableName và chuyển luồng sang XacNhanOrderActivity
     private void addItemsToOrder() {
         btnDongY.setEnabled(true);
         Intent intent = new Intent(LapOrderActivity.this, XacNhanOrderActivity.class);
